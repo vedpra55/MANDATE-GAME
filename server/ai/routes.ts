@@ -16,7 +16,7 @@ import {
   VOICES_SCHEMA,
   voicesSchema,
 } from '../../src/ai/contract.ts';
-import { FAULT_LINES, TOLAS } from '../../src/engine/types.ts';
+import { FAULT_LINES, ISSUES, TOLAS } from '../../src/engine/types.ts';
 import { AiError, availableModels, decide, generateJson, moderate } from './openai.ts';
 import { loadSettings, saveSettings } from './settings.ts';
 import { TASK_IDS, TASKS, type TaskId } from './tasks.ts';
@@ -32,6 +32,16 @@ const readSchema = z.object({
     forced: z.enum(FAULT_LINES).nullable(),
     day: z.number().int().min(0).max(40),
     rivalName: z.string().max(40),
+    rivalPromises: z
+      .array(
+        z.object({
+          issue: z.enum(ISSUES),
+          tola: z.enum([...TOLAS, 'village']),
+          how: z.enum(['vague', 'big', 'specific']),
+        }),
+      )
+      .max(12)
+      .optional(),
   }),
 });
 const callSchema = z.object({ text: z.string().min(1).max(MAX_TEXT) });

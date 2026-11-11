@@ -59,11 +59,19 @@ export function noteText(n: PaNote, address: Address, rival = 'Rajendra Babu'): 
     case 'cadreUnpaid':
       return "The workers haven't had tea money. They're grumbling.";
     case 'rivalMove':
-      return S.rivalMoves[n.move](
-        n.tola ? S.tolas[n.tola] : '',
-        n.faultLine ? fl(n.faultLine) : n.issue ? S.issues[n.issue] : '',
-        rival,
+      return (
+        S.rivalMoves[n.move](
+          n.tola ? S.tolas[n.tola] : '',
+          n.faultLine ? fl(n.faultLine) : n.issue ? S.issues[n.issue] : '',
+          rival,
+        ) + (n.promised && n.move !== 'counterIssue' ? S.rivalPromised(S.issues[n.promised]) : '')
       );
+    case 'meToo':
+      return S.compare.meToo(rival, S.issues[n.issue]);
+    case 'outbid':
+      return S.compare.outbid(rival, S.issues[n.issue]);
+    case 'proofBeatsPromise':
+      return S.compare.proof(rival, S.issues[n.issue]);
     case 'silence':
       return `Campaigning is over, ${A}. Only quiet visits today.`;
     case 'lastNight':
@@ -249,6 +257,10 @@ export function deciderText(d: Decider, rival = 'Rajendra Babu'): string {
       return `${rival} mocking your promises`;
     case 'rivalAttackDodge':
       return `${rival} saying you won't take a stand on ${f}`;
+    case 'rivalPromise':
+      return `${rival} promising ${i} in ${t}`;
+    case 'rivalRaise':
+      return `${rival} raising his offer on ${i}`;
     case 'rivalDoubt':
       return `${rival} calling your compromise hot air`;
     case 'rivalRally':

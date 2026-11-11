@@ -194,6 +194,8 @@ export const en = {
         ? 'The village votes today.'
         : `The village votes in ${n} days. Tea stalls talk of little else.`,
     quote: 'Candidate says:',
+    rivalColumn: (r: string) => `${r} promises`,
+    rivalNone: (r: string) => `${r} has promised nothing in particular yet.`,
   },
 
   writing: {
@@ -213,6 +215,8 @@ export const en = {
     divides: 'What divides the village',
     unknownDivides: "There may be more fights I don't know about yet.",
     yourWord: 'Your word:',
+    rivalPromises: (r: string) => `What ${r} has promised`,
+    meTooMark: 'you said it first',
     words: {
       win_win: 'a way for both sides (believed)',
       win_win_doubted: "you offered a compromise, but people don't believe it yet",
@@ -248,6 +252,7 @@ export const en = {
   cash: { title: 'Cash in hand' },
 
   map: {
+    rivalWasHere: (r: string) => `${r}'s people were here and promised this`,
     title: 'The village',
     hint: 'Pick a tola to visit.',
     backToDesk: 'Back to the charpai',
@@ -353,6 +358,23 @@ export const en = {
     toTitle: 'Back to the title',
   },
 
+  /** What the rival promised, as people repeat it. level 1 vague, 2 big, 3 specific. */
+  rivalPromise: (level: 1 | 2 | 3, raised: number, issue: string, tola: string) => {
+    const where = tola || 'the village';
+    if (raised > 0 && level < 3) return `${issue} for ${where}, "bilkul pakka, sabse pehle!"`;
+    if (level === 1) return `"${where} ka ${issue}? Hamara parivaar dekh lega."`;
+    if (level === 2) return `${issue} for ${where} "in one week, guaranteed!"`;
+    return `${issue} for ${where}: a costed plan, work to start in ten days`;
+  },
+  rivalPromised: (issue: string) => ` He promised ${issue} there.`,
+  compare: {
+    meToo: (r: string, i: string) =>
+      `People heard ${r} say the same about ${i}: "${r.split(' ')[0]} bhi yahi bole the." Say more than he did: when, how, how much.`,
+    outbid: (r: string, i: string) =>
+      `On ${i} you went further than ${r}. People noticed the difference. He may raise his offer.`,
+    proof: (r: string, i: string) =>
+      `${r} promises ${i}; you already built it. "Isne to kaam karke dikhaya."`,
+  },
   rivalMoves: {
     doorToDoor: (t: string, _i: string, r: string) => `${r}'s people went door to door in ${t}.`,
     sweets: (t: string, _i: string, r: string) => `Sweets from ${r}'s people in ${t} last night.`,
@@ -366,6 +388,8 @@ export const en = {
       `${r} says your compromise is hot air: 'Kab hoga? Sab hawa hai.'`,
     attackDodge: (_t: string, f: string, r: string) =>
       `${r} is telling everyone you still won't say where you stand on ${f}.`,
+    raiseOffer: (t: string, i: string, r: string) =>
+      `${r} has raised his offer on ${i}${t ? ` in ${t}` : ''}. He heard what you promised.`,
     lieLow: () => '',
     lastNight: (t: string) => `Envelopes went round in ${t} last night.`,
   } satisfies Record<RivalMove, (tola: string, issue: string, rival: string) => string>,

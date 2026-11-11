@@ -117,6 +117,8 @@ export type ReadContext = {
   forced: FaultLineId | null;
   day: number;
   rivalName: string;
+  /** What the rival already promised to this audience (C): for the "beyond the rival" score. */
+  rivalPromises?: { issue: IssueId; tola: TolaId | 'village'; how: 'vague' | 'big' | 'specific' }[];
 };
 
 const ISSUE_LABELS: Record<IssueId, string> = {
@@ -294,6 +296,25 @@ export function statementQuestions(ctx: ReadContext): Question[] {
       },
     );
   }
+  if (ctx.rivalPromises?.length) {
+    q.push({
+      type: 'score',
+      name: 'beyond_rival',
+      instructions: `${ctx.rivalName} already promised the things listed in situation.rival_promised. For the same issues, does this statement offer something more concrete, credible or different than what ${ctx.rivalName} promised (a date, a cost, a how, proof of work done)?`,
+      levels: [
+        { label: 'same or less', description: 'Promises the same thing, no more concretely' },
+        {
+          label: 'slightly more',
+          description: 'A little more detail, but nothing that really differs',
+        },
+        {
+          label: 'clearly more',
+          description: 'Clearly more concrete or credible: says when, how or how much',
+        },
+        { label: 'much more', description: 'Concrete and believable in a way his promise is not' },
+      ],
+    });
+  }
   return q;
 }
 
@@ -318,6 +339,13 @@ export function statementRequestBody(ctx: ReadContext, text: string) {
                       ? 'a public answer to a question from the press'
                       : 'a statement printed in the local newspaper',
                 question_asked: ctx.forced ? FAULT_LINE_DATA[ctx.forced].describe.question : null,
+                rival_promised: ctx.rivalPromises?.length
+                  ? ctx.rivalPromises.map((p) => ({
+                      issue: ISSUE_LABELS[p.issue],
+                      where: p.tola,
+                      how: p.how,
+                    }))
+                  : undefined,
               },
               statement: { text },
             },
@@ -433,6 +461,7 @@ export function readingFromAnswers(
     faultLines: faults,
     listens: pred('listens', fallback.listens),
     changesMind: pred('changes_mind', fallback.changesMind),
+    beyondRival: score('beyond_rival')?.score,
     source: 'ai',
   };
 }

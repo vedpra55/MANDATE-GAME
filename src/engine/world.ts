@@ -29,6 +29,7 @@ export type Archetype = {
   wedgeEvery: number;
   moveBias: Partial<Record<RivalMove, number>>;
   mockThreshold: number;
+  promiseLevel: 1 | 2 | 3;
 };
 
 export const ARCHETYPES = rivalFile.archetypes as Record<ArchetypeId, Archetype>;

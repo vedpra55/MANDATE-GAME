@@ -3,6 +3,7 @@ import { applyAction, newGame, validate } from './engine.ts';
 import { interpretFallback } from './interpret.ts';
 import { createRng } from './rng.ts';
 import { playGame } from './sim.ts';
+import { rivalPromise } from './rivalPromises.ts';
 import { GROUPS, TOLAS, type Action, type GameState } from './types.ts';
 
 /** A fixed village (no variation): fault lines pond, wages, kiln; the dynast. */
@@ -236,6 +237,37 @@ describe('promise dates', () => {
     const p = s.promises.find((pr) => pr.issue === 'water')!;
     expect(p.dateSource).toBe('words');
     expect(p.deadlineDay).toBe(s.clock.day + 14);
+  });
+});
+
+describe('the visible rival', () => {
+  const withRivalPromise = () => {
+    const s = structuredClone(campaign());
+    rivalPromise(s, 'water', 'purvi');
+    return s;
+  };
+  const gain = (s: GameState, text: string) => {
+    const before = s.tolas.purvi.mood;
+    const after = run(s, { type: 'visit', tola: 'purvi', text });
+    return { gain: after.tolas.purvi.mood - before, after };
+  };
+
+  it('a generic me-too counts for little; going further counts in full', () => {
+    const plain = 'Handpump theek karwa denge.';
+    const further = 'Handpump theek karwa denge, do hafte mein, 5000 rupaye apni jeb se.';
+    const fresh = gain(campaign(), plain);
+    const meToo = gain(withRivalPromise(), plain);
+    const outbid = gain(withRivalPromise(), further);
+    expect(meToo.gain).toBeLessThan(fresh.gain);
+    expect(meToo.after.paNotes.some((n) => n.kind === 'meToo')).toBe(true);
+    expect(outbid.gain).toBeGreaterThan(meToo.gain);
+    expect(outbid.after.rival.outbidBy).toHaveLength(1);
+  });
+
+  it('when you promised first, his promise is the me-too', () => {
+    const s = run(campaign(), { type: 'visit', tola: 'purvi', text: 'Handpump theek karwa denge.' });
+    const p = rivalPromise(structuredClone(s), 'water', 'purvi');
+    expect(p.meToo).toBe(true);
   });
 });
 

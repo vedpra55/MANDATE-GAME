@@ -81,6 +81,11 @@ export type Reading = {
   listens: number;
   /** Probability the speaker openly admits changing a position ("I was wrong about…"). */
   changesMind: number;
+  /**
+   * 0..3: compared with what the rival already promised here, how much further this goes (a
+   * date, a cost, a how). Only asked when the rival has promised; undefined otherwise.
+   */
+  beyondRival?: number;
   source: 'ai' | 'fallback';
 };
 
@@ -204,6 +209,8 @@ export type Statement = {
   source: 'ai' | 'fallback';
   /** The reading the engine used (the AI tape: replaying it reproduces the game). */
   reading?: Reading;
+  /** How the statement compared with the rival's promises (C): for the voices and the end card. */
+  compare?: { meToo: IssueId[]; outbid: IssueId[]; proof: IssueId[]; first: IssueId[] };
   /** AI-written reactions, attached after the engine resolved the statement. Presentation only. */
   voices?: { pa?: string; quotes?: { who: string; text: string }[] };
 };
@@ -244,6 +251,8 @@ export type LogKind =
   | 'rivalMock'
   | 'rivalDoubt'
   | 'rivalAttackDodge'
+  | 'rivalPromise'
+  | 'rivalRaise'
   | 'rivalRally'
   | 'rivalLastNight'
   | 'stance'
@@ -311,8 +320,13 @@ export type PaNote =
       tola?: TolaId;
       issue?: IssueId;
       faultLine?: FaultLineId;
+      /** The promise he made on this visit, if any. */
+      promised?: IssueId;
     }
   | { day: number; kind: 'silence' }
+  | { day: number; kind: 'meToo'; issue: IssueId }
+  | { day: number; kind: 'outbid'; issue: IssueId }
+  | { day: number; kind: 'proofBeatsPromise'; issue: IssueId }
   | { day: number; kind: 'lastNight'; tola: TolaId }
   | { day: number; kind: 'pollingDay' }
   | { day: number; kind: 'stanceTaken'; faultLine: FaultLineId; stance: Stance }
@@ -382,10 +396,30 @@ export type RivalMove =
   | 'mockPromises'
   | 'doubtSolution'
   | 'attackDodge'
+  | 'raiseOffer'
   | 'lastNight';
+
+/**
+ * A promise the rival made (C). level: 1 vague ("the family will look after you"), 2 big,
+ * 3 specific. tola null = to the whole village.
+ */
+export type RivalPromise = {
+  id: number;
+  day: number;
+  tola: TolaId | null;
+  issue: IssueId;
+  level: 1 | 2 | 3;
+  /** How many times he raised it after you out-bid him. */
+  raised: number;
+  /** You promised it here before him: his promise is a me-too. */
+  meToo: boolean;
+};
 
 export type RivalState = {
   archetype: ArchetypeId;
+  promises: RivalPromise[];
+  /** Where you out-bid him: he may raise his offer. */
+  outbidBy: { tola: TolaId | null; issue: IssueId; day: number }[];
   name: string;
   cash: number;
   heat: number;

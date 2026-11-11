@@ -1,20 +1,37 @@
 {
-  "note": "Rival archetypes (CLAUDE.md §5.6). Shifts are added to the region's base rival trust per bloc.",
+  "note": "Rival archetypes (CLAUDE.md §5.6). Shifts are added to the region's base rival trust per bloc. promiseLevel: how concrete his promises are (1 vague, 2 big, 3 specific).",
   "archetypes": {
     "dynast": {
       "name": "Rajendra Babu",
       "cash": 60000,
       "reputation": 10,
-      "trustShift": { "elders": 6, "farmers": 4, "traders": 2, "labourers": -2, "youth": -2 },
+      "trustShift": {
+        "elders": 6,
+        "farmers": 4,
+        "traders": 2,
+        "labourers": -2,
+        "youth": -2
+      },
       "wedgeEvery": 4,
-      "moveBias": { "sweets": 1.4, "rally": 1.2, "doorToDoor": 1 },
-      "mockThreshold": 6
+      "moveBias": {
+        "sweets": 1.4,
+        "rally": 1.2,
+        "doorToDoor": 1
+      },
+      "mockThreshold": 6,
+      "promiseLevel": 1
     },
     "firebrand": {
       "name": "Sonu Bhaiya",
       "cash": 35000,
       "reputation": 0,
-      "trustShift": { "youth": 10, "labourers": 4, "elders": -6, "traders": -2, "farmers": 0 },
+      "trustShift": {
+        "youth": 10,
+        "labourers": 4,
+        "elders": -6,
+        "traders": -2,
+        "farmers": 0
+      },
       "wedgeEvery": 3,
       "moveBias": {
         "attackPromise": 1.6,
@@ -22,16 +39,29 @@
         "doubtSolution": 1.8,
         "doorToDoor": 1.1
       },
-      "mockThreshold": 5
+      "mockThreshold": 5,
+      "promiseLevel": 2
     },
     "technocrat": {
       "name": "Meera Kumari",
       "cash": 45000,
       "reputation": 8,
-      "trustShift": { "traders": 6, "youth": 4, "elders": 0, "farmers": 2, "labourers": -4 },
+      "trustShift": {
+        "traders": 6,
+        "youth": 4,
+        "elders": 0,
+        "farmers": 2,
+        "labourers": -4
+      },
       "wedgeEvery": 4,
-      "moveBias": { "counterIssue": 1.6, "mockPromises": 1.5, "doubtSolution": 2, "doorToDoor": 1 },
-      "mockThreshold": 4
+      "moveBias": {
+        "counterIssue": 1.6,
+        "mockPromises": 1.5,
+        "doubtSolution": 2,
+        "doorToDoor": 1
+      },
+      "mockThreshold": 4,
+      "promiseLevel": 3
     }
   }
 }

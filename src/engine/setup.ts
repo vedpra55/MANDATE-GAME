@@ -200,6 +200,8 @@ export function newGame(opts: NewGameOptions): GameState {
       reputation: arch.reputation,
       rallyDone: false,
       attackedDodges: [],
+      promises: [],
+      outbidBy: [],
       attackedPromiseIds: [],
       lastMockDay: -99,
       lastWedgeDay: 0,

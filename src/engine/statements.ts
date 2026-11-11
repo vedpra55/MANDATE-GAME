@@ -23,6 +23,7 @@ import type { Rng } from './rng.ts';
 import { bandOfTrust, bandOfTola } from './pa.ts';
 import { applyStances } from './faultlines.ts';
 import { learnTola } from './knowledge.ts';
+import { afterComparison, compareWithRival } from './rivalPromises.ts';
 
 const K: Record<Channel, number> = { declaration: 4, pad: 12, visit: 13, answer: 10 };
 const MAX_DELTA = 12;
@@ -128,13 +129,20 @@ export function applyStatement(
   s.statements.push(statement);
   if (issue) s.rival.memory.issueFocus[issue] = (s.rival.memory.issueFocus[issue] ?? 0) + 1;
 
+  // --- the rival comparison: "Sonu Bhaiya bhi yahi bole the"
+  const cmp =
+    channel === 'declaration'
+      ? null
+      : compareWithRival(s, reading, channel === 'visit' ? tola : null);
+
   // --- trust and mood
   const trust: Partial<Record<GroupId, number>> = {};
   const aud =
     channel === 'pad' ? 0.5 : channel === 'visit' ? 0.35 : channel === 'answer' ? 0.6 : 0.3;
   let moodNumerator = 0;
   for (const g of GROUPS) {
-    const raw = groupDelta(s, reading, g, channel, tola, repetition);
+    let raw = groupDelta(s, reading, g, channel, tola, repetition);
+    if (cmp && raw > 0) raw *= cmp.mult;
     trust[g] = clamp(raw * aud, -MAX_DELTA, MAX_DELTA);
     if (tola) moodNumerator += raw * s.tolas[tola].voters[g];
   }
@@ -198,6 +206,8 @@ export function applyStatement(
     applyDivisive(s, rng, reading, p);
     notes.push({ day, kind: 'divisive' });
   }
+
+  if (cmp) notes.push(...afterComparison(s, cmp, channel === 'visit' ? tola : null, statement));
 
   // --- fault lines: sides, win-wins, evasion, contradictions
   notes.push(...applyStances(s, reading, channel, statement.id, forced));

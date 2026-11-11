@@ -44,6 +44,18 @@ export function VillageMap() {
             aria-label={S.tolas[a.tola]}
           >
             <span className="map-tag hand">{S.tolas[a.tola]}</span>
+            {game.rival.promises
+              .filter((p) => p.tola === a.tola && p.day >= game.clock.day - 1)
+              .slice(-1)
+              .map((p) => (
+                <span
+                  key={p.id}
+                  className="rival-pin hand"
+                  title={S.map.rivalWasHere(game.rival.name)}
+                >
+                  {game.rival.name}: {S.issues[p.issue]}
+                </span>
+              ))}
           </button>
         );
       })}

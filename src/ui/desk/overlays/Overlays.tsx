@@ -417,6 +417,26 @@ function Newspaper() {
             "{last.voices.quotes[0].text}" — {last.voices.quotes[0].who}
           </p>
         )}
+        <aside className="rival-column">
+          <h3>{S.newspaper.rivalColumn(game.rival.name)}</h3>
+          {game.rival.promises.length === 0 ? (
+            <p>{S.newspaper.rivalNone(game.rival.name)}</p>
+          ) : (
+            game.rival.promises
+              .slice(-3)
+              .reverse()
+              .map((p) => (
+                <p key={p.id}>
+                  {S.rivalPromise(
+                    p.level,
+                    p.raised,
+                    S.issues[p.issue],
+                    p.tola ? S.tolas[p.tola] : '',
+                  )}
+                </p>
+              ))
+          )}
+        </aside>
       </div>
     </article>
   );
@@ -552,6 +572,30 @@ function Diary() {
           </ul>
           {game.known.faultLines.length < game.faultLines.length && (
             <p className="muted small-note">{S.diary.unknownDivides}</p>
+          )}
+          {game.rival.promises.length > 0 && (
+            <>
+              <h3 className="diary-h3">{S.diary.rivalPromises(game.rival.name)}</h3>
+              <ul className="divides hand">
+                {game.rival.promises
+                  .slice(-5)
+                  .reverse()
+                  .map((p) => (
+                    <li key={p.id}>
+                      <span className="muted">
+                        {S.calendar.day} {p.day}:
+                      </span>{' '}
+                      {S.rivalPromise(
+                        p.level,
+                        p.raised,
+                        S.issues[p.issue],
+                        p.tola ? S.tolas[p.tola] : '',
+                      )}
+                      {p.meToo && <span className="muted"> ({S.diary.meTooMark})</span>}
+                    </li>
+                  ))}
+              </ul>
+            </>
           )}
           {building.length > 0 && (
             <>

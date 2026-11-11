@@ -21,6 +21,12 @@ import { computeCells, margin, totals } from './vote.ts';
 import { allGroups, applyEffect } from './state.ts';
 import { openBigPromises } from './statements.ts';
 import { archetypeOf, sideWeight } from './world.ts';
+import {
+  rivalPromise,
+  rivalPromiseIssue,
+  rivalPromiseMood,
+  rivalPromisesOn,
+} from './rivalPromises.ts';
 
 type Candidate = {
   move: RivalMove;
@@ -29,6 +35,8 @@ type Candidate = {
   promiseId?: number;
   faultLine?: FaultLineId;
   effect: Effect;
+  /** A visit where he will also promise this (its mood is included in effect for the utility). */
+  promise?: { issue: IssueId; mood: number; base: number };
 };
 
 function topPlayerIssue(s: GameState): IssueId | null {
@@ -46,9 +54,22 @@ function topPlayerIssue(s: GameState): IssueId | null {
 function candidates(s: GameState): Candidate[] {
   const list: Candidate[] = [{ move: 'lieLow', effect: {} }];
   for (const t of TOLAS) {
-    list.push({ move: 'doorToDoor', tola: t, effect: { rivalMood: { [t]: 5 } } });
+    const issue = rivalPromiseIssue(s, t);
+    const pm = issue ? rivalPromiseMood(s, issue, t) : 0;
+    const promise = (base: number) => (issue ? { issue, mood: pm, base } : undefined);
+    list.push({
+      move: 'doorToDoor',
+      tola: t,
+      effect: { rivalMood: { [t]: 3.5 + pm } },
+      promise: promise(3.5),
+    });
     if (s.rival.cash >= 5000) {
-      list.push({ move: 'sweets', tola: t, effect: { rivalMood: { [t]: 8 }, rivalCash: -5000 } });
+      list.push({
+        move: 'sweets',
+        tola: t,
+        effect: { rivalMood: { [t]: 6.5 + pm }, rivalCash: -5000 },
+        promise: promise(6.5),
+      });
     }
   }
   const issue = topPlayerIssue(s);
@@ -110,6 +131,18 @@ function candidates(s: GameState): Candidate[] {
       effect: { trust, credibility: -0.03 },
     });
   }
+  // You out-bid him: he raises his own offer (bigger, and for the firebrand vaguer too).
+  for (const o of s.rival.outbidBy) {
+    if (s.clock.day - o.day > 3) continue;
+    if (rivalPromisesOn(s, o.issue, o.tola).length === 0) continue;
+    const mood = o.tola ? { [o.tola]: 4 } : Object.fromEntries(TOLAS.map((t) => [t, 2]));
+    list.push({
+      move: 'raiseOffer',
+      tola: o.tola ?? undefined,
+      issue: o.issue,
+      effect: { rivalMood: mood },
+    });
+  }
   if (!s.rival.rallyDone && s.clock.day >= 10 && s.rival.cash >= 8000) {
     const rivalTrust: Partial<Record<GroupId, number>> = {};
     for (const g of GROUPS)
@@ -147,6 +180,7 @@ const KIND = {
   mockPromises: 'rivalMock',
   doubtSolution: 'rivalDoubt',
   attackDodge: 'rivalAttackDodge',
+  raiseOffer: 'rivalRaise',
   lastNight: 'rivalLastNight',
 } as const;
 
@@ -181,14 +215,31 @@ export function rivalTurn(s: GameState, rng: Rng): PaNote[] {
       s.tolas[pick.tola].rivalLastVisit = day;
     if (pick.move === 'mockPromises') s.rival.lastMockDay = day;
     if (pick.move === 'attackDodge' && pick.faultLine) s.rival.attackedDodges.push(pick.faultLine);
+    if (pick.move === 'raiseOffer' && pick.issue) raiseOffer(s, pick.issue, pick.tola ?? null);
+    // He campaigns like a person: where he goes, he promises something (its mood is logged apart).
+    const effect =
+      pick.promise && pick.tola
+        ? { ...pick.effect, rivalMood: { [pick.tola]: pick.promise.base } }
+        : pick.effect;
     record(s, {
       actor: 'rival',
       kind: KIND[pick.move],
       tola: pick.tola,
       issue: pick.issue,
       faultLine: pick.faultLine,
-      effect: pick.effect,
+      effect,
     });
+    let promised: IssueId | undefined;
+    if (pick.promise && pick.tola) {
+      rivalPromise(s, pick.promise.issue, pick.tola);
+      promised = pick.promise.issue;
+    }
+    if (pick.move === 'counterIssue' && pick.issue) {
+      if (!s.rival.promises.some((p) => p.issue === pick.issue && p.tola === null)) {
+        rivalPromise(s, pick.issue, null);
+        promised = pick.issue;
+      }
+    }
     notes.push({
       day,
       kind: 'rivalMove',
@@ -196,9 +247,23 @@ export function rivalTurn(s: GameState, rng: Rng): PaNote[] {
       tola: pick.tola,
       issue: pick.issue,
       faultLine: pick.faultLine,
+      promised,
     });
   }
+  s.rival.outbidBy = s.rival.outbidBy.filter((o) => s.clock.day - o.day <= 3);
   return notes;
+}
+
+function raiseOffer(s: GameState, issue: IssueId, tola: TolaId | null): void {
+  for (const p of rivalPromisesOn(s, issue, tola)) {
+    p.raised += 1;
+    if (archetypeOf(s).promiseLevel < 3) p.level = Math.min(3, p.level + 1) as 1 | 2 | 3;
+    p.day = s.clock.day;
+  }
+  s.rival.outbidBy = s.rival.outbidBy.filter((o) => !(o.issue === issue && o.tola === tola));
+  // Out-bidding the out-bidder: his own promise inflation.
+  const raises = s.rival.promises.reduce((a, p) => a + p.raised, 0);
+  if (raises >= 3) s.rival.reputation -= 1;
 }
 
 /** The tola where the rival's expected lead is smallest: where he will spend on the last night. */
