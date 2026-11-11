@@ -19,7 +19,16 @@ import {
 import { FAULT_LINE_DATA, sideWeight } from './world.ts';
 import { beneficiariesOf } from './promises.ts';
 
-const BASE: Record<Channel, number> = { declaration: 2, pad: 6, visit: 7, answer: 8 };
+const BASE: Record<Channel, number> = {
+  declaration: 2,
+  pad: 6,
+  visit: 7,
+  answer: 8,
+  chai: 6,
+  sabha: 8,
+  leader: 4,
+  debate: 9,
+};
 const CHANGE_WORDS = [
   'i was wrong',
   'changed my mind',

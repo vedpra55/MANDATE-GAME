@@ -318,6 +318,17 @@ export function statementQuestions(ctx: ReadContext): Question[] {
   return q;
 }
 
+const WHERE: Record<Channel, (tola: TolaId | null, rival: string) => string> = {
+  declaration: () => 'the first words of a new candidate, at their nomination',
+  pad: () => 'a statement printed in the local newspaper',
+  visit: (t) => `door to door in ${t}`,
+  answer: () => 'a public answer to a question from the press',
+  chai: (t) => `chatting with a small group at a tea stall in ${t}`,
+  sabha: (t) => `a short speech at a street meeting the candidate organised in ${t}`,
+  leader: (t) => `one to one with the respected opinion leader of ${t}`,
+  debate: (_t, r) => `a public debate with ${r} at the chowk, in front of the whole village`,
+};
+
 export function statementRequestBody(ctx: ReadContext, text: string) {
   return {
     input: [
@@ -332,12 +343,7 @@ export function statementRequestBody(ctx: ReadContext, text: string) {
               situation: {
                 day: ctx.day,
                 rival: ctx.rivalName,
-                where:
-                  ctx.channel === 'visit'
-                    ? `door to door in ${ctx.tola}`
-                    : ctx.channel === 'answer'
-                      ? 'a public answer to a question from the press'
-                      : 'a statement printed in the local newspaper',
+                where: WHERE[ctx.channel](ctx.tola, ctx.rivalName),
                 question_asked: ctx.forced ? FAULT_LINE_DATA[ctx.forced].describe.question : null,
                 rival_promised: ctx.rivalPromises?.length
                   ? ctx.rivalPromises.map((p) => ({

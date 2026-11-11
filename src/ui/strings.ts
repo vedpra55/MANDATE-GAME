@@ -124,6 +124,9 @@ export const en = {
     unknownGrievance: "You don't know that problem yet. Go and listen first.",
     alreadyBuilding: 'Work is already going on there.',
     tooManyWorkers: "You don't have that many workers.",
+    needWorkers: 'You need more workers for that. Recruit some first.',
+    notHere: "That can't be done here.",
+    alreadyDone: 'Not again so soon.',
   } satisfies Record<ActionError, string>,
 
   faultLines: {
@@ -252,6 +255,36 @@ export const en = {
   cash: { title: 'Cash in hand' },
 
   map: {
+    modes: {
+      visit: 'Door to door',
+      chai: 'Chai pe charcha',
+      sabha: 'Nukkad sabha',
+      leader: (name: string) => `Sit with ${name}`,
+      debate: (rival: string) => `Debate ${rival}`,
+    },
+    modeHelp: {
+      visit: "1 slot, free. Go to people's doors; ask, listen, promise.",
+      chai: '1 slot, ₹300 for the tea. A small group at the stall: you learn a lot; the young and the traders listen most.',
+      sabha:
+        '2 slots, ₹2,000 (needs 3+ workers to gather people). A short speech to a crowd: a bigger audience than door to door. Not on the silent day.',
+      leader: (name: string, about: string) =>
+        `1 slot, free. One to one with ${name} (${about}). Win them and their people hear it through them; bore them and they say so.`,
+      debate: (rival: string) =>
+        `2 slots, once, from day 5. You and ${rival} face the village at the chowk. Whoever convinces a group takes it from the other. High risk.`,
+    },
+    sweets: 'Tea and sweets for the crowd',
+    sweetsNone: 'None',
+    leaderMet: (name: string, day: number) => `You last sat with ${name} on day ${day}.`,
+    deeds: 'Be there',
+    play: {
+      cricket: 'Play cricket with the young ones on the ground (1 slot)',
+      school: 'Spend an hour at the school (1 slot)',
+    },
+    shramdaan: (n: number) =>
+      `Shramdaan: clean up with your workers (1 slot, needs 5 workers; you have ${n})`,
+    debatePlaceholder: (rival: string) =>
+      `What will you say to the village, face to face with ${rival}?`,
+    debateDone: (won: number) => `The debate is over. You won over ${won} of 10 groups.`,
     people: 'People you know here',
     rivalWasHere: (r: string) => `${r}'s people were here and promised this`,
     title: 'The village',
@@ -368,6 +401,34 @@ export const en = {
     return `${issue} for ${where}: a costed plan, work to start in ten days`;
   },
   rivalPromised: (issue: string) => ` He promised ${issue} there.`,
+  verbs: {
+    leaderWon: (name: string) =>
+      `${name} nodded. "Theek hai, hum logon ko batayenge." Their people will hear it from them.`,
+    leaderLost: (name: string) => `${name} was not impressed. Word of that will travel too.`,
+    leaderNeutral: (name: string) => `${name} listened, said little. Not won, not lost.`,
+    debate: (won: number, rival: string) =>
+      won >= 6
+        ? `The chowk is buzzing: you won over ${won} of 10 groups against ${rival}.`
+        : won >= 4
+          ? `A close debate: ${won} of 10 groups leaned your way. ${rival} held the rest.`
+          : `${rival} had the better evening: only ${won} of 10 groups leaned your way.`,
+    play: {
+      cricket:
+        'The boys and girls on the ground will talk about this. And they told you about the exam.',
+      school:
+        'The teachers and the mothers saw you at the school. You heard what the children lack.',
+    },
+    shramdaan: (t: string) => `Your workers cleaned up ${t} with you. They feel part of something.`,
+  },
+  /** The rival's lines in the debate (offline; the AI voices may replace them). */
+  rivalDebate: {
+    dynast:
+      'Mere parivaar ne is gaon ki teen peedhi tak seva ki hai. Naye log aate hain, chale jaate hain.',
+    firebrand:
+      'Bhaiyo-behno, yeh log sirf baatein karte hain! Hum sadak pe utarte hain, hum ladte hain!',
+    technocrat:
+      'Mere paas har tole ka hisaab hai: kitna paisa, kitne din, kaun sa kaam. Yeh kaagaz dekhiye.',
+  },
   compare: {
     meToo: (r: string, i: string) =>
       `People heard ${r} say the same about ${i}: "${r.split(' ')[0]} bhi yahi bole the." Say more than he did: when, how, how much.`,

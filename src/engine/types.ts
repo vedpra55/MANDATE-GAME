@@ -49,7 +49,18 @@ export type ArchetypeId = 'dynast' | 'firebrand' | 'technocrat';
 export type Phase = 'nomination' | 'campaign' | 'polling' | 'counting' | 'ended';
 export type Address = 'bhaiya' | 'didi';
 export type Tone = 'policy' | 'emotional' | 'humble' | 'aggressive' | 'evasive' | 'divisive';
-export type Channel = 'declaration' | 'pad' | 'visit' | 'answer';
+export type Channel =
+  | 'declaration'
+  | 'pad'
+  | 'visit'
+  | 'answer'
+  | 'chai' // chai pe charcha: a small group at a tea stall
+  | 'sabha' // nukkad sabha: a street meeting you organise
+  | 'leader' // one to one with an opinion leader
+  | 'debate'; // the public debate with the rival
+
+/** Channels spoken in one tola (memory, presence and the rival comparison are local). */
+export const LOCAL_CHANNELS: readonly Channel[] = ['visit', 'chai', 'sabha', 'leader'];
 export type Language = 'hindi' | 'english' | 'hinglish' | 'other';
 export type IntentAction =
   'none' | 'public_works' | 'cash_help' | 'visit' | 'rally' | 'recruit' | 'other';
@@ -269,6 +280,14 @@ export type LogKind =
   | 'favourLeaked'
   | 'donorAngry'
   | 'promiseDated'
+  | 'chai'
+  | 'sabha'
+  | 'sweetsShared'
+  | 'play'
+  | 'leaderMet'
+  | 'leaderWon'
+  | 'shramdaan'
+  | 'debate'
   | 'promiseDateChanged';
 
 export type LogEntry = {
@@ -325,6 +344,10 @@ export type PaNote =
     }
   | { day: number; kind: 'silence' }
   | { day: number; kind: 'meToo'; issue: IssueId }
+  | { day: number; kind: 'leader'; name: string; won: boolean | null }
+  | { day: number; kind: 'debate'; won: number }
+  | { day: number; kind: 'play'; tola: TolaId; play: 'cricket' | 'school' }
+  | { day: number; kind: 'shramdaan'; tola: TolaId }
   | { day: number; kind: 'outbid'; issue: IssueId }
   | { day: number; kind: 'proofBeatsPromise'; issue: IssueId }
   | { day: number; kind: 'lastNight'; tola: TolaId }
@@ -543,6 +566,9 @@ export type GameState = {
     pendingTension: number | null; // day a communal tension event fires
     initialMargin: number; // expected vote share margin at the start (for "giant-killer")
     contradictions: number;
+    /** v1.1 verbs. Missing on older saves. */
+    debate?: { day: number; won: number } | null;
+    leadersMet?: Record<string, { day: number; won: boolean }>;
   };
   counting: CountingState | null;
   result: GameResult | null;
@@ -555,6 +581,12 @@ export type Action =
   | { type: 'visit'; tola: TolaId; text: string }
   | { type: 'publicWorks'; tola: TolaId; issue: IssueId }
   | { type: 'gifts'; tola: TolaId; amount: number }
+  | { type: 'chai'; tola: TolaId; text: string }
+  | { type: 'sabha'; tola: TolaId; text: string; sweets: 0 | 1000 | 3000 }
+  | { type: 'play'; tola: TolaId; kind: 'cricket' | 'school' }
+  | { type: 'meetLeader'; tola: TolaId; text: string }
+  | { type: 'shramdaan'; tola: TolaId }
+  | { type: 'debate'; text: string }
   | { type: 'recruit'; tola: TolaId; strongman: boolean }
   | { type: 'answer'; text: string }
   | { type: 'answerCall'; text: string }
@@ -578,4 +610,7 @@ export type ActionError =
   | 'nothingPending'
   | 'unknownGrievance'
   | 'alreadyBuilding'
-  | 'tooManyWorkers';
+  | 'tooManyWorkers'
+  | 'needWorkers'
+  | 'notHere'
+  | 'alreadyDone';

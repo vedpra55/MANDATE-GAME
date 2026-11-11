@@ -2,7 +2,13 @@
  * What the AI voices are allowed to know about a statement: the engine's verdicts in words,
  * never numbers, and never the player's words if moderation flagged them (CLAUDE.md §7).
  */
-import { GROUPS, type GameState, type GroupId, type Statement } from '../engine/types.ts';
+import {
+  GROUPS,
+  LOCAL_CHANNELS,
+  type GameState,
+  type GroupId,
+  type Statement,
+} from '../engine/types.ts';
 import { speakerFor, tolaMemory } from '../engine/residents.ts';
 import { FAULT_LINE_DATA } from '../engine/world.ts';
 import { noteText, addressWord } from '../ui/paText.ts';
@@ -46,12 +52,17 @@ export function voiceFacts(
       (e) =>
         `${e.kind === 'evasion' ? 'dodged' : e.stance === 'win_win' ? 'offered a compromise on' : 'took a side on'} ${FAULT_LINE_DATA[e.faultLine!].describe.topic.split(':')[0]}`,
     );
-  const where =
-    st.channel === 'visit' && st.tola
-      ? `went door to door in ${S.tolas[st.tola]}`
-      : st.channel === 'answer'
-        ? 'answered a public question'
-        : 'made a statement in the paper';
+  const t = st.tola ? S.tolas[st.tola] : '';
+  const where = {
+    declaration: 'stood for election',
+    pad: 'made a statement in the paper',
+    visit: `went door to door in ${t}`,
+    answer: 'answered a public question',
+    chai: `talked over tea with a small group in ${t}`,
+    sabha: `spoke at a street meeting in ${t}`,
+    leader: `sat one to one with the opinion leader of ${t}`,
+    debate: `debated ${s.rival.name} in front of the village`,
+  }[st.channel];
   const issues = st.issues.map((i) => S.issues[i]).join(', ');
   return {
     address: addressWord(s.player.address),
@@ -90,7 +101,7 @@ export function memoryFacts(s: GameState, st: Statement): { memory: string[]; av
     memory.push(
       `The candidate already built works on ${cmp.proof.map((i) => S.issues[i]).join(', ')}; people contrast that with mere promises ("isne to kaam karke dikhaya").`,
     );
-  if (st.channel === 'visit' && st.tola) {
+  if (LOCAL_CHANNELS.includes(st.channel) && st.tola) {
     const m = tolaMemory(s, st.tola, st);
     if (m.repeating)
       memory.push(

@@ -3,7 +3,17 @@ import { simulate, type BotName } from '../src/engine/sim.ts';
 import type { ArchetypeId } from '../src/engine/types.ts';
 
 const games = Number(process.argv[2] ?? 200);
-const all: BotName[] = ['idle', 'naive', 'panderer', 'coalition', 'cash', 'promiser'];
+const all: BotName[] = [
+  'idle',
+  'naive',
+  'panderer',
+  'coalition',
+  'cash',
+  'promiser',
+  'metoo',
+  'outbidder',
+  'organiser',
+];
 const bots = (process.argv[3]?.split(',') as BotName[] | undefined) ?? all;
 const archetype = process.argv[4] as ArchetypeId | undefined;
 console.log(`games per bot: ${games}${archetype ? `, rival: ${archetype}` : ''}`);

@@ -299,6 +299,62 @@ describe('memory', () => {
   });
 });
 
+describe('more to do', () => {
+  it('a nukkad sabha needs workers, takes two slots and pays for the sweets', () => {
+    let s = campaign();
+    const sabha = {
+      type: 'sabha',
+      tola: 'purvi',
+      text: 'Handpump ka kaam do hafte mein.',
+      sweets: 1000,
+    } as const;
+    s = { ...s, cadre: { ...s.cadre, size: 0 } };
+    expect(validate(s, sabha)).toBe('needWorkers');
+    s = { ...s, cadre: { ...s.cadre, size: 4 } };
+    const cash = s.cash;
+    const after = run(s, sabha);
+    expect(after.clock.slotsLeftToday).toBe(s.clock.slotsLeftToday - 2);
+    expect(after.cash).toBe(cash - 3000);
+  });
+
+  it('cricket happens on the ground, not everywhere; it teaches you about jobs', () => {
+    const s = campaign();
+    expect(validate(s, { type: 'play', tola: 'purvi', kind: 'cricket' })).toBe('notHere');
+    const after = run(s, { type: 'play', tola: 'naya', kind: 'cricket' });
+    expect(after.groups.youth_m.trust).toBeGreaterThan(s.groups.youth_m.trust);
+  });
+
+  it('an elder is won by their concern said concretely, not by flattery', () => {
+    const s = campaign();
+    const vague = run(s, { type: 'meetLeader', tola: 'purvi', text: 'Kaka, aap mahaan hain.' });
+    expect(vague.flags.leadersMet?.ramdeo?.won).toBe(false);
+    const concrete = run(s, {
+      type: 'meetLeader',
+      tola: 'purvi',
+      text: 'Ramdeo kaka, aapki pension aur kheti ki sinchai ka kaam do hafte mein shuru karungi.',
+    });
+    expect(concrete.flags.leadersMet?.ramdeo?.won).toBe(true);
+    expect(validate(concrete, { type: 'meetLeader', tola: 'purvi', text: 'Phir se.' })).toBe(
+      'alreadyDone',
+    );
+  });
+
+  it('the debate happens once', () => {
+    let s = campaign();
+    while (s.clock.day < 5) s = run(s, { type: 'endDay' });
+    s = { ...s, pending: { question: null, call: null } };
+    const text = 'Pension, sinchai, handpump aur naukri: do hafte mein, hisaab ke saath.';
+    const after = run(s, { type: 'debate', text });
+    expect(after.flags.debate).not.toBeNull();
+    expect(
+      validate(
+        { ...after, clock: { ...after.clock, slotsLeftToday: 3 } },
+        { type: 'debate', text },
+      ),
+    ).toBe('alreadyDone');
+  });
+});
+
 describe('election', () => {
   it('counts round by round to a result and names what decided it', () => {
     const s = playGame('coalition', 3);

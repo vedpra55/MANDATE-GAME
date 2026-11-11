@@ -61,7 +61,7 @@ export async function aiReadStatement(
       day: s.clock.day,
       rivalName: s.rival.name,
       rivalPromises: s.rival.promises
-        .filter((p) => channel !== 'visit' || p.tola === null || p.tola === tola)
+        .filter((p) => !tola || p.tola === null || p.tola === tola)
         .slice(-12)
         .map((p) => ({
           issue: p.issue,

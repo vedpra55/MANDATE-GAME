@@ -7,6 +7,7 @@ import { allGroups, clamp, record, slotIndex, tolaVoters } from './state.ts';
 import {
   GROUPS,
   TOLAS,
+  LOCAL_CHANNELS,
   type Channel,
   type Effect,
   type FaultLineId,
@@ -25,7 +26,34 @@ import { applyStances } from './faultlines.ts';
 import { learnTola } from './knowledge.ts';
 import { afterComparison, compareWithRival } from './rivalPromises.ts';
 
-const K: Record<Channel, number> = { declaration: 4, pad: 12, visit: 13, answer: 10 };
+const K: Record<Channel, number> = {
+  declaration: 4,
+  pad: 12,
+  visit: 13,
+  answer: 10,
+  chai: 11,
+  sabha: 15,
+  leader: 9,
+  debate: 16,
+};
+/** Share of each group that hears it (trust is village-wide; mood stays in the tola). */
+const AUDIENCE: Record<Channel, number> = {
+  declaration: 0.3,
+  pad: 0.5,
+  visit: 0.35,
+  answer: 0.6,
+  chai: 0.3,
+  sabha: 0.5,
+  leader: 0.15,
+  debate: 0.65,
+};
+/** Showing up in person, before the words: mood in the tola. */
+const PRESENCE: Partial<Record<Channel, number>> = { visit: 2.5, chai: 1.5, sabha: 4, leader: 1 };
+/** Tea-stall talk reaches the young and the traders more, the elders less. */
+function channelWeight(channel: Channel, g: GroupId): number {
+  if (channel !== 'chai') return 1;
+  return g.startsWith('youth') || g.startsWith('traders') ? 1.4 : g.startsWith('elders') ? 0.8 : 1;
+}
 const MAX_DELTA = 12;
 
 function mainIssue(reading: Reading): IssueId | null {
@@ -91,6 +119,7 @@ export function applyStatement(
   const day = s.clock.day;
   const notes: PaNote[] = [];
   const issue = mainIssue(reading);
+  const local = LOCAL_CHANNELS.includes(channel) && tola !== null;
 
   // Diminishing returns: the same main issue pushed in the last 3 days.
   // Repetition is per audience: the same tola for visits, the newspaper's readers for the pad.
@@ -99,7 +128,7 @@ export function applyStatement(
     (st) =>
       st.day >= day - 2 &&
       st.channel === channel &&
-      (channel !== 'visit' || st.tola === tola) &&
+      (!local || st.tola === tola) &&
       (issue ? st.issues.includes(issue) : st.issues.length === 0),
   ).length;
   const repetition = Math.pow(0.6, repeats);
@@ -130,19 +159,16 @@ export function applyStatement(
   if (issue) s.rival.memory.issueFocus[issue] = (s.rival.memory.issueFocus[issue] ?? 0) + 1;
 
   // --- the rival comparison: "Sonu Bhaiya bhi yahi bole the"
-  const cmp =
-    channel === 'declaration'
-      ? null
-      : compareWithRival(s, reading, channel === 'visit' ? tola : null);
+  const cmp = channel === 'declaration' ? null : compareWithRival(s, reading, local ? tola : null);
 
   // --- trust and mood
   const trust: Partial<Record<GroupId, number>> = {};
-  const aud =
-    channel === 'pad' ? 0.5 : channel === 'visit' ? 0.35 : channel === 'answer' ? 0.6 : 0.3;
+  const aud = AUDIENCE[channel];
   let moodNumerator = 0;
   for (const g of GROUPS) {
     let raw = groupDelta(s, reading, g, channel, tola, repetition);
     if (cmp && raw > 0) raw *= cmp.mult;
+    raw *= channelWeight(channel, g);
     trust[g] = clamp(raw * aud, -MAX_DELTA, MAX_DELTA);
     if (tola) moodNumerator += raw * s.tolas[tola].voters[g];
   }
@@ -151,11 +177,14 @@ export function applyStatement(
     // Showing up at people's doors counts in itself (less on repeat visits to the same tola).
     const recentVisits = s.statements.filter(
       (st) =>
-        st.channel === 'visit' && st.tola === tola && st.day >= day - 2 && st.id !== statement.id,
+        LOCAL_CHANNELS.includes(st.channel) &&
+        st.tola === tola &&
+        st.day >= day - 2 &&
+        st.id !== statement.id,
     ).length;
     const badWords =
       reading.tone === 'divisive' || reading.addressesEvaluator >= 0.5 || reading.coherent < 0.5;
-    const presence = badWords ? 0 : 2.5 * Math.pow(0.6, recentVisits);
+    const presence = badWords ? 0 : (PRESENCE[channel] ?? 0) * Math.pow(0.6, recentVisits);
     effect.mood = {
       [tola]: clamp(moodNumerator / tolaVoters(s, tola) + presence, -MAX_DELTA, MAX_DELTA),
     };
@@ -185,8 +214,18 @@ export function applyStatement(
     effect.reputation = (effect.reputation ?? 0) - 3;
   }
 
-  const kind =
-    channel === 'visit' ? 'visit' : channel === 'declaration' ? 'declaration' : 'statement';
+  const kind = (
+    {
+      visit: 'visit',
+      declaration: 'declaration',
+      chai: 'chai',
+      sabha: 'sabha',
+      leader: 'leaderMet',
+      debate: 'debate',
+      pad: 'statement',
+      answer: 'statement',
+    } as const
+  )[channel];
   record(s, {
     actor: 'player',
     kind,
@@ -207,15 +246,18 @@ export function applyStatement(
     notes.push({ day, kind: 'divisive' });
   }
 
-  if (cmp) notes.push(...afterComparison(s, cmp, channel === 'visit' ? tola : null, statement));
+  if (cmp) notes.push(...afterComparison(s, cmp, local ? tola : null, statement));
 
   // --- fault lines: sides, win-wins, evasion, contradictions
   notes.push(...applyStances(s, reading, channel, statement.id, forced));
 
   // --- what a visit teaches you about the tola
-  if (tola && channel === 'visit') {
+  if (tola && local) {
     s.tolas[tola].lastVisit = day;
-    const learned = learnTola(s, tola, reading.listens >= 0.5 ? 'listen' : 'glance');
+    // Tea-stall talk and a sit-down with the elder reveal more than a speech does.
+    const mode =
+      channel === 'chai' || channel === 'leader' || reading.listens >= 0.5 ? 'listen' : 'glance';
+    const learned = learnTola(s, tola, mode);
     if (learned) notes.push(learned);
   }
 
@@ -233,7 +275,8 @@ export function applyStatement(
   for (const d of drafts) {
     const duplicate = s.promises.some(
       (pr) =>
-        pr.status === 'open' && pr.issue === d.issue && pr.tola === d.tola && pr.when === d.when,
+        // The same promise again, whatever date it carries now: it reinforces, never duplicates.
+        pr.status === 'open' && pr.issue === d.issue && pr.tola === d.tola && !pr.faultLine,
     );
     if (duplicate) continue;
     s.promises.push({ ...d, id: s.nextId++, status: 'open' });

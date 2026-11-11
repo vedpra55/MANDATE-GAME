@@ -26,7 +26,7 @@ const MAX_TEXT = 1200;
 const readSchema = z.object({
   text: z.string().min(1).max(MAX_TEXT),
   context: z.object({
-    channel: z.enum(['declaration', 'pad', 'visit', 'answer']),
+    channel: z.enum(['declaration', 'pad', 'visit', 'answer', 'chai', 'sabha', 'leader', 'debate']),
     tola: z.enum(TOLAS).nullable(),
     faultLines: z.array(z.enum(FAULT_LINES)).max(6),
     forced: z.enum(FAULT_LINES).nullable(),

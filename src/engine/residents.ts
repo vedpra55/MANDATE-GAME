@@ -5,7 +5,15 @@
  */
 import data from '../data/regions/bihar-residents.json' with { type: 'json' };
 import { blocOf } from './world.ts';
-import type { FaultLineId, GameState, GroupId, IssueId, Statement, TolaId } from './types.ts';
+import {
+  LOCAL_CHANNELS,
+  type FaultLineId,
+  type GameState,
+  type GroupId,
+  type IssueId,
+  type Statement,
+  type TolaId,
+} from './types.ts';
 
 export type Resident = {
   id: string;
@@ -15,6 +23,7 @@ export type Resident = {
   group: GroupId;
   portrait: string;
   about: string;
+  leader?: boolean;
 };
 
 export const RESIDENTS = data.residents as Resident[];
@@ -70,7 +79,7 @@ export type TolaMemory = {
 /** What a tola remembers about you (and the rival), excluding the statement being voiced. */
 export function tolaMemory(s: GameState, tola: TolaId, current?: Statement): TolaMemory {
   const here = s.statements.filter(
-    (st) => st.channel === 'visit' && st.tola === tola && st.id !== current?.id,
+    (st) => LOCAL_CHANNELS.includes(st.channel) && st.tola === tola && st.id !== current?.id,
   );
   const repeating =
     !!current &&
@@ -94,4 +103,9 @@ export function tolaMemory(s: GameState, tola: TolaId, current?: Statement): Tol
     lastQuotes: here.flatMap((st) => st.voices?.quotes ?? []).slice(-4),
     repeating,
   };
+}
+
+/** The tola's opinion leader (one per tola). */
+export function leaderOf(tola: TolaId): Resident {
+  return RESIDENTS.find((r) => r.tola === tola && r.leader) ?? residentsOf(tola)[0]!;
 }

@@ -13,6 +13,19 @@ import { interpretFallback, MAX_TEXT_LENGTH } from './interpret.ts';
 import { knowsGrievance } from './knowledge.ts';
 import { canDate, lastCampaignDay, worksCost, type PromiseDraft } from './promises.ts';
 import { setPromiseDate } from './dates.ts';
+import {
+  COST,
+  DEBATE_FROM_DAY,
+  PLAY_PLACE,
+  SABHA_WORKERS,
+  SHRAMDAAN_WORKERS,
+  debateDuel,
+  leaderOnCooldown,
+  leaderVerdict,
+  play,
+  shareSweets,
+  shramdaan,
+} from './verbs.ts';
 import { createRng } from './rng.ts';
 import { applyStatement } from './statements.ts';
 import { endOfDay } from './tick.ts';
@@ -35,7 +48,15 @@ const SLOT_ACTIONS = new Set<Action['type']>([
   'gifts',
   'recruit',
   'deliver',
+  'chai',
+  'sabha',
+  'play',
+  'meetLeader',
+  'shramdaan',
+  'debate',
 ]);
+/** Actions that take two slots (a meeting has to be gathered; a debate takes the evening). */
+const TWO_SLOTS = new Set<Action['type']>(['sabha', 'debate']);
 
 export type ActionOptions = {
   /** An AI reading of the action's text (Decisions API). */
@@ -70,6 +91,7 @@ export function validate(s: GameState, a: Action): ActionError | null {
   }
   if (!inCampaign) return 'wrongPhase';
   if (SLOT_ACTIONS.has(a.type) && s.clock.slotsLeftToday === 0) return 'noSlots';
+  if (TWO_SLOTS.has(a.type) && s.clock.slotsLeftToday < 2) return 'noSlots';
   switch (a.type) {
     case 'statement':
       if (s.clock.daysToPoll === 1) return 'silencePeriod';
@@ -110,6 +132,23 @@ export function validate(s: GameState, a: Action): ActionError | null {
       return s.cash >= a.amount ? null : 'notEnoughCash';
     case 'recruit':
       return null;
+    case 'chai':
+      return textCheck(a.text) ?? (s.cash >= COST.chai ? null : 'notEnoughCash');
+    case 'sabha':
+      if (s.clock.daysToPoll === 1) return 'silencePeriod';
+      if (s.cadre.size < SABHA_WORKERS) return 'needWorkers';
+      if (![0, 1000, 3000].includes(a.sweets)) return 'invalidAmount';
+      return textCheck(a.text) ?? (s.cash >= COST.sabha + a.sweets ? null : 'notEnoughCash');
+    case 'play':
+      return PLAY_PLACE[a.kind] === a.tola ? null : 'notHere';
+    case 'meetLeader':
+      return textCheck(a.text) ?? (leaderOnCooldown(s, a.tola) ? 'alreadyDone' : null);
+    case 'shramdaan':
+      return s.cadre.size >= SHRAMDAAN_WORKERS ? null : 'needWorkers';
+    case 'debate':
+      if (s.clock.daysToPoll === 1) return 'silencePeriod';
+      if (s.flags.debate || s.clock.day < DEBATE_FROM_DAY) return 'alreadyDone';
+      return textCheck(a.text);
   }
 }
 
@@ -173,6 +212,43 @@ export function applyAction(
     case 'gifts':
       notes.push(...gifts(s, action.tola, action.amount));
       break;
+    case 'chai':
+      s.cash -= COST.chai;
+      notes.push(
+        ...applyStatement(s, rng, action.text, reading(), 'chai', action.tola, null, extracted)
+          .notes,
+      );
+      break;
+    case 'sabha':
+      s.cash -= COST.sabha;
+      shareSweets(s, action.tola, action.sweets);
+      notes.push(
+        ...applyStatement(s, rng, action.text, reading(), 'sabha', action.tola, null, extracted)
+          .notes,
+      );
+      break;
+    case 'play':
+      notes.push(...play(s, action.tola, action.kind));
+      break;
+    case 'meetLeader': {
+      const r = reading();
+      notes.push(
+        ...applyStatement(s, rng, action.text, r, 'leader', action.tola, null, extracted).notes,
+        ...leaderVerdict(s, action.tola, r),
+      );
+      break;
+    }
+    case 'shramdaan':
+      notes.push(...shramdaan(s, action.tola));
+      break;
+    case 'debate': {
+      const r = reading();
+      notes.push(
+        ...applyStatement(s, rng, action.text, r, 'debate', null, null, extracted).notes,
+        ...debateDuel(s, rng, r),
+      );
+      break;
+    }
     case 'recruit':
       notes.push(...recruit(s, rng, action.tola, action.strongman));
       break;
@@ -209,6 +285,7 @@ export function applyAction(
   }
 
   if (SLOT_ACTIONS.has(action.type)) s.clock = spendSlot(s.clock);
+  if (TWO_SLOTS.has(action.type)) s.clock = spendSlot(s.clock);
   s.paNotes.push(...notes);
   s.rngState = rng.state;
   return { state: s, error: null };

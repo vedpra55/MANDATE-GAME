@@ -1,5 +1,5 @@
 {
-  "note": "Recurring named residents (PLAN-v1.1 §D): fictional people, 4 per tola, each with a portrait from the generated pack. Appearance never maps to voting: groups are mixed across looks on purpose. 'group' is whose verdict they voice.",
+  "note": "Recurring named residents (PLAN-v1.1 §D): fictional people, 4 per tola, each with a portrait from the generated pack. Appearance never maps to voting: groups are mixed across looks on purpose. 'group' is whose verdict they voice. 'leader': the tola's opinion leader; win them and their people hear it through them.",
   "residents": [
     {
       "id": "ramdeo",
@@ -8,7 +8,8 @@
       "age": 75,
       "group": "elders_m",
       "portrait": "portraits-villagers-01-2",
-      "about": "retired farmer, proud, remembers every promise anyone ever made him"
+      "about": "retired farmer, proud, remembers every promise anyone ever made him",
+      "leader": true
     },
     {
       "id": "sunita",
@@ -37,7 +38,6 @@
       "portrait": "portraits-villagers-03-2",
       "about": "grows vegetables on a small plot, practical, counts every rupee"
     },
-
     {
       "id": "fauji",
       "tola": "paschim",
@@ -45,7 +45,8 @@
       "age": 65,
       "group": "elders_m",
       "portrait": "portraits-villagers-06-1",
-      "about": "retired soldier, likes straight answers and dislikes flattery"
+      "about": "retired soldier, likes straight answers and dislikes flattery",
+      "leader": true
     },
     {
       "id": "gudiya",
@@ -74,7 +75,6 @@
       "portrait": "portraits-villagers-08-1",
       "about": "keeps two buffaloes and a small field, worried about irrigation"
     },
-
     {
       "id": "ramesh",
       "tola": "bazaar",
@@ -82,7 +82,8 @@
       "age": 45,
       "group": "traders_m",
       "portrait": "portraits-villagers-05-3",
-      "about": "runs the grocery on the chowk, knows everyone's debts"
+      "about": "runs the grocery on the chowk, knows everyone's debts",
+      "leader": true
     },
     {
       "id": "kiran",
@@ -111,7 +112,6 @@
       "portrait": "portraits-villagers-09-1",
       "about": "drives an e-rickshaw to the block town, curses the potholes"
     },
-
     {
       "id": "jagdish",
       "tola": "pokhar",
@@ -128,7 +128,8 @@
       "age": 85,
       "group": "elders_w",
       "portrait": "portraits-villagers-07-3",
-      "about": "has seen every election since the seventies, still waiting for her pension"
+      "about": "has seen every election since the seventies, still waiting for her pension",
+      "leader": true
     },
     {
       "id": "lalita",
@@ -148,7 +149,6 @@
       "portrait": "portraits-villagers-07-2",
       "about": "ASHA health worker, knows which houses are sick"
     },
-
     {
       "id": "sanjay",
       "tola": "naya",
@@ -165,7 +165,8 @@
       "age": 29,
       "group": "farmers_w",
       "portrait": "portraits-villagers-12-2",
-      "about": "runs the women's self-help group ledger, careful with promises"
+      "about": "runs the women's self-help group ledger, careful with promises",
+      "leader": true
     },
     {
       "id": "baleshwar",

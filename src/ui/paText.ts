@@ -66,6 +66,18 @@ export function noteText(n: PaNote, address: Address, rival = 'Rajendra Babu'): 
           rival,
         ) + (n.promised && n.move !== 'counterIssue' ? S.rivalPromised(S.issues[n.promised]) : '')
       );
+    case 'leader':
+      return n.won === true
+        ? S.verbs.leaderWon(n.name)
+        : n.won === false
+          ? S.verbs.leaderLost(n.name)
+          : S.verbs.leaderNeutral(n.name);
+    case 'debate':
+      return S.verbs.debate(n.won, rival);
+    case 'play':
+      return S.verbs.play[n.play];
+    case 'shramdaan':
+      return S.verbs.shramdaan(S.tolas[n.tola]);
     case 'meToo':
       return S.compare.meToo(rival, S.issues[n.issue]);
     case 'outbid':
@@ -210,6 +222,22 @@ export function deciderText(d: Decider, rival = 'Rajendra Babu'): string {
       return `Keeping your ${i} promise`;
     case 'promiseBroken':
       return `Breaking your ${i} promise`;
+    case 'chai':
+      return `Chai pe charcha in ${t} (${day})`;
+    case 'sabha':
+      return `Your nukkad sabha in ${t} (${day})`;
+    case 'sweetsShared':
+      return `Tea and sweets in ${t}`;
+    case 'play':
+      return `Time with the young and the school in ${t}`;
+    case 'leaderMet':
+      return `Sitting with the elder in ${t} (${day})`;
+    case 'leaderWon':
+      return `Winning over the opinion leader in ${t}`;
+    case 'shramdaan':
+      return `Shramdaan in ${t}`;
+    case 'debate':
+      return `The debate with ${rival}`;
     case 'promiseDated':
       return `Giving a date for ${i}`;
     case 'promiseDateChanged':

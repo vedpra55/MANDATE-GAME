@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { aiPromises, aiReadCall, aiReadStatement, aiVoices } from '../ai/client.ts';
 import { voiceFacts } from '../ai/facts.ts';
-import { applyAction, attachVoices, newGame } from '../engine/engine.ts';
+import { applyAction, attachVoices, newGame, validate } from '../engine/engine.ts';
 import type {
   Action,
   ActionError,
@@ -156,12 +156,11 @@ export const useGame = create<GameStore>((set, get) => ({
   say: async (action) => {
     const { game } = get();
     if (!game || get().thinking) return false;
-    const { state: checked, error } = applyAction(game, action); // validate cheaply first
+    const error = validate(game, action); // validate cheaply first
     if (error) {
       set({ lastError: error });
       return false;
     }
-    void checked;
     set({ thinking: true, lastError: null });
     try {
       if (action.type === 'answerCall') {
@@ -171,15 +170,17 @@ export const useGame = create<GameStore>((set, get) => ({
         set({ game: r.state, aiStatus: callReading ? 'on' : 'offline' });
         return true;
       }
-      const channel: Channel =
-        action.type === 'declare'
-          ? 'declaration'
-          : action.type === 'visit'
-            ? 'visit'
-            : action.type === 'answer'
-              ? 'answer'
-              : 'pad';
-      const tola: TolaId | null = action.type === 'visit' ? action.tola : null;
+      const channel: Channel = {
+        declare: 'declaration' as const,
+        statement: 'pad' as const,
+        visit: 'visit' as const,
+        answer: 'answer' as const,
+        chai: 'chai' as const,
+        sabha: 'sabha' as const,
+        meetLeader: 'leader' as const,
+        debate: 'debate' as const,
+      }[action.type];
+      const tola: TolaId | null = 'tola' in action ? action.tola : null;
       const forced: FaultLineId | null =
         action.type === 'answer' ? (game.pending.question?.faultLine ?? null) : null;
       const ai = await aiReadStatement(game, action.text, channel, tola, forced);

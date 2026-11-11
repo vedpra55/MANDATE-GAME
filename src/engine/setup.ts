@@ -236,6 +236,8 @@ export function newGame(opts: NewGameOptions): GameState {
       pendingTension: null,
       initialMargin: 0,
       contradictions: 0,
+      debate: null,
+      leadersMet: {},
     },
     counting: null,
     result: null,

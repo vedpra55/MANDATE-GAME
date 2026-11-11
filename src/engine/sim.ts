@@ -5,6 +5,7 @@
 import { applyAction, newGame } from './engine.ts';
 import { ISSUE_WORDS } from './lexicon.ts';
 import { worksCost } from './promises.ts';
+import { leaderOf } from './residents.ts';
 import { tolaVoters } from './state.ts';
 import {
   GROUPS,
@@ -13,13 +14,23 @@ import {
   type ArchetypeId,
   type FaultLineId,
   type GameState,
+  type GroupId,
   type IssueId,
   type TolaId,
 } from './types.ts';
 import { computeCells, playerShare, totals } from './vote.ts';
 import { FAULT_LINE_DATA, sideWeight } from './world.ts';
 
-export type BotName = 'idle' | 'naive' | 'panderer' | 'coalition' | 'cash' | 'promiser';
+export type BotName =
+  | 'idle'
+  | 'naive'
+  | 'panderer'
+  | 'coalition'
+  | 'cash'
+  | 'promiser'
+  | 'metoo'
+  | 'outbidder'
+  | 'organiser';
 
 const TOLA_NAMES: Record<TolaId, string> = {
   purvi: 'Purvi tola',
@@ -104,6 +115,8 @@ function interrupt(bot: BotName, s: GameState): Action | null {
     }
     switch (bot) {
       case 'coalition':
+      case 'organiser':
+      case 'outbidder':
         return {
           type: 'answer',
           text: s.stances[q.faultLine] ? winWinText(q.faultLine) : coalitionText(s, q.faultLine),
@@ -113,6 +126,7 @@ function interrupt(bot: BotName, s: GameState): Action | null {
         return { type: 'answer', text: sideText(q.faultLine, 'side_a') };
       case 'naive':
       case 'cash':
+      case 'metoo':
         return { type: 'answer', text: evasiveText(q.faultLine) };
       case 'idle':
         return null;
@@ -121,9 +135,20 @@ function interrupt(bot: BotName, s: GameState): Action | null {
   return null;
 }
 
+/** The issue a group cares about most. */
+function topIssueOf(s: GameState, g: GroupId): IssueId {
+  return (Object.entries(s.groups[g].issueWeights) as [IssueId, number][]).sort(
+    (a, b) => b[1] - a[1],
+  )[0]![0];
+}
+
 function decide(bot: BotName, s: GameState, i: number): Action {
   const pending = interrupt(bot, s);
   if (pending) return pending;
+  // Pintu asks "Kab tak?": careful bots answer "after I win" rather than miss a date.
+  const undated = s.promises.find((p) => p.status === 'open' && p.dateSource === 'default');
+  if (undated && (bot === 'metoo' || bot === 'organiser' || bot === 'outbidder'))
+    return { type: 'setPromiseDate', id: undated.id, day: null };
   if (s.clock.slotsLeftToday === 0) return { type: 'endDay' };
   const day = s.clock.day;
   const slot = 3 - s.clock.slotsLeftToday;
@@ -179,6 +204,62 @@ function decide(bot: BotName, s: GameState, i: number): Action {
       if (slot === 1 && affordable && !building)
         return { type: 'publicWorks', tola, issue: issue! };
       return { type: 'visit', tola, text: listenText(s, tola) };
+    case 'metoo': {
+      // Promises each tola its worst problem in plain words, whatever the rival already said.
+      if (day <= 2) return { type: 'visit', tola, text: listenText(s, tola) };
+      if (slot === 0 && affordable && !building)
+        return { type: 'publicWorks', tola, issue: issue! };
+      return {
+        type: 'visit',
+        tola,
+        text: issue ? `Aapka ${word(issue)} theek karwa denge.` : listenText(s, tola),
+      };
+    }
+    case 'outbidder': {
+      // Like the coalition player, but answers every rival promise with a date and a price.
+      const rp = s.rival.promises.find(
+        (p) =>
+          p.tola === tola &&
+          !s.statements.some(
+            (st) => st.tola === tola && st.day >= p.day && st.issues.includes(p.issue),
+          ),
+      );
+      if (rp && day > 2)
+        return {
+          type: 'visit',
+          tola,
+          text: `${TOLA_NAMES[tola]} ka ${word(rp.issue)}: do hafte mein, 5000 rupaye lagakar, main khud theek karwaungi.`,
+        };
+      return decide('coalition', s, i);
+    }
+    case 'organiser': {
+      // Coalition play with the v1.1 verbs: tea, leaders, a sabha, cricket, the debate.
+      if (day <= 2) {
+        const t = TOLAS[(day - 1) * 3 + slot] ?? tola;
+        return { type: 'chai', tola: t, text: listenText(s, t) };
+      }
+      if (day === 3 && slot === 0) return { type: 'recruit', tola, strongman: false };
+      if (day === 3 && slot === 1) return { type: 'play', tola: 'naya', kind: 'cricket' };
+      const unsolved = s.known.faultLines.find((fl) => !s.stances[fl] && s.clock.daysToPoll > 1);
+      if (unsolved) return { type: 'statement', text: coalitionText(s, unsolved) };
+      if (day === 6 && slot === 0 && !s.flags.debate) {
+        const issues = [...new Set(GROUPS.map((g) => topIssueOf(s, g)))].slice(0, 4);
+        return {
+          type: 'debate',
+          text: `Jeetne ke baad mera kaam: ${issues.map(word).join(', ')}. Har tole mein, hisaab ke saath.`,
+        };
+      }
+      const leader = leaderOf(tola);
+      if (slot === 2 && !s.flags.leadersMet?.[leader.id])
+        return {
+          type: 'meetLeader',
+          tola,
+          text: `${leader.name}, jeetne ke baad ${word(topIssueOf(s, leader.group))} ka kaam mera pehla kaam hoga.`,
+        };
+      if (slot === 1 && (day === 8 || day === 14) && s.cadre.size >= 3 && s.cash >= 4000)
+        return { type: 'sabha', tola, text: listenText(s, tola), sweets: 1000 };
+      return decide('coalition', s, i);
+    }
     case 'promiser': {
       // Promise everything, and spend the donor's money on visible works.
       if (slot === 0 && affordable && !building)

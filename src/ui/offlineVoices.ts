@@ -4,7 +4,7 @@
  */
 import { voiceFacts } from '../ai/facts.ts';
 import { tolaMemory } from '../engine/residents.ts';
-import type { GameState, Statement } from '../engine/types.ts';
+import { LOCAL_CHANNELS, type GameState, type Statement } from '../engine/types.ts';
 import { strings as S } from './strings.ts';
 
 const BY_VERDICT: Record<string, string[]> = {
@@ -35,7 +35,9 @@ export function offlineQuotes(game: GameState, st: Statement): { who: string; te
   const facts = voiceFacts(game, st, false, game.paNotes.length);
   const rivalShort = game.rival.name.split(' ')[0]!;
   const repeating =
-    st.channel === 'visit' && st.tola ? tolaMemory(game, st.tola, st).repeating : false;
+    LOCAL_CHANNELS.includes(st.channel) && st.tola
+      ? tolaMemory(game, st.tola, st).repeating
+      : false;
   const special: string[] = [];
   if (st.compare?.meToo.length)
     special.push(`${rivalShort} bhi yahi bole the. Aap kya alag karoge?`);
