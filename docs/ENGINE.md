@@ -447,7 +447,7 @@ Every night:
 3. **Final weight** = `softmax(utility / 0.5) × p_decide^0.7`; the engine samples. If Decide is
    unavailable: utility only.
 4. **Effects are fully deterministic.** Generate writes the rival's public line for the paper or
-   the phone, in character (`gpt-6.1-terra`).
+   the phone, in character (task `voice_key_chars`).
 
 The rival remembers your patterns (`memory`: aggression, issue focus, the tolas you neglect) and its
 utility function uses them. That is how it "studies you".
@@ -490,17 +490,36 @@ says they love a speech that the engine scored as offensive.
 
 ## 11. AI integration: contracts, safety, fallbacks
 
-### 11.1 Models (verified against the account on 2026-11-11)
+### 11.1 Models: a setting per task (owner's choice)
 
-| Job                                                      | API                            | Model                                                                  |
-| -------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------- |
-| All measurement and NPC choices                          | Decisions `/v1/decisions`      | `gpt-6-luna` (the only Decisions model)                                |
-| Promise extraction, PA whispers, voter quotes, headlines | Responses + Structured Outputs | `gpt-6-luna`, reasoning `none` or `low` ("focused, high-volume tasks") |
-| Key characters: rival, journalist, donor dialogue        | Responses                      | `gpt-6.1-terra` ("writing")                                            |
-| Region director (once per new game, later)               | Responses + Structured Outputs | `gpt-6.1-sol` ("complex work at lower cost")                           |
-| Safety                                                   | Moderations                    | `omni-moderation-latest`                                               |
+Each AI task has its **own model setting**. Defaults are chosen to keep cost low: `gpt-6-luna` for
+everything, and `omni-moderation-latest` for safety.
 
-Model IDs live in one server config file, so swapping is one line.
+| Task id            | What it does                               | API                            | Default                  | Other allowed choices                         |
+| ------------------ | ------------------------------------------ | ------------------------------ | ------------------------ | --------------------------------------------- |
+| `decide`           | All measurement and NPC choices            | Decisions `/v1/decisions`      | `gpt-6-luna`             | none (the only Decisions model today)         |
+| `moderate`         | Safety check on every player text          | Moderations                    | `omni-moderation-latest` | other moderation models as they appear        |
+| `extract_promises` | Promises out of player text                | Responses + Structured Outputs | `gpt-6-luna`             | `gpt-6.1-terra`, `gpt-6.1-sol`                |
+| `voice_pa`         | Pintu's diary lines and whispers           | Responses                      | `gpt-6-luna`             | `gpt-6.1-terra`                               |
+| `voice_villagers`  | Voter quotes, petitioners' replies         | Responses                      | `gpt-6-luna`             | `gpt-6.1-terra`                               |
+| `voice_press`      | Headlines, Priya's questions               | Responses                      | `gpt-6-luna`             | `gpt-6.1-terra`, `gpt-6.1-sol`                |
+| `voice_key_chars`  | Rival, donor and journalist dialogue       | Responses                      | `gpt-6-luna`             | `gpt-6.1-terra` (best writing), `gpt-6.1-sol` |
+| `region_director`  | Opening situation from region data (later) | Responses + Structured Outputs | `gpt-6-luna`             | `gpt-6.1-sol`                                 |
+| `end_card`         | Closing paragraph on the end card          | Responses                      | `gpt-6-luna`             | `gpt-6.1-terra`                               |
+
+How it works:
+
+- **Settings live on the server** (`server/data/settings.json`, git-ignored, with defaults in code).
+  Each AI route reads its task's model at call time, so a change applies to the next call with no restart.
+- **Settings screen:** the **Settings** stamp on the title screen opens an owner panel (outside the
+  diegetic desk, since it is not part of the fiction). Each task has a dropdown of its allowed models.
+  The server fills each list from an allowlist intersected with the account's `/v1/models`, so you
+  can only pick models that exist and suit the task. `decide` is shown but fixed.
+- **Per-task extras** sit next to the model: reasoning effort (`none` / `low` / `medium`) and an
+  on/off switch per Generate task (off = template text, zero cost).
+- **The AI tape records which model answered,** so a replay or a balance run knows what it compares.
+- **Guardrails:** the server rejects any model not on the allowlist, and the settings endpoint is
+  only available in development or behind an owner token.
 
 ### 11.2 Where the code lives
 
@@ -635,3 +654,22 @@ around those facts.
 
 Credits: E4–E6 make real API calls only for development checks at a small scale; any bulk run (the
 calibration set, many test games) is announced before running.
+
+---
+
+## 15. Rules added by the playthrough (`docs/PLAYTHROUGH.md`)
+
+1. **New-game form:** the player's name and form of address (_bhaiya_ / _didi_); every voice uses it.
+2. **Statement #1 (day 0):** "why are you standing", written before the clock starts. Free (no slot),
+   stored in `statementHistory`, quotable by the press; it only nudges reputation by ±3.
+3. **Silence period (day 21):** rallies, statements and interviews are blocked; door-to-door visits,
+   public works and the phone remain.
+4. **The last night (day 21):** a scripted event: the rival distributes cash in his weakest tola. The
+   player may match it (the vote-buying verb, with doubled filming risk) or abstain.
+5. **Polling day (day 22):** no actions. Turnout events (rain, late booth) and phone calls; cadre
+   mobilisation applied.
+6. **Tie:** an exact tie is decided by draw of lots (seeded RNG), shown on screen.
+7. **Endings stack:** one main title (People's Sarpanch, Giant-Killer, Promise Machine, Bought Chair,
+   Divider, Won/Lost by Lottery, Nearly-Man/Woman, Outsider Who Stayed Outside, Barred) plus "cost"
+   tags (favours owed, FIR, notice, broken promises).
+8. **Settings stamp** on the title screen: AI model per task (§11.1).
