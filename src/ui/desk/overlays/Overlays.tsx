@@ -26,7 +26,7 @@ export function Overlays() {
     return () => window.removeEventListener('keydown', onKey);
   }, [overlay, close, thinking]);
 
-  if (!overlay || overlay === 'booths') return null;
+  if (!overlay || overlay === 'booths' || overlay === 'guide') return null;
   const body = {
     phone: <Phone />,
     ledger: <Ledger />,

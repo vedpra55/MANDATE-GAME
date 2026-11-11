@@ -210,9 +210,10 @@ export function TolaCard({ tola }: { tola: TolaId }) {
             disabled={busy || game.cadre.size < SHRAMDAAN_WORKERS}
             onClick={() => act(dispatch({ type: 'shramdaan', tola }))}
           >
-            {S.map.shramdaan(game.cadre.size)}
+            {S.map.shramdaan}
           </Stamp>
         </div>
+        <p className="muted mode-help">{S.map.shramdaanHelp(game.cadre.size)}</p>
       </section>
 
       <section>

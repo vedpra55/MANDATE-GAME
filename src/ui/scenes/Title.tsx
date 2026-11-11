@@ -5,6 +5,7 @@ import { art } from '../assets.ts';
 import { Stamp } from '../components/Stamp.tsx';
 import { strings as S } from '../strings.ts';
 import { Settings } from './Settings.tsx';
+import { Guide } from '../components/Guide.tsx';
 
 /** Title screen and the nomination form (name and form of address). */
 export function Title() {
@@ -13,6 +14,7 @@ export function Title() {
   const continueGame = useGame((s) => s.continueGame);
   const [form, setForm] = useState(false);
   const [settings, setSettings] = useState(false);
+  const [guide, setGuide] = useState(false);
   const [name, setName] = useState('');
   const [address, setAddress] = useState<Address>('bhaiya');
   const bg = art('scene-village-desk');
@@ -29,6 +31,7 @@ export function Title() {
           <div className="title-buttons">
             <Stamp onClick={() => setForm(true)}>{S.menu.newGame}</Stamp>
             {hasSave && <Stamp onClick={continueGame}>{S.menu.continue}</Stamp>}
+            <Stamp onClick={() => setGuide(true)}>{S.guide.open}</Stamp>
             <Stamp onClick={() => setSettings(true)}>{S.menu.settings}</Stamp>
           </div>
         </div>
@@ -76,6 +79,7 @@ export function Title() {
           </div>
         </form>
       )}
+      {guide && <Guide onClose={() => setGuide(false)} />}
     </div>
   );
 }

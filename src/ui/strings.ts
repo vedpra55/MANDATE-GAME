@@ -246,6 +246,12 @@ export const en = {
     dueToday: 'Answer today. Silence will be reported.',
   },
   thinking: 'Pintu is listening…',
+  guide: {
+    title: 'How to play',
+    open: 'How to play',
+    deskTag: 'Kaise khelein?',
+    close: 'Back',
+  },
   dusk: {
     text: 'Shaam ho gayi. The day is done…',
     wait: 'Wait',
@@ -280,8 +286,9 @@ export const en = {
       cricket: 'Play cricket with the young ones on the ground (1 slot)',
       school: 'Spend an hour at the school (1 slot)',
     },
-    shramdaan: (n: number) =>
-      `Shramdaan: clean up with your workers (1 slot, needs 5 workers; you have ${n})`,
+    shramdaan: 'Shramdaan with your workers',
+    shramdaanHelp: (n: number) =>
+      `Shramdaan: clean up a lane or the pond edge with your workers. 1 slot; needs 5 workers, you have ${n}.`,
     debatePlaceholder: (rival: string) =>
       `What will you say to the village, face to face with ${rival}?`,
     debateDone: (won: number) => `The debate is over. You won over ${won} of 10 groups.`,

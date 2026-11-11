@@ -3,6 +3,10 @@
 Written 2026-11-11 after the owner's playtest of v1. Nothing new (rally, chaupal, scandal) is built
 until these are done.
 
+> **Status: built (2026-11-11).** A–F are done; how each was built, with numbers, is in
+> `docs/ENGINE.md` §18. The player guide is `docs/GUIDE.md` (also in the game: "How to play" on the
+> title screen and the "Kaise khelein?" note on the desk).
+
 ---
 
 ## 0. What the playtest found, and why

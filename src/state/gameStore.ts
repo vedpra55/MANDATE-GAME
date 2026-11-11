@@ -13,7 +13,7 @@ import type {
 } from '../engine/types.ts';
 
 export type OverlayId =
-  'phone' | 'ledger' | 'newspaper' | 'files' | 'writingPad' | 'diary' | 'cash' | 'booths';
+  'phone' | 'ledger' | 'newspaper' | 'files' | 'writingPad' | 'diary' | 'cash' | 'booths' | 'guide';
 export type SceneId = 'title' | 'desk' | 'map' | 'counting';
 
 const SAVE_KEY = 'mandate.save.v1';

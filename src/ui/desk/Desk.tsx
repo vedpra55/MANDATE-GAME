@@ -6,6 +6,8 @@ import { openingMessages } from '../content.ts';
 import { Calendar } from './Calendar.tsx';
 import { Declaration, Overlays } from './overlays/Overlays.tsx';
 import { BoothPlan } from './BoothPlan.tsx';
+import { Guide } from '../components/Guide.tsx';
+import { strings as S } from '../strings.ts';
 
 const tier = layout.tiers['1'];
 const LABELS: Record<string, string> = {
@@ -23,6 +25,7 @@ const LABELS: Record<string, string> = {
 export function Desk() {
   const game = useGame((s) => s.game)!;
   const open = useGame((s) => s.open);
+  const close = useGame((s) => s.close);
   const goTo = useGame((s) => s.goTo);
   const phoneSeen = useGame((s) => s.phoneSeen);
   const overlay = useGame((s) => s.overlay);
@@ -69,7 +72,13 @@ export function Desk() {
         />
       ))}
 
-      {game.phase === 'nomination' ? (
+      <button type="button" className="guide-tag hand" onClick={() => open('guide')}>
+        {S.guide.deskTag}
+      </button>
+
+      {overlay === 'guide' ? (
+        <Guide onClose={close} />
+      ) : game.phase === 'nomination' ? (
         <Declaration />
       ) : overlay === 'booths' ? (
         <BoothPlan />

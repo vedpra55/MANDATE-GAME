@@ -4,6 +4,8 @@ _Every vote has a price._ An AI-driven political career game set in India.
 
 See [`CLAUDE.md`](./CLAUDE.md) for the full project brief, architecture rules and decisions log.
 
+**New player?** Read [`docs/GUIDE.md`](docs/GUIDE.md), or open _How to play_ in the game.
+
 ## Getting started
 
 Requires Node 22+.

@@ -733,3 +733,90 @@ will be sharper than keyword matching.
 - **Language** is decided by script in code (Devanagari means Hindi); the AI only chooses
   Hinglish or English for Latin text.
 - **The AI tape:** each statement stores the AI reading it was resolved with (`statement.reading`).
+
+## 18. v1.1 as built (2026-11-11, `docs/PLAN-v1.1.md`)
+
+**A. The question loop.** `publicWord` records what you last said on each fault line: a side, a
+believed compromise, a compromise not yet believed, a dodge, or a silence. `asked` lists the fault
+lines the rival has raised; he raises each one **at most once**. A dodge, silence or disbelieved
+compromise becomes his `attackDodge` move ("he still won't say"), not another question. Questions
+arrive the next morning and are due by the end of the following day. Pintu opens the phone himself
+when one is waiting. The end card groups repeated causes and counts them (`Decider.count`).
+
+**F. Dusk.** When there are no slots left, nothing is pending, no overlay is open and nothing is
+thinking, the day ends after 3 s. Opening anything cancels it, and so does _Wait_. Settings can
+turn it off (`mandate.autoEndDay` in localStorage).
+
+**B. Promise dates.** `LedgerPromise.dateSource` is `words`, `player` or `default`. A `default`
+date is provisional, and the bahi-khata shows a "Kab tak?" slip with every campaign day and
+"after I win". The first choice is free. A change later costs credibility −0.03, and Pintu says
+"tareekh pe tareekh". A date 3 days away or less gives the beneficiaries +1. Choosing "after I win"
+runs the promise-inflation check (`checkInflation`). The AI extraction has a new field,
+`when_stated`. A repeated promise reinforces the open one whatever its date (this fixed a
+duplication bug).
+
+**C. The visible rival** (`rivalPromises.ts`):
+
+- **His promises.** Wherever he goes door to door or hands out sweets, he promises that tola's
+  worst grievance that he hasn't promised there yet. `counterIssue` becomes a promise to the whole
+  village. His archetype's `promiseLevel` sets the wording: 1 vague, 2 big, 3 specific.
+- **The comparison.** Each issue you commit to (score ≥ 2) gets a multiplier on your positive
+  effect, weighted by score:
+
+  | Case                                                    | Multiplier |
+  | ------------------------------------------------------- | ---------- |
+  | Proof (finished works on that issue there)              | ×1.1       |
+  | He promised it here, you go further (`beyondRival` ≥ 2) | ×1.15      |
+  | He promised it here, you don't (me-too)                 | ×0.4       |
+  | Nobody promised it here before                          | ×1.1       |
+
+  `beyondRival` is a new Decide score (0–3), asked only when he has promised something to this
+  audience. Offline, it is `specificity − (promiseLevel − 1)`.
+
+- **Mood.** His promise adds 2.5 rival mood in the tola (×0.4 if you promised it first), on top
+  of his visit (3.5 door to door, 6.5 with sweets). His utility counts it, so he is not stronger
+  overall.
+- **He answers you.** When you out-bid him, `raiseOffer` lets him raise his promise within 3 days.
+  A dynast or firebrand becomes more specific; from 3 raises on, his reputation pays for it.
+- **Where you see it:** a pin on the map for yesterday's and today's promises, a list in the
+  diary, a column in the newspaper, and "He promised X there" on Pintu's rival notes.
+
+**D. Memory and residents** (`residents.ts`, `data/regions/bihar-residents.json`):
+
+- **Residents.** There are 20 fictional residents, 4 per tola, each with a portrait. One per tola
+  is the opinion leader. `speakerFor` picks, for each reacting group, a resident of that group in
+  the tola (else the same bloc, else anyone there); recent speakers step back.
+- **Memory.** `tolaMemory` derives each tola's memory from state: the last 3 visits, its promises,
+  its works, the rival's visits and promises, its last quotes, and `repeating`.
+- **Voices.** The prompt gets `memory` and `avoid` (lines already said), and it must say "aap yeh
+  pehle bhi keh chuke ho" or "… bhi yahi bole the" when the facts say so.
+- **Offline.** Without the AI, `offlineVoices.ts` gives resident quotes under the same rules.
+
+**E. New verbs** (`verbs.ts`). New channels have their own K / audience / presence / fault-line
+base:
+
+| Verb            | Channel  | Cost                       | K   | Audience | Presence | Extra                                                                                                                    |
+| --------------- | -------- | -------------------------- | --- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Chai pe charcha | `chai`   | 1 slot, ₹300               | 11  | 0.3      | 1.5      | Always "listen" learning; youth/traders ×1.4, elders ×0.8                                                                |
+| Nukkad sabha    | `sabha`  | 2 slots, ₹2,000, 3 workers | 15  | 0.5      | 4        | Optional sweets ₹1,000/3,000: tola mood +1/+3, no heat; not on the silent day                                            |
+| Sit with elder  | `leader` | 1 slot, 5-day cooldown     | 9   | 0.15     | 1        | Won if their group scores ≥ 3 **and** specificity ≥ 2: their bloc +2 village-wide and tola mood +2. Below 1.6: −1.5 / −1 |
+| Debate          | `debate` | 2 slots, once, day ≥ 5     | 16  | 0.65     | –        | Per group: your score vs his strength (2.0 / 2.3 / 2.5 + form ±0.4 + bloc affinity); rival trust −4 × diff (±6)          |
+| Cricket/school  | deed     | 1 slot                     | –   | –        | –        | Naya ground / Purvi school; youth or mothers +1–2.5; learn jobs/sports or education/health; halves on repeat             |
+| Shramdaan       | deed     | 1 slot, 5 workers          | –   | –        | –        | Tola mood +3, loyalty +0.04, roads/water/health grievance −0.05; halves on repeat                                        |
+
+**Balance after v1.1** (100 games per bot, keyword fallback):
+
+| Bot                                                                               | Wins |
+| --------------------------------------------------------------------------------- | ---- |
+| idle                                                                              | 0%   |
+| naive                                                                             | 23%  |
+| panderer                                                                          | 0%   |
+| coalition                                                                         | 84%  |
+| cash                                                                              | 22%  |
+| promise storm                                                                     | 25%  |
+| **me-too** (generic promises of each tola's worst problem)                        | 0%   |
+| **out-bidder** (answers every rival promise with a date and a price)              | 30%  |
+| **organiser** (coalition play with tea, the elders, a sabha, cricket, the debate) | 69%  |
+
+The new verbs are alternatives, not a recipe: the organiser does about as well as the plain
+coalition player.
