@@ -78,7 +78,7 @@ aggregates). The structure:
 
 ### 3.1 Tolas (map areas)
 
-Five neighbourhoods, matching the map art: **Purvi tola, Paschim tola, Bazaar, Nadi-paar
+Five neighbourhoods, matching the map art: **Purvi tola, Paschim tola, Bazaar, Pokhar tola
 (across the river), Naya tola.** Each has a voter count, a bloc mix, and **local grievances**
 (issue → intensity 0..1, e.g. Purvi tola: water 0.9).
 
@@ -673,3 +673,39 @@ calibration set, many test games) is announced before running.
    Divider, Won/Lost by Lottery, Nearly-Man/Woman, Outsider Who Stayed Outside, Barred) plus "cost"
    tags (favours owed, FIR, notice, broken promises).
 8. **Settings stamp** on the title screen: AI model per task (§11.1).
+
+---
+
+## 16. Tuning after the first simulation (E1–E3, 2026-11-11)
+
+The first build was balanced with `npm run sim` (bots × seeds, offline fallback). Changes from the
+numbers above, all in code and covered by tests:
+
+- `K_verb`: statement **12**, visit **16**, declaration 4 (no rally or darbar yet).
+- **Presence:** a door-to-door visit adds +3 tola mood on its own, ×0.6 for each visit to the same
+  tola in the last 3 days. Showing up counts.
+- **Repetition is per audience:** the same tola for visits, the newspaper's readers for the pad.
+  Statements with no issue (platitudes) repeat against each other.
+- `relM = 0.5 + 0.5 × min(1, 3 × rel)`.
+- **Credibility:** the "policy" tone bonus needs specificity ≥ 2. Each new expensive (≥ ₹5,000)
+  "if elected" promise beyond 4 open: credibility −0.05, elders and traders −1.5, everyone −0.5.
+  Repeating an open promise reinforces it instead of duplicating it.
+- **Fallback reactions:** `score = 2 + 2 × min(1, rel/0.25) × commit × breadth`; a vague list of 3+
+  promises (specificity ≤ 1) has breadth 0.9.
+- **Rival:** door-to-door +4, sweets +6 rival mood; two moves a night from day 12; a new move,
+  **mock promises** (needs 6+ big open promises, every 3 days at most).
+- **Drift:** 3% a day for trust and mood.
+
+Result over 100 seeds per bot:
+
+| Bot                                            | Wins | Avg. margin |
+| ---------------------------------------------- | ---- | ----------- |
+| idle                                           | 0%   | −38 pts     |
+| talker (platitudes)                            | 0%   | −19 pts     |
+| honest (visits, works, no unkeepable promises) | 65%  | +2 pts      |
+| promiser ("if elected" everything)             | 53%  | +0.5 pts    |
+| cash (gifts every morning)                     | 46%  | −1 pt       |
+
+The honest bot plays perfectly, so it sits a little above the 45–60% target; human players are less
+efficient. Recheck these numbers when the Decisions API replaces the fallback (E4), since AI readings
+will be sharper than keyword matching.

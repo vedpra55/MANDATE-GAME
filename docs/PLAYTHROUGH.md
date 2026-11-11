@@ -162,12 +162,12 @@ next question. Refusing the interview gives her a story about refusing.
 - **Exam paper leak** in the state recruitment test: youth are furious, and Vikas wants to know
   where you stand.
 - **Mustard prices crash at the mandi:** farmers are anxious.
-- **Family feud:** two families in Nadi-paar fight over a boundary wall, and both ask you to take
+- **Family feud:** two families in Pokhar tola fight over a boundary wall, and both ask you to take
   sides. Choose one, mediate, or stay out. _One family feud can swing it_: the losing family's
   relatives vote together.
 - **Rumour:** "he's an outsider who'll leave after the election" (the rival's move, if media
   tone is low).
-- **Monsoon washes out the road** to Nadi-paar: a promise opportunity, or a promise trap.
+- **Monsoon washes out the road** to Pokhar tola: a promise opportunity, or a promise trap.
 
 ### The rally (one in the MVP, usually days 10–14)
 
@@ -248,7 +248,7 @@ Nothing to type. You watch:
 
 ## 6. Counting day (the climax)
 
-The counting centre. The booths are counted **one round at a time**, Nadi-paar first and the Bazaar
+The counting centre. The booths are counted **one round at a time**, Pokhar tola first and the Bazaar
 last. Each round shows on a TV-style board, the first time you ever see exact numbers. Workers' faces
 crowd the mesh and phones ring.
 
@@ -257,7 +257,7 @@ The shapes it can take:
 | Shape              | How it feels                                                                                                                        |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
 | **Landslide**      | You lead from round one. Workers start garlanding you by round three.                                                               |
-| **Comeback**       | Behind after Nadi-paar and Paschim tola (the rival's strongholds), ahead after Purvi tola, clinging on through the Bazaar.          |
+| **Comeback**       | Behind after Pokhar tola and Paschim tola (the rival's strongholds), ahead after Purvi tola, clinging on through the Bazaar.        |
 | **Collapse**       | Ahead early, then the tola you neglected counts last and wipes out your lead.                                                       |
 | **Narrow loss**    | Within 50 votes. Pintu, quietly: _"Naya tola…"_                                                                                     |
 | **Tie** [new rule] | Exactly equal. As in real panchayat rules, the winner is decided by **draw of lots**. The returning officer's hand goes into a box. |

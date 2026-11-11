@@ -23,7 +23,8 @@
     "assets:generate": "node tools/assets/generate.mjs",
     "assets:review": "node tools/assets/review.mjs",
     "assets:slice": "node tools/assets/slice.mjs",
-    "assets:optimize": "node tools/assets/optimize.mjs"
+    "assets:optimize": "node tools/assets/optimize.mjs",
+    "sim": "tsx tools/sim.ts"
   },
   "dependencies": {
     "@fontsource/hind": "^5.3.0",

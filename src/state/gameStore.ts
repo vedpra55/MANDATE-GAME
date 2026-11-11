@@ -1,85 +1,114 @@
 import { create } from 'zustand';
-import { canAct, createClock, endDay, isPollDay, spendSlot, type Clock } from '../engine/clock.ts';
-import { headlines, openingMessages, paNotesByDay } from '../ui/content.ts';
+import { applyAction, newGame } from '../engine/engine.ts';
+import type { Action, ActionError, Address, GameState, TolaId } from '../engine/types.ts';
 
 export type OverlayId =
   'phone' | 'ledger' | 'newspaper' | 'files' | 'writingPad' | 'diary' | 'cash';
-export type SceneId = 'desk' | 'map';
+export type SceneId = 'title' | 'desk' | 'map' | 'counting';
 
-export type PhoneMessage = { id: number; from: string; text: string; day: number };
-export type Statement = { id: number; day: number; slot: number; text: string };
-export type LedgerPromise = {
-  id: number;
-  day: number;
-  text: string;
-  status: 'open' | 'kept' | 'broken';
-};
-export type LedgerFavour = { id: number; day: number; owedTo: string; ask: string };
+const SAVE_KEY = 'mandate.save.v1';
+
+function loadSave(): GameState | null {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw) as GameState;
+    return s.version === 1 ? s : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSave(s: GameState | null): void {
+  try {
+    if (s && s.phase !== 'ended') localStorage.setItem(SAVE_KEY, JSON.stringify(s));
+    else localStorage.removeItem(SAVE_KEY);
+  } catch {
+    // Storage can be unavailable (private mode); the game simply doesn't autosave.
+  }
+}
 
 type GameStore = {
-  clock: Clock;
-  cash: number;
+  game: GameState | null;
   scene: SceneId;
   overlay: OverlayId | null;
-  messages: PhoneMessage[];
-  unread: number;
-  statements: Statement[];
-  promises: LedgerPromise[];
-  favours: LedgerFavour[];
-  paNotes: string[];
+  selectedTola: TolaId | null;
+  lastError: ActionError | null;
+  phoneSeen: boolean;
+  hasSave: boolean;
+  startNewGame: (name: string, address: Address) => void;
+  continueGame: () => void;
+  quitToTitle: () => void;
+  /** Apply an engine action. Returns true if it was accepted. */
+  dispatch: (action: Action) => boolean;
   open: (overlay: OverlayId) => void;
   close: () => void;
   goTo: (scene: SceneId) => void;
-  tearCalendarPage: () => void;
-  submitStatement: (text: string) => boolean;
+  selectTola: (tola: TolaId | null) => void;
 };
 
-let nextId = 1;
-
 /**
- * UI-facing store. The engine owns the rules (clock); this binds them to React.
- * Step 5 replaces the loose fields with the engine's GameState.
+ * UI store: holds the engine's GameState and the UI's own state (scene, open overlay).
+ * All game rules live in the engine; this file only calls it and saves the result.
  */
 export const useGame = create<GameStore>((set, get) => ({
-  clock: createClock(),
-  cash: 15_000,
-  scene: 'desk',
+  game: null,
+  scene: 'title',
   overlay: null,
-  messages: openingMessages.map((m) => ({ ...m, id: nextId++, day: 1 })),
-  unread: openingMessages.length,
-  statements: [],
-  promises: [],
-  favours: [],
-  paNotes: [paNotesByDay[0]!],
+  selectedTola: null,
+  lastError: null,
+  phoneSeen: false,
+  hasSave: loadSave() !== null,
 
-  open: (overlay) => set(overlay === 'phone' ? { overlay, unread: 0 } : { overlay }),
-  close: () => set({ overlay: null }),
-  goTo: (scene) => set({ scene, overlay: null }),
-
-  tearCalendarPage: () => {
-    const { clock, paNotes } = get();
-    if (isPollDay(clock)) return;
-    const next = endDay(clock);
-    const note = paNotesByDay[(next.day - 1) % paNotesByDay.length]!;
-    set({ clock: next, paNotes: [...paNotes, note] });
-  },
-
-  submitStatement: (text) => {
-    const { clock, statements } = get();
-    const trimmed = text.trim();
-    if (!trimmed || !canAct(clock)) return false;
-    const slot = 3 - clock.slotsLeftToday;
+  startNewGame: (name, address) => {
+    const game = newGame({ seed: Math.floor(Math.random() * 2 ** 31), name, address });
+    writeSave(game);
     set({
-      clock: spendSlot(clock),
-      statements: [...statements, { id: nextId++, day: clock.day, slot, text: trimmed }],
+      game,
+      scene: 'desk',
+      overlay: null,
+      selectedTola: null,
+      lastError: null,
+      phoneSeen: false,
+      hasSave: true,
     });
+  },
+  continueGame: () => {
+    const game = loadSave();
+    if (game)
+      set({
+        game,
+        scene: game.phase === 'counting' ? 'counting' : 'desk',
+        overlay: null,
+        lastError: null,
+      });
+  },
+  quitToTitle: () =>
+    set({ scene: 'title', overlay: null, selectedTola: null, hasSave: loadSave() !== null }),
+
+  dispatch: (action) => {
+    const { game } = get();
+    if (!game) return false;
+    const { state, error } = applyAction(game, action);
+    if (error) {
+      set({ lastError: error });
+      return false;
+    }
+    writeSave(state);
+    set({ game: state, lastError: null });
     return true;
   },
-}));
 
-export function headlineFor(day: number): string {
-  return headlines[(day - 1) % headlines.length]!;
-}
+  open: (overlay) =>
+    set(
+      overlay === 'phone'
+        ? { overlay, phoneSeen: true, lastError: null }
+        : { overlay, lastError: null },
+    ),
+  close: () => set({ overlay: null, lastError: null }),
+  goTo: (scene) => set({ scene, overlay: null, selectedTola: null, lastError: null }),
+  selectTola: (tola) => set({ selectedTola: tola, lastError: null }),
+}));
 
 // Dev-only handle for inspecting and seeding state from the browser console or test scripts.
 if (import.meta.env.DEV) {

@@ -25,6 +25,7 @@ npm run dev            # Vite on :5173 + AI proxy on :8787
 | `npm run build`     | Typecheck and production build to `dist/`                                                                                                |
 | `npm run format`    | Prettier                                                                                                                                 |
 | `npm run assets:*`  | Image pipeline: `generate` (dry run by default), `review`, `slice`, `optimize`. See [`tools/assets/README.md`](./tools/assets/README.md) |
+| `npm run sim`       | Balance report: headless bots play many seeded games (`npm run sim -- 200 honest,idle`)                                                  |
 
 ## Layout
 

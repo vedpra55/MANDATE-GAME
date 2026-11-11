@@ -21,12 +21,6 @@ export const headlines = [
   'Panchayat road repair: work order signed, no work seen',
 ];
 
-export const paNotesByDay = [
-  'Bhaiya, Purvi tola is angry about the handpump. Women walk to the next well.',
-  'The old sarpanch family is visiting every house with sweets.',
-  'Young boys at the chowk say nobody talks about jobs.',
-];
-
 export const grievanceFiles = [
   'Widow pension stopped for six months',
   'Ration card name spelt wrong, rations refused',

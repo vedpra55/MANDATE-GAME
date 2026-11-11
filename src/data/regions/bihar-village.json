@@ -1,0 +1,165 @@
+{
+  "id": "bihar-village-01",
+  "meta": {
+    "provisional": true,
+    "note": "Illustrative numbers shaped on rural Bihar block-level patterns. To be replaced by processed Census, ECI and NFHS data (see CLAUDE.md §6)."
+  },
+  "campaignDays": 21,
+  "startCash": 25000,
+  "startCadre": { "size": 2, "loyalty": 70 },
+  "rival": { "name": "Rajendra Babu", "cash": 60000, "reputation": 10 },
+  "blocs": {
+    "farmers": {
+      "baseTurnout": 0.68,
+      "playerTrust": 0,
+      "rivalTrust": 18,
+      "issues": {
+        "irrigation": 0.25,
+        "crop_prices": 0.25,
+        "roads": 0.15,
+        "electricity": 0.15,
+        "water": 0.1,
+        "corruption": 0.1
+      }
+    },
+    "labourers": {
+      "baseTurnout": 0.62,
+      "playerTrust": 0,
+      "rivalTrust": -2,
+      "issues": {
+        "wages_work": 0.3,
+        "housing": 0.2,
+        "ration": 0.2,
+        "water": 0.1,
+        "health": 0.1,
+        "dignity": 0.1
+      }
+    },
+    "youth": {
+      "baseTurnout": 0.55,
+      "playerTrust": 6,
+      "rivalTrust": -6,
+      "issues": {
+        "jobs_exams": 0.4,
+        "education": 0.15,
+        "roads": 0.1,
+        "safety": 0.1,
+        "corruption": 0.15,
+        "sports": 0.1
+      }
+    },
+    "traders": {
+      "baseTurnout": 0.66,
+      "playerTrust": 0,
+      "rivalTrust": 15,
+      "issues": {
+        "roads": 0.25,
+        "electricity": 0.2,
+        "safety": 0.25,
+        "corruption": 0.15,
+        "credit": 0.15
+      }
+    },
+    "elders": {
+      "baseTurnout": 0.72,
+      "playerTrust": -2,
+      "rivalTrust": 24,
+      "issues": { "pensions": 0.35, "health": 0.3, "water": 0.15, "safety": 0.1, "dignity": 0.1 }
+    }
+  },
+  "women": {
+    "share": 0.48,
+    "turnoutDelta": -0.02,
+    "rivalTrustDelta": -6,
+    "issueBoost": { "water": 1.5, "safety": 1.5, "health": 1.4, "pensions": 1.3 }
+  },
+  "tolas": {
+    "purvi": {
+      "voters": 520,
+      "blocs": {
+        "farmers": 0.15,
+        "labourers": 0.4,
+        "youth": 0.22,
+        "traders": 0.05,
+        "elders": 0.18
+      },
+      "grievances": { "water": 0.9, "wages_work": 0.6, "housing": 0.5 },
+      "neighbours": ["bazaar", "pokhar"],
+      "rivalMood": -5,
+      "rivalCoverage": 0.45
+    },
+    "paschim": {
+      "voters": 480,
+      "blocs": {
+        "farmers": 0.45,
+        "labourers": 0.15,
+        "youth": 0.18,
+        "traders": 0.04,
+        "elders": 0.18
+      },
+      "grievances": { "irrigation": 0.8, "crop_prices": 0.6, "roads": 0.4 },
+      "neighbours": ["bazaar", "naya"],
+      "rivalMood": 10,
+      "rivalCoverage": 0.6
+    },
+    "bazaar": {
+      "voters": 360,
+      "blocs": {
+        "farmers": 0.08,
+        "labourers": 0.15,
+        "youth": 0.27,
+        "traders": 0.35,
+        "elders": 0.15
+      },
+      "grievances": { "roads": 0.7, "safety": 0.6, "electricity": 0.5 },
+      "neighbours": ["purvi", "paschim", "pokhar", "naya"],
+      "rivalMood": 5,
+      "rivalCoverage": 0.55
+    },
+    "pokhar": {
+      "voters": 540,
+      "blocs": {
+        "farmers": 0.3,
+        "labourers": 0.38,
+        "youth": 0.17,
+        "traders": 0.03,
+        "elders": 0.12
+      },
+      "grievances": { "roads": 0.8, "health": 0.6, "ration": 0.6 },
+      "neighbours": ["purvi", "bazaar"],
+      "rivalMood": 8,
+      "rivalCoverage": 0.5
+    },
+    "naya": {
+      "voters": 500,
+      "blocs": {
+        "farmers": 0.12,
+        "labourers": 0.28,
+        "youth": 0.38,
+        "traders": 0.08,
+        "elders": 0.14
+      },
+      "grievances": { "jobs_exams": 0.8, "education": 0.6, "electricity": 0.5 },
+      "neighbours": ["paschim", "bazaar"],
+      "rivalMood": -4,
+      "rivalCoverage": 0.4
+    }
+  },
+  "works": {
+    "water": 6000,
+    "roads": 12000,
+    "irrigation": 9000,
+    "electricity": 5000,
+    "health": 5000,
+    "education": 4000,
+    "safety": 3000,
+    "sports": 3000,
+    "jobs_exams": 5000,
+    "credit": 5000,
+    "housing": 2000,
+    "ration": 1500,
+    "pensions": 1500,
+    "wages_work": 1500
+  },
+  "countingOrder": ["pokhar", "paschim", "naya", "purvi", "bazaar"]
+}
