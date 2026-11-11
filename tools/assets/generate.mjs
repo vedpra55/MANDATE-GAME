@@ -126,9 +126,19 @@ runMain(async (argv) => {
         background: asset.background,
         references: job.references,
       });
-      await fs.writeFile(variantFile(dir, number), png);
-      console.log(`  ✓ v${number} (${((Date.now() - started) / 1000).toFixed(1)}s)`);
-      return number;
+      // Exclusive create: a concurrent run can never overwrite a variant; take the next free number.
+      let saved = number;
+      for (;;) {
+        try {
+          await fs.writeFile(variantFile(dir, saved), png, { flag: 'wx' });
+          break;
+        } catch (err) {
+          if (err.code !== 'EEXIST') throw err;
+          saved = Math.max(saved + 1, nextVariantNumber(await listVariants(dir)));
+        }
+      }
+      console.log(`  ✓ v${saved} (${((Date.now() - started) / 1000).toFixed(1)}s)`);
+      return saved;
     });
 
     const saved = results.filter((r) => r.ok).map((r) => r.value);

@@ -1,7 +1,9 @@
 # Style direction C: blend of A and B. Signboard shapes and colour, print texture.
+# Chosen by the owner on 2026-11-11 after the first Phase 0 run. Run 2: colour balance and camera locked.
 Medium: a hand-painted signboard illustration printed on paper: the bold simplified shapes and colours of Indian sign painting, with the texture of old letterpress print. Flat 2D illustration, not photorealistic, not a 3D render.
-Line: thick, slightly irregular dark-brown brush outlines; hand-made and a little imperfect.
-Colour: flat fills from a matchbox-label palette: marigold yellow, vermilion red, deep indigo, leaf green, warm cream, earth brown, ink black. No gradients.
-Shading: sparse halftone dots and a little hatching inside the shadow shapes; subtle paper grain across the image; very slight colour misregistration.
+Line: thick, slightly irregular dark-brown brush outlines around every object; hand-made and a little imperfect.
+Colour: flat fills from a matchbox-label palette: marigold yellow, vermilion red, deep indigo, leaf green, warm cream, earth brown, ink black. No gradients. Keep the colour balanced: warm ground and wood, but deep indigo and leaf green must appear clearly across the image, so it is never dominated by orange and ochre.
+Shading: shadows are flat cool indigo-tinted shapes, not brown; sparse halftone dots and a little hatching inside the shadow shapes; subtle paper grain across the image; very slight colour misregistration.
 Light: warm late-afternoon sunlight from the top-left, shadows falling to the bottom-right.
+Camera: a high overhead three-quarter view looking down at about 70 degrees, as if standing over the charpai; mild perspective; the same angle for every desk asset.
 Mood: warm, tactile and full of character; graphic like a sign painting, textured like old print.
