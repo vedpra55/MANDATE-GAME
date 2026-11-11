@@ -15,7 +15,13 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { parseArgs, runMain } from './lib/cli.mjs';
 import { outputWidths, spriteLayout } from './lib/layout.mjs';
-import { EXPRESSIONS, loadManifest, saveManifest, selectAssets } from './lib/manifest.mjs';
+import {
+  loadManifest,
+  saveManifest,
+  selectAssets,
+  SHEET_KINDS,
+  sliceLabels,
+} from './lib/manifest.mjs';
 import { assetFileBase, assetOutputDir, REPO_ROOT, SRC_ASSETS_DIR } from './lib/paths.mjs';
 import { sliceSheet } from './lib/sheets.mjs';
 import { variantFile } from './lib/variants.mjs';
@@ -50,10 +56,15 @@ runMain(async (argv) => {
     const outDir = path.join(SRC_ASSETS_DIR, asset.category);
     const base = assetFileBase(asset.id);
 
-    if (asset.kind === 'character-sheet') {
-      const sliced = await sliceSheet(source, path.join(assetOutputDir(asset.id), 'sliced'));
-      for (const expression of EXPRESSIONS) {
-        await writePair(sliced[expression], outDir, `${base}-${expression}`, asset.displayWidth);
+    if (SHEET_KINDS.includes(asset.kind)) {
+      const labels = sliceLabels(asset.kind);
+      const sliced = await sliceSheet(
+        source,
+        path.join(assetOutputDir(asset.id), 'sliced'),
+        labels,
+      );
+      for (const label of labels) {
+        await writePair(sliced[label], outDir, `${base}-${label}`, asset.displayWidth);
       }
     } else {
       await writePair(source, outDir, base, asset.displayWidth);
@@ -96,7 +107,19 @@ async function writePair(source, outDir, base, displayWidth) {
 
 async function writeSprite(name, members) {
   if (members.length === 0) return;
-  const sources = members.map((m) => variantFile(assetOutputDir(m.id), m.picked));
+  // Each member gives one frame, or four if it is a 2×2 grid of different subjects.
+  const frames = [];
+  for (const m of members) {
+    const file = variantFile(assetOutputDir(m.id), m.picked);
+    if (m.kind === 'grid-4') {
+      const labels = sliceLabels(m.kind);
+      const sliced = await sliceSheet(file, path.join(assetOutputDir(m.id), 'sliced'), labels);
+      labels.forEach((l) => frames.push({ id: `${m.id}-${l}`, file: sliced[l] }));
+    } else {
+      frames.push({ id: m.id, file });
+    }
+  }
+  const sources = frames.map((f) => f.file);
   const sizes = await Promise.all(sources.map((s) => sharp(s).metadata()));
   const widths = new Set(members.map((m) => m.displayWidth));
   if (widths.size > 1) throw new Error(`sprite "${name}": members must share one displayWidth`);
@@ -113,7 +136,7 @@ async function writeSprite(name, members) {
   for (const scale of [1, 2]) {
     const cellW = Math.min(displayWidth * scale, sizes[0].width);
     const cellH = Math.round(cellW * aspect);
-    const layout = spriteLayout(members.length, cellW, cellH);
+    const layout = spriteLayout(frames.length, cellW, cellH);
     const tiles = await Promise.all(
       sources.map((s) =>
         sharp(s).resize({ width: cellW, height: cellH, fit: 'fill' }).png().toBuffer(),
@@ -134,13 +157,13 @@ async function writeSprite(name, members) {
       .webp(WEBP)
       .toFile(file);
     console.log(
-      `✓ sprite ${rel(file)} (${members.length} frames, ${layout.width}×${layout.height})`,
+      `✓ sprite ${rel(file)} (${frames.length} frames, ${layout.width}×${layout.height})`,
     );
     if (scale === 1) {
       atlas.image = `${name}.webp`;
       atlas.image2x = `${name}@2x.webp`;
       atlas.cell = { w: cellW, h: cellH };
-      atlas.frames = Object.fromEntries(members.map((m, i) => [m.id, layout.frames[i]]));
+      atlas.frames = Object.fromEntries(frames.map((f, i) => [f.id, layout.frames[i]]));
     }
   }
   const atlasFile = path.join(outDir, `${name}.json`);

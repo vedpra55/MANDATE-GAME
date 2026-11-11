@@ -5,9 +5,7 @@
     "quality": "medium",
     "variants": 4,
     "styleBlockFile": "style-block.txt",
-    "references": [
-      "references"
-    ]
+    "references": ["references"]
   },
   "assets": [
     {
@@ -19,7 +17,7 @@
       "background": "opaque",
       "displayWidth": 1920,
       "status": "generated",
-      "notes": "Phase 0 style direction A.",
+      "notes": "Phase 0 style direction A. Exploration only: never exported.",
       "styleBlockFile": "styles/style-a-signboard.txt"
     },
     {
@@ -31,7 +29,7 @@
       "background": "opaque",
       "displayWidth": 1920,
       "status": "generated",
-      "notes": "Phase 0 style direction B.",
+      "notes": "Phase 0 style direction B. Exploration only: never exported.",
       "styleBlockFile": "styles/style-b-newsprint.txt"
     },
     {
@@ -43,54 +41,501 @@
       "background": "opaque",
       "displayWidth": 1920,
       "status": "generated",
-      "notes": "Phase 0 style direction C. CHOSEN by owner. Run 2: indigo/green balance, camera locked.",
+      "picked": 2,
+      "notes": "Phase 0 style direction C. CHOSEN by owner. Run 2: indigo/green balance, camera locked. Exploration only: never exported.",
       "styleBlockFile": "styles/style-c-blend.txt"
     },
     {
       "id": "scene.village-desk",
       "category": "scenes",
       "kind": "image",
-      "description": "The player's desk at the start of the game: the open-air workspace of a village sarpanch candidate in a fictional village in rural Bihar, north India. Seen from a high overhead angle, as if standing over the charpai.\nComposition (16:9): a woven rope charpai with a wooden frame fills the middle two-thirds of the frame and serves as the desk. The centre of the charpai is left clear and uncluttered, because the game places a sheet of paper there. Along the top edge, the base of a thick neem tree trunk with gnarled roots; a tear-off wall calendar with blank pages hangs on a nail in the trunk. The ground around the charpai is packed earth with a few fallen neem leaves.\nObjects, each clearly separated with space around it so it can be cut out later:\n- left side: an old cream rotary landline phone with a coiled cord; a dented deep-indigo painted tin cash box\n- on the charpai, near its edges: a red cloth-bound bahi-khata ledger; a folded newspaper whose columns are suggested by grey blocks with no readable letters; a small stack of paper files tied with cotton string; a small spiral notebook with a pencil\n- right side: a glass of milky chai on a small steel saucer\n- bottom-right corner: the front wheel and handlebars of an old black bicycle entering the frame\nDappled cool shadows of neem leaves fall across the scene; a few green neem sprigs overhang the top corners.",
+      "description": "The player's desk at the start of the game: the open-air workspace of a village sarpanch candidate in a fictional village in rural Bihar, north India, present day.\nComposition (16:9): a woven rope charpai with a wooden frame fills the middle two-thirds of the frame and serves as the desk; its surface is seen from above. The centre of the charpai is left clear and uncluttered, because the game places a sheet of paper there. Along the top edge, the base of a thick neem tree trunk with roots; a tear-off wall calendar with blank pages hangs front-facing on a nail in the trunk. Neem foliage overhangs the two top corners. The ground is packed earth with a few fallen single leaflets.\nObjects, each clearly separated with space around it so it can be cut out later:\n- left side: a small wooden stool holding a cheap Android smartphone in a worn rubber case with a cracked screen guard, its screen dark and blank; below the stool, a dented deep-indigo painted tin cash box\n- on the charpai, near its edges: a red cloth-bound bahi-khata ledger tied with string (top-left area); a folded newspaper whose columns are suggested by grey blocks with no readable letters (bottom-left area); a stack of paper files tied with cotton string (top-right area); a spiral writing pad with a pencil on it (bottom-right area); a small khaki cloth-bound pocket diary held shut with a rubber band, beside the writing pad but clearly separate from it\n- right side, on the ground: a glass of milky chai on a small steel saucer\n- bottom-right corner: the front wheel and handlebars of an old black bicycle with a bell, entering the frame",
       "size": "2048x1152",
       "background": "opaque",
       "displayWidth": 1920,
-      "status": "todo"
+      "status": "final",
+      "picked": 1,
+      "notes": "Master desk. Approved image becomes golden reference #1.",
+      "references": []
+    },
+    {
+      "id": "scene.village-desk-empty",
+      "category": "scenes",
+      "kind": "image",
+      "description": "Edit the reference image. Remove ALL of these loose objects: (1) the smartphone on the stool, (2) the blue tin cash box on the ground at the lower left, (3) the red ledger, (4) the newspaper, (5) the stack of tied files, (6) the writing pad and pencil, (7) the khaki diary, (8) the chai glass and saucer on the right, (9) the calendar pad on the trunk, leaving only its nail. Fill every uncovered area with the matching charpai weave and earth ground. Keep everything else exactly the same: the tree, foliage, charpai, the empty stool, the bicycle, ground, shadow pattern, framing and style, at the same brightness and colour as the reference (do not darken or re-grade the image).",
+      "size": "2048x1152",
+      "background": "opaque",
+      "displayWidth": 1920,
+      "status": "final",
+      "picked": 3,
+      "notes": "Empty desk background; props are layered on top in code.",
+      "referenceNote": "Image 1 is the master desk scene to edit. Preserve its composition, camera, palette and style exactly; change only what the subject lists.",
+      "references": ["@picked:scene.village-desk"]
     },
     {
       "id": "prop.phone",
       "category": "props",
       "kind": "image",
-      "description": "An old cream-coloured rotary landline telephone with a coiled cord, slightly worn and scuffed, seen from directly above to match the desk scene.",
+      "description": "A cheap Android smartphone in a worn dark rubber case with a cracked screen guard, lying flat, seen at a gentle three-quarter tilt from above. The screen is dark, glossy and completely blank.",
+      "size": "1024x1024",
+      "background": "transparent",
+      "displayWidth": 160,
+      "status": "final",
+      "picked": 1,
+      "referenceNote": "The attached master desk scene contains this object (the smartphone). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
+    },
+    {
+      "id": "prop.ledger-closed",
+      "category": "props",
+      "kind": "image",
+      "description": "A closed red cloth-bound bahi-khata account ledger, thick and well-used, tied with a cotton string, seen at a gentle three-quarter tilt from above. Cover is plain, with no writing or emblem.",
+      "size": "1024x1024",
+      "background": "transparent",
+      "displayWidth": 300,
+      "status": "final",
+      "picked": 1,
+      "referenceNote": "The attached master desk scene contains this object (the red bahi-khata ledger). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
+    },
+    {
+      "id": "prop.ledger-open",
+      "category": "props",
+      "kind": "image",
+      "description": "The same red cloth-bound bahi-khata ledger lying open flat, showing two blank cream pages ruled with faint red vertical columns only, no writing at all; seen from directly above; the red cloth cover edges visible around the pages.",
+      "size": "1536x1024",
+      "background": "transparent",
+      "displayWidth": 760,
+      "status": "final",
+      "picked": 1,
+      "referenceNote": "The attached master desk scene contains this object (the red bahi-khata ledger). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
+    },
+    {
+      "id": "prop.newspaper",
+      "category": "props",
+      "kind": "image",
+      "description": "A folded local Hindi newspaper seen at a gentle three-quarter tilt from above. Its layout of columns and one photo box is suggested with flat grey blocks only: no letters, no numbers, no masthead text.",
+      "size": "1024x1024",
+      "background": "transparent",
+      "displayWidth": 320,
+      "status": "final",
+      "picked": 1,
+      "referenceNote": "The attached master desk scene contains this object (the folded newspaper). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
+    },
+    {
+      "id": "prop.cash-tin",
+      "category": "props",
+      "kind": "image",
+      "description": "A dented deep-indigo painted tin cash box with a metal handle and a small brass lock, paint chipped at the edges, closed, seen at a gentle three-quarter tilt from above.",
       "size": "1024x1024",
       "background": "transparent",
       "displayWidth": 220,
-      "status": "todo",
-      "model": "gpt-image-2.6-sunburst",
-      "references": [
-        "references",
-        "@picked:scene.village-desk"
-      ]
+      "status": "final",
+      "picked": 1,
+      "referenceNote": "The attached master desk scene contains this object (the indigo tin cash box). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
+    },
+    {
+      "id": "prop.calendar",
+      "category": "props",
+      "kind": "image",
+      "description": "A tear-off wall calendar hanging front-facing on a single nail: a red header strip with no writing, and a thick pad of blank cream pages with slightly curled edges. No numbers or text.",
+      "size": "1024x1536",
+      "background": "transparent",
+      "displayWidth": 180,
+      "status": "final",
+      "picked": 1,
+      "referenceNote": "The attached master desk scene contains this object (the tear-off calendar). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
+    },
+    {
+      "id": "prop.files",
+      "category": "props",
+      "kind": "image",
+      "description": "A stack of five or six worn paper files and folders in buff, faded blue and green, tied with cotton string in a bow, seen at a gentle three-quarter tilt from above. No writing on any file.",
+      "size": "1024x1024",
+      "background": "transparent",
+      "displayWidth": 300,
+      "status": "final",
+      "picked": 1,
+      "referenceNote": "The attached master desk scene contains this object (the tied files). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
+    },
+    {
+      "id": "prop.pa-diary",
+      "category": "props",
+      "kind": "image",
+      "description": "A small khaki cloth-bound pocket diary held shut with a red rubber band, a little dog-eared, seen at a gentle three-quarter tilt from above. No writing on the cover.",
+      "size": "1024x1024",
+      "background": "transparent",
+      "displayWidth": 140,
+      "status": "final",
+      "picked": 1,
+      "referenceNote": "The attached master desk scene contains this object (the khaki pocket diary). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
+    },
+    {
+      "id": "prop.writing-pad",
+      "category": "props",
+      "kind": "image",
+      "description": "A spiral-bound writing pad with plain cream pages and a yellow pencil lying across it, seen at a gentle three-quarter tilt from above. The page is blank: faint ruled lines only, no writing.",
+      "size": "1024x1024",
+      "background": "transparent",
+      "displayWidth": 260,
+      "status": "final",
+      "picked": 1,
+      "referenceNote": "The attached master desk scene contains this object (the spiral writing pad). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
+    },
+    {
+      "id": "prop.chai",
+      "category": "props",
+      "kind": "image",
+      "description": "A small ribbed glass of hot milky chai on a little round steel saucer, seen from high above at a steep angle (about 60 degrees down), so the round surface of the tea shows as a wide oval and the saucer as a wide ellipse around the glass. The tea is opaque and pale milky brown, like milky coffee, with a thin skin of froth; never orange, never clear. A faint wisp of steam.",
+      "size": "1024x1024",
+      "background": "transparent",
+      "displayWidth": 140,
+      "status": "final",
+      "picked": 3,
+      "referenceNote": "The attached master desk scene contains this object (the glass of chai). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
     },
     {
       "id": "character.pa",
       "category": "characters",
       "kind": "character-sheet",
-      "description": "The player's personal assistant: a fictional young man in his mid-twenties from a small north Indian village. Sharp, loyal and a little anxious. Neatly combed hair, thin moustache, simple checked half-sleeve shirt with a pen clipped in the pocket.",
+      "description": "The player's personal assistant: a young man of about 25 from the village, quick, loyal and a little anxious. Lean build, neatly combed hair, thin moustache, a checked half-sleeve shirt with a ballpoint pen clipped in the pocket, a cheap wristwatch.",
       "size": "2048x2048",
       "background": "opaque",
       "displayWidth": 360,
-      "status": "todo"
+      "status": "final",
+      "picked": 1
     },
     {
-      "id": "crowd.villager-back-01",
-      "category": "crowd",
+      "id": "character.rival",
+      "category": "characters",
+      "kind": "character-sheet",
+      "description": "The rival candidate: heir of the family that has held the village headship for decades; a man in his early fifties, confident, polished and charming, with a hint of menace. Heavy-set, thick greying moustache, gold-rimmed spectacles, a crisp off-white kurta with a maroon woollen shawl over one shoulder, a gold ring. Not a caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 360,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "character.donor",
+      "category": "characters",
+      "kind": "character-sheet",
+      "description": "A local construction contractor and brick-kiln owner of about 45 who funds candidates in return for future favours. Heavy, well-fed build, broad face, clean-shaven, neatly oiled hair, a plain solid maroon polo shirt with no checks or pattern, a thick gold chain and a chunky gold watch, a smartphone held near his chest. A friendly smile that does not quite reach his eyes. He must look clearly different from the young man in the reference image.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 360,
+      "status": "final",
+      "picked": 2
+    },
+    {
+      "id": "character.journalist",
+      "category": "characters",
+      "kind": "character-sheet",
+      "description": "A young local reporter of about 27 who runs her own news channel from her phone; sharp, fearless, curious. Hair tied back, small earrings, a cotton kurta with a dupatta, a lanyard with a blank press card, holding a smartphone fitted with a small clip-on microphone.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 360,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "character.villager-farmer",
+      "category": "characters",
+      "kind": "character-sheet",
+      "description": "A recurring villager: an elderly farmer of about 70, wiry and sun-weathered, white stubble, a checked cotton gamchha tied as a turban, an open shirt over a plain vest. Proud, tired, dignified.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 360,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "character.villager-shg",
+      "category": "characters",
+      "kind": "character-sheet",
+      "description": "A recurring villager: a woman of about 40 who leads the village women's self-help group; practical, outspoken and respected. Cotton saree with the pallu over her head, glass bangles, a cloth bag on her shoulder.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 360,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "character.villager-graduate",
+      "category": "characters",
+      "kind": "character-sheet",
+      "description": "A recurring villager: an unemployed graduate of about 24, restless and frustrated. Clean-shaven with NO moustache, thin black rectangular spectacles, slightly long side-parted hair, a plain pale-pink full-sleeve formal shirt with no checks or pattern, a plastic folder of job applications held against his chest (no visible text). He must look clearly different from the young man in the reference image.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 360,
+      "status": "final",
+      "picked": 2
+    },
+    {
+      "id": "scene.village-map",
+      "category": "scenes",
       "kind": "image",
-      "description": "One villager standing in a rally crowd, seen from behind and slightly above, head and shoulders and upper body. Simple flat shapes suitable for a crowd silhouette; ordinary everyday clothes.",
+      "description": "Camera override: seen from directly above, flat top-down. A hand-painted illustrated map of the fictional village, like a painted board: several distinct neighbourhoods (tolas) of mud-and-brick houses with tiled and tin roofs separated by dirt lanes; a central chowk with a tea stall and a big peepal tree on a raised platform; a primary school with a small playground; a public well and a handpump; a small pond; a small simple temple and a small simple mosque in different neighbourhoods; a dirt road entering from the left edge; green and mustard-yellow fields with irrigation channels around the outskirts; a few neem and mango trees. Every area is visually distinct and separated so each can be clicked. No labels, no text, no people.",
+      "size": "2048x1152",
+      "background": "opaque",
+      "displayWidth": 1920,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "scene.chaupal",
+      "category": "scenes",
+      "kind": "image",
+      "description": "Camera override: eye level, from where the candidate sits. The village chaupal where villagers bring their grievances: a raised platform of old brick under a large banyan tree with hanging aerial roots and broad, simple, oval glossy leaves. A worn striped durrie rug in the foreground. The middle third of the frame is an open, empty space where a villager will stand (added later as a separate portrait), so keep it free of people and objects. Background: a lane with a few mud-brick houses, a handpump, a buffalo resting in the distance.",
+      "size": "2048x1152",
+      "background": "opaque",
+      "displayWidth": 1920,
+      "status": "final",
+      "picked": 2
+    },
+    {
+      "id": "scene.rally-stage",
+      "category": "scenes",
+      "kind": "image",
+      "description": "Camera override: eye level, from just behind the speaker at the lectern. Foreground: the back edge of a simple wooden lectern with a blank notepad on it, marigold garlands strung along the front edge of the stage, two horn loudspeakers on bamboo poles at the sides, a blank cloth banner (no writing) strung across the top of the frame. Beyond the stage: an open dusty field and, at the horizon, trees and village houses. The field is EMPTY of people, because the crowd is added later as separate sprites.",
+      "size": "2048x1152",
+      "background": "opaque",
+      "displayWidth": 1920,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "scene.counting-centre",
+      "category": "scenes",
+      "kind": "image",
+      "description": "Camera override: eye level. A vote-counting hall in a block office on counting day: long tables in rows with blank tally sheets, grey steel ballot boxes with paper seals, bundles of blank ballot papers tied with string, a wire-mesh barricade in front of rows of empty plastic chairs for counting agents, a ceiling fan and tube lights, a large blank whiteboard on the back wall for results. No people (they are added later).",
+      "size": "2048x1152",
+      "background": "opaque",
+      "displayWidth": 1920,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-01",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a woman of about 35 in a printed cotton saree; an old man of about 75 with a white beard and a woollen cap; a teenage girl of about 16 in a school uniform with two braids; a man of about 40 in a sweat-stained vest with a gamchha on his shoulder. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-02",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a young man of about 22 in a plain sports jersey with no logo or number; an elderly woman of about 70 with deep wrinkles and a pale saree pallu over her head; a man of about 50 with a trimmed beard and a white skullcap, in a plain kurta; a woman of about 28 holding a baby wrapped in cloth. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-03",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a schoolteacher of about 45 with spectacles and a pen in his shirt pocket; a woman of about 50 in a green saree with a sickle over her shoulder; a boy of about 12 in a faded t-shirt; a man of about 60 in a dhoti and shawl leaning on a walking stick. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-04",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a woman of about 30 anganwadi worker in a pink saree; a man of about 35 auto-rickshaw driver in a khaki shirt; a college student of about 20 with a backpack and dupatta; a very thin old man of about 80 with a long white beard. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-05",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a woman of about 55 in a maroon saree with a large nose ring; a migrant worker of about 28 back from the city, in a hoodie; a shopkeeper of about 45 with a paunch and a checked shirt; a woman of about 24 in salwar kameez with a scarf covering her hair. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-06",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a retired soldier of about 65 with a clipped grey moustache; a tailor of about 38 with a measuring tape around her neck; a young man of about 19 with earphones; a woman of about 60 carrying a bundle of firewood on her head. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-07",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a fisherman of about 50 with a net over his shoulder; an ASHA health worker of about 26 with a cloth bag; a stooped old woman of about 85 with white hair; a mason of about 33 with cement dust on his shirt. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-08",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a woman of about 42 with a printed head scarf and kurta; a farmer of about 55 with a turban and grey beard; a boy of about 15 with a cricket bat on his shoulder; a woman of about 32 holding a steel milk can. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-09",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: an e-rickshaw driver of about 38 with a muffler; a vegetable seller of about 48 with a basket; a nursing student of about 23 with her hair in a bun; an old man of about 72 holding a small transistor radio. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-10",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a barber of about 30 with scissors in his shirt pocket; a woman of about 65 with traditional tattoos on her forearms and a coarse cotton saree; a girl of about 10 with short hair and a school bag; an electrician of about 45 with a coil of wire on his shoulder. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-11",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a brick-kiln worker of about 36 in a yellow saree with dust on her arms; a postman of about 58 in a khaki uniform with a cloth bag; a mobile-repair shop worker of about 25 with a thin beard and a screwdriver in his pocket; an elderly woman of about 68 with spectacles and a cardigan over her saree. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "portraits.villagers-12",
+      "category": "characters",
+      "kind": "grid-4",
+      "description": "Four different ordinary villagers from the same village, each chest-up in a three-quarter view with a calm, natural expression, as portraits for people who come to the candidate with their problems. In order: a tractor driver of about 40 in a plain cap; a self-help group member of about 29 with a ledger under her arm; a retired schoolmaster of about 70 in a white kurta and cloth cap; a delivery rider of about 17 with a helmet under his arm. Each is an individual with real dignity; no caricature.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 280,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "crowd.backs-01",
+      "category": "crowd",
+      "kind": "grid-4",
+      "description": "Four different villagers standing in a rally crowd, each seen from BEHIND and slightly above, head, shoulders and upper body, facing away toward a stage. Simple bold shapes suitable for layering into a crowd. In order: a man with a gamchha tied on his head; a woman with her saree pallu over her head; a young man in a t-shirt raising one fist; an old man in a shawl.",
       "size": "1024x1536",
       "background": "transparent",
       "displayWidth": 160,
       "sprite": "crowd",
-      "status": "todo"
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "crowd.backs-02",
+      "category": "crowd",
+      "kind": "grid-4",
+      "description": "Four different villagers standing in a rally crowd, each seen from BEHIND and slightly above, head, shoulders and upper body, facing away toward a stage. Simple bold shapes suitable for layering into a crowd. In order: a woman holding a small child on her hip; a man in a checked shirt with arms folded; a teenage boy in a hoodie waving one hand; a woman with a scarf over her hair.",
+      "size": "1024x1536",
+      "background": "transparent",
+      "displayWidth": 160,
+      "sprite": "crowd",
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "crowd.backs-03",
+      "category": "crowd",
+      "kind": "grid-4",
+      "description": "Four different villagers standing in a rally crowd, each seen from BEHIND and slightly above, head, shoulders and upper body, facing away toward a stage. Simple bold shapes suitable for layering into a crowd. In order: a man in a vest with a towel on his shoulder; a young woman in salwar kameez; a man in a plain cap clapping with hands raised; an elderly woman with white hair in a bun.",
+      "size": "1024x1536",
+      "background": "transparent",
+      "displayWidth": 160,
+      "sprite": "crowd",
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "crowd.backs-04",
+      "category": "crowd",
+      "kind": "grid-4",
+      "description": "Four different villagers standing in a rally crowd, each seen from BEHIND and slightly above, head, shoulders and upper body, facing away toward a stage. Simple bold shapes suitable for layering into a crowd. In order: a man with a turban; two-tone short hair young man holding up a phone to record; a woman in a bright saree; a man in a kurta raising both arms.",
+      "size": "1024x1536",
+      "background": "transparent",
+      "displayWidth": 160,
+      "sprite": "crowd",
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "texture.paper",
+      "category": "textures",
+      "kind": "image",
+      "description": "A flat, evenly lit close-up surface of warm cream rough handmade paper with visible fibres and faint halftone speckle, filling the whole frame.",
+      "size": "1024x1024",
+      "background": "opaque",
+      "displayWidth": 512,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "texture.newsprint",
+      "category": "textures",
+      "kind": "image",
+      "description": "A flat, evenly lit close-up surface of cheap newsprint paper filling the whole frame: cool grey-white (clearly greyer and cooler than cream paper), with a fine, even, clearly visible black halftone dot screen in a light grey tint, faint fibres and slight yellowing at random spots. No print, no letters, no images.",
+      "size": "1024x1024",
+      "background": "opaque",
+      "displayWidth": 512,
+      "status": "final",
+      "picked": 2
+    },
+    {
+      "id": "texture.red-cloth",
+      "category": "textures",
+      "kind": "image",
+      "description": "A flat, evenly lit close-up surface of coarse red cotton cloth with a visible weave, as on a bahi-khata ledger cover, slightly faded, filling the whole frame.",
+      "size": "1024x1024",
+      "background": "opaque",
+      "displayWidth": 512,
+      "status": "final",
+      "picked": 1
+    },
+    {
+      "id": "texture.wood",
+      "category": "textures",
+      "kind": "image",
+      "description": "A flat, evenly lit close-up surface of worn warm-brown wooden desk top with long straight grain and small scratches, filling the whole frame.",
+      "size": "1024x1024",
+      "background": "opaque",
+      "displayWidth": 512,
+      "status": "final",
+      "picked": 2
     }
   ]
 }

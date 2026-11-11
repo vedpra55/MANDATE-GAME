@@ -7,6 +7,13 @@ export const CATEGORIES = ['scenes', 'props', 'characters', 'crowd', 'ui', 'text
 export const STATUSES = ['todo', 'generated', 'picked', 'final'];
 /** Order of the 2×2 character sheet: top-left, top-right, bottom-left, bottom-right. */
 export const EXPRESSIONS = ['neutral', 'pleased', 'angry', 'suspicious'];
+/** Kinds that are 2×2 sheets, sliced into four files. "grid-4" holds four different subjects. */
+export const SHEET_KINDS = ['character-sheet', 'grid-4'];
+
+/** File-name labels for the four quadrants of a sheet (TL, TR, BL, BR). */
+export function sliceLabels(kind) {
+  return kind === 'character-sheet' ? EXPRESSIONS : ['1', '2', '3', '4'];
+}
 
 const sizeSchema = z.string().superRefine((value, ctx) => {
   const error = sizeError(value);
@@ -26,7 +33,7 @@ const assetSchema = z
   .object({
     id: z.string().regex(/^[a-z0-9]+(?:[.-][a-z0-9]+)*$/, 'lowercase, digits, "." and "-" only'),
     category: z.enum(CATEGORIES),
-    kind: z.enum(['image', 'character-sheet']).default('image'),
+    kind: z.enum(['image', 'character-sheet', 'grid-4']).default('image'),
     /** What to draw. Style and technical spec are added by the prompt builder. */
     description: z.string().min(10),
     size: sizeSchema,
@@ -44,6 +51,8 @@ const assetSchema = z
     /** Variant number chosen in review. */
     picked: z.number().int().positive().optional(),
     notes: z.string().optional(),
+    /** How the model should use the attached references (OpenAI: "assign roles to references"). */
+    referenceNote: z.string().optional(),
     model: generationSettings.model.optional(),
     quality: generationSettings.quality.optional(),
     variants: generationSettings.variants.optional(),

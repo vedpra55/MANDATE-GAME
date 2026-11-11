@@ -51,6 +51,11 @@ export function buildTechnicalSpec(asset) {
       `Top-left: ${tl}. Top-right: ${tr}. Bottom-left: ${bl}. Bottom-right: ${br}.`,
       'Each face centred in its quadrant with margin; nothing crosses quadrant edges; no borders, gutters or labels.',
     );
+  } else if (asset.kind === 'grid-4') {
+    lines.push(
+      'A 2x2 grid of four equal quadrants, each showing a DIFFERENT person as described, one per quadrant, in the order listed: top-left, top-right, bottom-left, bottom-right.',
+      'Identical framing, scale, camera angle and lighting in every quadrant; each figure centred with margin; nothing crosses quadrant edges; no borders, gutters or labels.',
+    );
   } else if (asset.category === 'scenes') {
     lines.push('Full illustrated scene, composed edge to edge.');
   } else if (asset.category === 'textures') {
@@ -65,7 +70,7 @@ export function buildTechnicalSpec(asset) {
     lines.push(
       'Isolated on a fully transparent background: no scenery, no solid backdrop, no checkerboard, no cast shadow on the background.',
     );
-  } else if (asset.kind === 'character-sheet') {
+  } else if (asset.kind === 'character-sheet' || asset.kind === 'grid-4') {
     lines.push('Plain flat, even, light background in every quadrant.');
   }
 
@@ -82,9 +87,15 @@ export function buildTechnicalSpec(asset) {
  * Labelled sections in the order OpenAI recommends (use → subject/scene → style → constraints).
  * The style block is the shared, never-changing part; the subject is per asset.
  */
-export function buildPrompt(styleBlockText, asset) {
+export const DEFAULT_REFERENCE_NOTE =
+  'The attached reference images are STYLE references only: match their palette, outline weight, texture, shading and light. Do not copy their objects, people or layout.';
+
+export function buildPrompt(styleBlockText, asset, { referenceCount = 0 } = {}) {
+  const refs =
+    referenceCount > 0 ? ['', `References: ${asset.referenceNote ?? DEFAULT_REFERENCE_NOTE}`] : [];
   return [
     `Intended use: ${INTENDED_USE[asset.category]}`,
+    ...refs,
     '',
     'Subject:',
     asset.description.trim(),

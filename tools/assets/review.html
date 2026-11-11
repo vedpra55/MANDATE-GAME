@@ -330,7 +330,7 @@
       function renderAsset(a) {
         const cls = [
           a.background === 'transparent' ? 'transparent' : '',
-          a.kind === 'character-sheet' ? 'sheet' : '',
+          a.kind !== 'image' ? 'sheet' : '',
         ].join(' ');
         const variants = a.variants.length
           ? $(
@@ -379,7 +379,7 @@
           ? $(
               'div',
               { class: 'slices' },
-              data.expressions.map((e) =>
+              a.sliceLabels.map((e) =>
                 $(
                   'figure',
                   {},

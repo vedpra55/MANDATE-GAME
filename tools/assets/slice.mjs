@@ -8,7 +8,7 @@
  */
 import path from 'node:path';
 import { parseArgs, runMain } from './lib/cli.mjs';
-import { loadManifest, selectAssets } from './lib/manifest.mjs';
+import { loadManifest, selectAssets, SHEET_KINDS, sliceLabels } from './lib/manifest.mjs';
 import { assetOutputDir, REPO_ROOT } from './lib/paths.mjs';
 import { sliceSheet } from './lib/sheets.mjs';
 import { variantFile } from './lib/variants.mjs';
@@ -19,7 +19,7 @@ runMain(async (argv) => {
   const sheets = selectAssets(manifest, {
     only: args.only,
     statuses: ['picked', 'final'],
-  }).filter((a) => a.kind === 'character-sheet');
+  }).filter((a) => SHEET_KINDS.includes(a.kind));
 
   if (args.variant !== undefined && sheets.length !== 1) {
     throw new Error('--variant needs exactly one sheet: use --only <id>');
@@ -36,7 +36,11 @@ runMain(async (argv) => {
       continue;
     }
     const dir = assetOutputDir(sheet.id);
-    const files = await sliceSheet(variantFile(dir, number), path.join(dir, 'sliced'));
+    const files = await sliceSheet(
+      variantFile(dir, number),
+      path.join(dir, 'sliced'),
+      sliceLabels(sheet.kind),
+    );
     console.log(`✓ ${sheet.id} v${number} →`);
     for (const file of Object.values(files)) console.log(`    ${path.relative(REPO_ROOT, file)}`);
   }

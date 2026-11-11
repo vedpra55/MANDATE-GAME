@@ -1,5 +1,11 @@
-# PLACEHOLDER: the real style block is written in Phase 0 (step 3), after the owner picks
-# style direction A, B or C. Every asset will then share exactly this wording.
-#
+# MANDATE locked style (direction C), 2026-11-11. Shared by every asset. See style-bible.md.
 # Lines starting with "#" are comments and are never sent to the model.
-# generate.mjs refuses to spend credits while this file contains the word PLACEHOLDER.
+Medium: a hand-painted Indian signboard illustration printed on paper: the bold simplified shapes and colours of sign painting, with the texture of old letterpress print. Flat 2D illustration, not photorealistic, not a 3D render.
+Line: thick, slightly irregular dark-brown brush outlines around every object and figure; hand-made and a little imperfect.
+Colour: flat fills from a matchbox-label palette: marigold yellow, vermilion red, deep indigo, leaf green, warm cream, earth brown, ink black. No gradients. Keep the colour balanced: deep indigo and leaf green must appear clearly, so the image is never dominated by orange and ochre.
+Shading: shadows are flat cool indigo-tinted shapes, not brown; sparse halftone dots and a little hatching inside shadow shapes; subtle paper grain across the image; very slight colour misregistration.
+Light: warm late-afternoon sunlight from the top-left, shadows falling to the bottom-right.
+Camera (unless the subject says otherwise): surfaces such as a charpai or desk are seen from above; every object resting on them is drawn at the same gentle three-quarter tilt, so its top and front face are both visible; things hanging on a trunk or wall face the viewer.
+Foliage: every tree keeps its own natural leaf shape. Neem leaves are long pinnate compound leaves, small serrated leaflets lined up in pairs along a central stalk, in drooping sprays; banyan and peepal leaves are broad, simple and oval or heart-shaped; mango leaves are long and simple. No leaves ever fan out from a single point. Shade from foliage falls as soft rounded dappled patches, never as sharp leaf-shaped silhouettes.
+Setting: present-day rural Bihar, north India (2020s); only objects, clothes and technology of today.
+Mood: warm, tactile and full of character; graphic like a sign painting, textured like old print.

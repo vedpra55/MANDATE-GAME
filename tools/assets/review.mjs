@@ -11,7 +11,13 @@ import fs from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
 import { parseArgs, runMain } from './lib/cli.mjs';
-import { EXPRESSIONS, loadManifest, saveManifest } from './lib/manifest.mjs';
+import {
+  EXPRESSIONS,
+  loadManifest,
+  saveManifest,
+  SHEET_KINDS,
+  sliceLabels,
+} from './lib/manifest.mjs';
 import { ASSETS_TOOL_DIR, assetOutputDir } from './lib/paths.mjs';
 import { buildPrompt } from './lib/prompt.mjs';
 import { listVariants, variantFile } from './lib/variants.mjs';
@@ -44,7 +50,7 @@ async function handle(req, res) {
   if (req.method === 'GET' && url.pathname === '/api/state')
     return sendJson(res, 200, await state());
 
-  const image = /^\/output\/([a-z0-9.-]+)\/(?:v(\d+)|sliced\/([a-z]+))\.png$/.exec(url.pathname);
+  const image = /^\/output\/([a-z0-9.-]+)\/(?:v(\d+)|sliced\/([a-z0-9]+))\.png$/.exec(url.pathname);
   if (req.method === 'GET' && image) return sendImage(res, image);
 
   if (req.method === 'POST' && url.pathname.startsWith('/api/')) {
@@ -100,9 +106,9 @@ async function state() {
         prompt = buildPrompt(style, asset);
       }
       const hasSlices =
-        asset.kind === 'character-sheet' &&
+        SHEET_KINDS.includes(asset.kind) &&
         (await fs
-          .access(path.join(dir, 'sliced', `${EXPRESSIONS[0]}.png`))
+          .access(path.join(dir, 'sliced', `${sliceLabels(asset.kind)[0]}.png`))
           .then(() => true)
           .catch(() => false));
       return {
@@ -123,7 +129,7 @@ async function sendImage(res, [, id, variant, expression]) {
     return sendJson(res, 404, { error: 'unknown asset' });
   let file;
   if (variant) file = variantFile(assetOutputDir(id), Number(variant));
-  else if (EXPRESSIONS.includes(expression))
+  else if ([...EXPRESSIONS, '1', '2', '3', '4'].includes(expression))
     file = path.join(assetOutputDir(id), 'sliced', `${expression}.png`);
   else return sendJson(res, 404, { error: 'not found' });
   try {

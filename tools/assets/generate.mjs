@@ -22,6 +22,7 @@ import { ASSETS_TOOL_DIR, assetOutputDir, REPO_ROOT } from './lib/paths.mjs';
 import { buildPrompt, isPlaceholderStyle } from './lib/prompt.mjs';
 import { resolveReferences } from './lib/references.mjs';
 import { listVariants, nextVariantNumber, variantFile } from './lib/variants.mjs';
+import { checkAlpha, writePreview } from './lib/inspect.mjs';
 
 const FLAGS = {
   only: 'list',
@@ -68,7 +69,7 @@ runMain(async (argv) => {
     const { files: references, pending } = await resolveReferences(manifest, asset.references);
     jobs.push({
       asset,
-      prompt: buildPrompt(styleText, asset),
+      prompt: buildPrompt(styleText, asset, { referenceCount: references.length }),
       placeholderStyle: isPlaceholderStyle(styleText),
       references,
       pending,
@@ -137,7 +138,18 @@ runMain(async (argv) => {
           saved = Math.max(saved + 1, nextVariantNumber(await listVariants(dir)));
         }
       }
-      console.log(`  ✓ v${saved} (${((Date.now() - started) / 1000).toFixed(1)}s)`);
+      const file = variantFile(dir, saved);
+      const preview = await writePreview(file);
+      let alphaNote = '';
+      if (asset.background === 'transparent') {
+        const alpha = await checkAlpha(file);
+        alphaNote = alpha.ok
+          ? ` · alpha ok (${alpha.transparentPct}% clear)`
+          : ` · ⚠ ${alpha.message}`;
+      }
+      console.log(
+        `  ✓ v${saved} (${((Date.now() - started) / 1000).toFixed(1)}s)${alphaNote} · preview ${path.relative(REPO_ROOT, preview)}`,
+      );
       return saved;
     });
 

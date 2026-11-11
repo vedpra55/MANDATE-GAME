@@ -371,7 +371,7 @@ Work in small, reviewable steps. After each step, summarise what changed and wha
 
 - Which single region for the MVP? (Default suggestion: a rural Hindi-belt village, fictional name, real district data.)
 - Final game name (see below).
-- Which style direction (A/B/C)? Decided in Phase 0.
+- ~~Which style direction (A/B/C)?~~ C, see Decisions Log.
 - ~~Hosting for the AI proxy~~: small Node server for now (see Decisions Log); revisit at deploy time.
 
 ### Name options
@@ -399,3 +399,9 @@ Work in small, reviewable steps. After each step, summarise what changed and wha
 | 2026-11-11 | Player-facing strings live in `src/ui/strings.ts` (i18n-ready from day one). |
 | 2026-11-11 | Image model IDs verified against the API: `gpt-image-2.6-flare` (exploration, default) and `gpt-image-2.6-sunburst` (prop matching). |
 | 2026-11-11 | Asset pipeline in `tools/assets/` (see its README). `generate.mjs` is dry-run by default; spending needs `--yes`, a non-placeholder style block, and stays under `--max-images`. Review is a small local server (`review.mjs`) serving `review.html`. |
+| 2026-11-11 | Style locked: direction C ("signboard printed on paper"). Rules and palette in `tools/assets/style-bible.md`; production plan in `tools/assets/PLAN.md`. |
+| 2026-11-11 | Production model: `gpt-image-2.6-flare`, medium quality, one image per request, self-reviewed against a checklist, max 3 attempts. |
+| 2026-11-11 | Era: present day. The desk phone is a cheap Android smartphone (blank screen = live UI for cadre messages), replacing §8.1's "old phone". |
+| 2026-11-11 | Sarpanch desk: the bicycle is the control to ride out to the village map; spiral pad = player's writing pad; khaki pocket diary = PA's mood notebook. |
+| 2026-11-11 | UI kit (stamps, pins, string, tape, torn edges) is hand-built in SVG/CSS, not generated. |
+| 2026-11-11 | MVP asset pack generated and exported to `src/assets/` (43 assets; known issues listed in `tools/assets/PLAN.md`). |

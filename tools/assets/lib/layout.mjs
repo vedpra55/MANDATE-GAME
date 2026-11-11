@@ -1,7 +1,7 @@
 import { EXPRESSIONS } from './manifest.mjs';
 
-/** Crop rectangles for a 2×2 sheet, in EXPRESSIONS order (TL, TR, BL, BR). Odd pixels go to the right/bottom cells. */
-export function sliceRects(width, height) {
+/** Crop rectangles for a 2×2 sheet, labelled TL, TR, BL, BR. Odd pixels go to the right/bottom cells. */
+export function sliceRects(width, height, labels = EXPRESSIONS) {
   const halfW = Math.floor(width / 2);
   const halfH = Math.floor(height / 2);
   const cells = [
@@ -10,7 +10,7 @@ export function sliceRects(width, height) {
     { left: 0, top: halfH, width: halfW, height: height - halfH },
     { left: halfW, top: halfH, width: width - halfW, height: height - halfH },
   ];
-  return EXPRESSIONS.map((expression, i) => ({ expression, ...cells[i] }));
+  return labels.map((expression, i) => ({ expression, ...cells[i] }));
 }
 
 /** Grid layout for a sprite sheet: near-square, at most `maxColumns` wide. */
