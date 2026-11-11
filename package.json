@@ -26,11 +26,15 @@
     "assets:optimize": "node tools/assets/optimize.mjs"
   },
   "dependencies": {
+    "@fontsource/hind": "^5.3.0",
+    "@fontsource/kalam": "^5.3.0",
+    "@fontsource/rozha-one": "^5.3.0",
     "dotenv": "^18.0.10",
     "express": "^5.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "zod": "^4.6.7"
+    "zod": "^4.6.7",
+    "zustand": "^5.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

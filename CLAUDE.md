@@ -405,3 +405,5 @@ Work in small, reviewable steps. After each step, summarise what changed and wha
 | 2026-11-11 | Sarpanch desk: the bicycle is the control to ride out to the village map; spiral pad = player's writing pad; khaki pocket diary = PA's mood notebook. |
 | 2026-11-11 | UI kit (stamps, pins, string, tape, torn edges) is hand-built in SVG/CSS, not generated. |
 | 2026-11-11 | MVP asset pack generated and exported to `src/assets/` (43 assets; known issues listed in `tools/assets/PLAN.md`). |
+| 2026-11-11 | Desk prototype (step 4): fixed 1920×1080 stage scaled to fit; props placed from `src/data/desk-layout.json` (positions measured from the master desk); every system opens as a physical object overlay; rubber stamps are the only buttons. Fonts: Rozha One (display), Hind (body), Kalam (handwriting); all three cover Devanagari. |
+| 2026-11-11 | UI state: Zustand store in `src/state/` binds the pure engine to React; placeholder world content lives in `src/ui/content.ts` until the engine and AI are wired. |

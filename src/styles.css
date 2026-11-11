@@ -1,52 +1,562 @@
-/* Placeholder styling until the style bible (Phase 0) is locked. */
+/* Palette from tools/assets/style-bible.md. UI and art share one palette. */
 :root {
-  --paper: #f3e9d2;
-  --ink: #2b2118;
-  --stamp-red: #b3261e;
-  --muted: #6b5d4f;
-  font-family: system-ui, 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
+  --paper: #f1d4a9;
+  --paper-light: #f8e8cc;
+  --indigo: #324564;
+  --vermilion: #d32d24;
+  --marigold: #e8a95b;
+  --ochre: #c2894b;
+  --earth: #9b7247;
+  --umber: #563e2f;
+  --ink: #2c2020;
+  --leaf: #586b25;
+  --steel: #7d7d7b;
+
+  --font-display: 'Rozha One', serif;
+  --font-body: 'Hind', system-ui, sans-serif;
+  --font-hand: 'Kalam', cursive;
+
+  font-family: var(--font-body);
   color: var(--ink);
-  background: var(--paper);
+  background: #1a1411;
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
+html,
+body,
+#root {
   margin: 0;
-  min-height: 100vh;
-  background: var(--paper);
+  height: 100%;
+  overflow: hidden;
 }
 
-.scaffold {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 4rem 1.5rem;
+button {
+  font: inherit;
+  color: inherit;
 }
 
-.scaffold h1 {
-  margin: 0;
-  font-size: 3.5rem;
-  letter-spacing: 0.08em;
-  color: var(--stamp-red);
+/* ---------- stage ---------- */
+.stage-frame {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #1a1411;
 }
 
-.tagline {
-  margin-top: 0.25rem;
+.stage {
+  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  overflow: hidden;
+}
+
+.desk,
+.map-scene {
+  position: absolute;
+  inset: 0;
+}
+
+.desk-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+/* ---------- props ---------- */
+.prop {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    filter 140ms ease;
+}
+
+.prop img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.prop:hover,
+.prop:focus-visible {
+  transform: translate(-50%, calc(-50% - 6px));
+  filter: drop-shadow(6px 10px 0 rgba(50, 69, 100, 0.35));
+  outline: none;
+}
+
+.prop:focus-visible {
+  filter: drop-shadow(0 0 0 var(--marigold)) drop-shadow(0 0 6px var(--marigold));
+}
+
+.prop-chai {
+  cursor: default;
+}
+
+.prop-chai:active {
+  transform: translate(-50%, -50%) rotate(-4deg);
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--vermilion);
+  color: var(--paper-light);
+  font: 700 20px/34px var(--font-body);
+  border: 3px solid var(--umber);
+}
+
+.prop-phone.ringing {
+  animation: ring 2.4s infinite;
+}
+
+@keyframes ring {
+  0%,
+  70%,
+  100% {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+  74%,
+  82%,
+  90% {
+    transform: translate(-50%, -50%) rotate(-7deg);
+  }
+  78%,
+  86%,
+  94% {
+    transform: translate(-50%, -50%) rotate(7deg);
+  }
+}
+
+.hotspot {
+  position: absolute;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 40%;
+}
+
+.hotspot:hover,
+.hotspot:focus-visible {
+  outline: 4px dashed rgba(232, 169, 91, 0.8);
+  outline-offset: -20px;
+}
+
+/* ---------- calendar ---------- */
+.calendar-page-text {
+  position: absolute;
+  left: 12%;
+  right: 10%;
+  top: 22%;
+  bottom: 8%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-hand);
+  color: var(--ink);
+  line-height: 1;
+}
+
+.calendar-day-label {
+  font-size: 20px;
+  color: var(--earth);
+}
+
+.calendar-day {
+  font-family: var(--font-display);
+  font-size: 88px;
+  color: var(--vermilion);
+  line-height: 0.95;
+}
+
+.calendar-left {
+  font-size: 18px;
+  margin-top: 4px;
+}
+
+.calendar-poll {
+  font-family: var(--font-display);
+  font-size: 30px;
+  color: var(--vermilion);
+  text-align: center;
+}
+
+.calendar-slots {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.slot {
+  width: 18px;
+  height: 18px;
+  border: 3px solid var(--umber);
+  border-radius: 50%;
+}
+
+.slot.used {
+  background: var(--indigo);
+}
+
+.calendar-tear {
+  position: absolute;
+  left: 9%;
+  right: 7%;
+  top: 20%;
+  bottom: 3%;
+  background: var(--paper-light) url('./assets/textures/texture-paper.webp') center / 300px;
+  border: 2px solid var(--umber);
+  transform-origin: 85% 0;
+  animation: tear 650ms ease-in forwards;
+}
+
+.calendar-tear .calendar-page-text {
+  left: 3%;
+  right: 3%;
+  top: 2%;
+  bottom: 5%;
+}
+
+@keyframes tear {
+  0% {
+    transform: rotate(0);
+  }
+  35% {
+    transform: rotate(-9deg);
+  }
+  100% {
+    transform: translate(-60px, 500px) rotate(-38deg);
+    opacity: 0;
+  }
+}
+
+/* ---------- stamp (the only button style) ---------- */
+.stamp {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--vermilion);
+  background: transparent;
+  border: 4px double var(--vermilion);
+  border-radius: 6px;
+  padding: 6px 22px 2px;
+  transform: rotate(-2deg);
+  cursor: pointer;
+  mix-blend-mode: multiply;
+  transition: transform 90ms ease;
+}
+
+.stamp:hover:not(:disabled) {
+  transform: rotate(-2deg) scale(1.05);
+}
+
+.stamp:active:not(:disabled) {
+  transform: rotate(-2deg) scale(0.94);
+  background: rgba(211, 45, 36, 0.12);
+}
+
+.stamp:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ---------- overlays ---------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(26, 20, 17, 0.62);
+  animation: fade 160ms ease;
+}
+
+.overlay-body {
+  position: relative;
+  animation: lift 200ms ease;
+}
+
+.overlay-close {
+  position: absolute;
+  top: -24px;
+  right: -24px;
+  font-size: 22px;
+  padding: 4px 12px 0;
+  background: var(--paper-light);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes lift {
+  from {
+    transform: translateY(30px) scale(0.96);
+    opacity: 0;
+  }
+}
+
+.paper {
+  background: var(--paper-light) url('./assets/textures/texture-paper.webp') center / 512px;
+  border: 3px solid var(--umber);
+  box-shadow: 14px 16px 0 rgba(50, 69, 100, 0.45);
+  padding: 36px 44px;
+}
+
+.paper h2,
+.diary h2,
+.ledger-page h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--umber);
+}
+
+.hand {
+  font-family: var(--font-hand);
+  font-size: 28px;
+  line-height: 1.35;
+}
+
+.muted {
+  color: var(--earth);
+  font-size: 20px;
+}
+
+.hand.muted {
+  font-size: 26px;
+}
+
+/* writing pad */
+.writing {
+  width: 980px;
+  transform: rotate(-0.6deg);
+}
+
+.writing textarea {
+  width: 100%;
+  border: 0;
+  background: repeating-linear-gradient(transparent 0 46px, rgba(50, 69, 100, 0.25) 46px 48px);
+  line-height: 48px;
+  font-size: 32px;
+  color: var(--indigo);
+  resize: none;
+  outline: none;
+}
+
+.writing-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.said {
+  margin: 22px 0 0;
+  padding-left: 1.2em;
+  font-size: 22px;
+  color: var(--umber);
+}
+
+/* ledger */
+.ledger-open {
+  position: relative;
+  width: 1300px;
+}
+
+.ledger-open img {
+  display: block;
+  width: 100%;
+}
+
+.ledger-page .hand {
+  color: var(--umber);
+  font-weight: 700;
+  background: rgba(248, 232, 204, 0.75);
+}
+
+.ledger-page {
+  position: absolute;
+  top: 12%;
+  bottom: 14%;
+  width: 36%;
+  overflow: auto;
+}
+
+.ledger-left {
+  left: 10%;
+}
+
+.ledger-right {
+  right: 9%;
+}
+
+/* newspaper */
+.newspaper-page {
+  width: 1100px;
+  background: #e9e6df url('./assets/textures/texture-newsprint.webp') center / 512px;
+  border: 3px solid var(--umber);
+  box-shadow: 14px 16px 0 rgba(50, 69, 100, 0.45);
+  padding: 28px 44px 40px;
+  transform: rotate(0.8deg);
+  color: #241d1a;
+}
+
+.newspaper-page header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 4px double #241d1a;
+  padding-bottom: 6px;
+}
+
+.masthead {
+  font-family: var(--font-display);
+  font-size: 64px;
+  line-height: 1;
+}
+
+.edition {
+  font-size: 20px;
+}
+
+.newspaper-page h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 54px;
+  line-height: 1.05;
+  margin: 22px 0 16px;
+}
+
+.columns {
+  column-count: 2;
+  column-gap: 40px;
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+.quote {
   font-style: italic;
 }
 
-.meta,
-.status-checking {
-  color: var(--muted);
+/* phone */
+.phone-device {
+  width: 470px;
+  height: 860px;
+  background: #23262b;
+  border: 6px solid #111;
+  border-radius: 48px;
+  padding: 26px 18px;
+  box-shadow: 14px 16px 0 rgba(50, 69, 100, 0.45);
 }
 
-.status-ok {
-  color: #2e6b2f;
+.phone-screen {
+  height: 100%;
+  border-radius: 24px;
+  background: #e6ddd0;
+  overflow: auto;
+  padding: 0 16px 16px;
 }
 
-.status-no-key,
-.status-down {
-  color: var(--stamp-red);
+.phone-header {
+  position: sticky;
+  top: 0;
+  margin: 0 -16px 14px;
+  padding: 18px 20px 12px;
+  background: var(--leaf);
+  color: #fff;
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.phone-msg {
+  background: #fff;
+  border-radius: 4px 16px 16px 16px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 21px;
+  line-height: 1.35;
+  max-width: 92%;
+}
+
+.phone-from {
+  font-weight: 600;
+  color: var(--indigo);
+  font-size: 18px;
+}
+
+.phone-empty {
+  font-size: 20px;
+  color: var(--steel);
+}
+
+/* diary */
+.diary {
+  width: 640px;
+  min-height: 560px;
+  background: #e9d9b2 url('./assets/textures/texture-paper.webp') center / 400px;
+  border: 3px solid var(--umber);
+  border-left: 26px solid #8a7a4a;
+  box-shadow: 14px 16px 0 rgba(50, 69, 100, 0.45);
+  padding: 32px 40px;
+  transform: rotate(1.2deg);
+}
+
+.diary p {
+  color: var(--indigo);
+  border-bottom: 2px dashed rgba(86, 62, 47, 0.25);
+  padding-bottom: 10px;
+}
+
+/* sheets */
+.sheet {
+  width: 760px;
+  transform: rotate(-1deg);
+}
+
+.files-list {
+  margin: 0 0 18px;
+  padding-left: 1.2em;
+}
+
+.cash-amount {
+  font-size: 72px;
+  color: var(--leaf);
+  margin: 0;
+}
+
+/* map */
+.map-note {
+  position: absolute;
+  left: 60px;
+  bottom: 60px;
+  width: 560px;
+  transform: rotate(-1.5deg);
+}
+
+.map-note .stamp {
+  margin-top: 8px;
 }

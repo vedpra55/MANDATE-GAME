@@ -67,7 +67,9 @@ runMain(async (argv) => {
         await writePair(sliced[label], outDir, `${base}-${label}`, asset.displayWidth);
       }
     } else {
-      await writePair(source, outDir, base, asset.displayWidth);
+      await writePair(source, outDir, base, asset.displayWidth, {
+        trim: asset.background === 'transparent',
+      });
     }
     done.add(asset.id);
   }
@@ -89,8 +91,10 @@ runMain(async (argv) => {
   console.log(`\nMarked ${done.size} asset(s) final.`);
 });
 
-async function writePair(source, outDir, base, displayWidth) {
+async function writePair(input, outDir, base, displayWidth, { trim = false } = {}) {
   await fs.mkdir(outDir, { recursive: true });
+  // Transparent props are trimmed to the object, so displayWidth is the object's own width on screen.
+  const source = trim ? await sharp(input).trim().png().toBuffer() : input;
   const { width } = await sharp(source).metadata();
   const { oneX, twoX, twoXIsShort } = outputWidths(displayWidth, width);
   const oneFile = path.join(outDir, `${base}.webp`);

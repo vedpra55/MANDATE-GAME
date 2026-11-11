@@ -79,7 +79,7 @@
       "description": "A cheap Android smartphone in a worn dark rubber case with a cracked screen guard, lying flat, seen at a gentle three-quarter tilt from above. The screen is dark, glossy and completely blank.",
       "size": "1024x1024",
       "background": "transparent",
-      "displayWidth": 160,
+      "displayWidth": 170,
       "status": "final",
       "picked": 1,
       "referenceNote": "The attached master desk scene contains this object (the smartphone). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
@@ -103,7 +103,7 @@
       "description": "The same red cloth-bound bahi-khata ledger lying open flat, showing two blank cream pages ruled with faint red vertical columns only, no writing at all; seen from directly above; the red cloth cover edges visible around the pages.",
       "size": "1536x1024",
       "background": "transparent",
-      "displayWidth": 760,
+      "displayWidth": 1100,
       "status": "final",
       "picked": 1,
       "referenceNote": "The attached master desk scene contains this object (the red bahi-khata ledger). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
@@ -115,7 +115,7 @@
       "description": "A folded local Hindi newspaper seen at a gentle three-quarter tilt from above. Its layout of columns and one photo box is suggested with flat grey blocks only: no letters, no numbers, no masthead text.",
       "size": "1024x1024",
       "background": "transparent",
-      "displayWidth": 320,
+      "displayWidth": 430,
       "status": "final",
       "picked": 1,
       "referenceNote": "The attached master desk scene contains this object (the folded newspaper). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
@@ -127,7 +127,7 @@
       "description": "A dented deep-indigo painted tin cash box with a metal handle and a small brass lock, paint chipped at the edges, closed, seen at a gentle three-quarter tilt from above.",
       "size": "1024x1024",
       "background": "transparent",
-      "displayWidth": 220,
+      "displayWidth": 262,
       "status": "final",
       "picked": 1,
       "referenceNote": "The attached master desk scene contains this object (the indigo tin cash box). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
@@ -139,7 +139,7 @@
       "description": "A tear-off wall calendar hanging front-facing on a single nail: a red header strip with no writing, and a thick pad of blank cream pages with slightly curled edges. No numbers or text.",
       "size": "1024x1536",
       "background": "transparent",
-      "displayWidth": 180,
+      "displayWidth": 200,
       "status": "final",
       "picked": 1,
       "referenceNote": "The attached master desk scene contains this object (the tear-off calendar). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
@@ -151,7 +151,7 @@
       "description": "A stack of five or six worn paper files and folders in buff, faded blue and green, tied with cotton string in a bow, seen at a gentle three-quarter tilt from above. No writing on any file.",
       "size": "1024x1024",
       "background": "transparent",
-      "displayWidth": 300,
+      "displayWidth": 400,
       "status": "final",
       "picked": 1,
       "referenceNote": "The attached master desk scene contains this object (the tied files). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
@@ -163,7 +163,7 @@
       "description": "A small khaki cloth-bound pocket diary held shut with a red rubber band, a little dog-eared, seen at a gentle three-quarter tilt from above. No writing on the cover.",
       "size": "1024x1024",
       "background": "transparent",
-      "displayWidth": 140,
+      "displayWidth": 184,
       "status": "final",
       "picked": 1,
       "referenceNote": "The attached master desk scene contains this object (the khaki pocket diary). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
@@ -175,7 +175,7 @@
       "description": "A spiral-bound writing pad with plain cream pages and a yellow pencil lying across it, seen at a gentle three-quarter tilt from above. The page is blank: faint ruled lines only, no writing.",
       "size": "1024x1024",
       "background": "transparent",
-      "displayWidth": 260,
+      "displayWidth": 290,
       "status": "final",
       "picked": 1,
       "referenceNote": "The attached master desk scene contains this object (the spiral writing pad). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."
@@ -187,7 +187,7 @@
       "description": "A small ribbed glass of hot milky chai on a little round steel saucer, seen from high above at a steep angle (about 60 degrees down), so the round surface of the tea shows as a wide oval and the saucer as a wide ellipse around the glass. The tea is opaque and pale milky brown, like milky coffee, with a thin skin of froth; never orange, never clear. A faint wisp of steam.",
       "size": "1024x1024",
       "background": "transparent",
-      "displayWidth": 140,
+      "displayWidth": 184,
       "status": "final",
       "picked": 3,
       "referenceNote": "The attached master desk scene contains this object (the glass of chai). Redraw only that object, matching its design, colours, outline weight and three-quarter tilt exactly as it appears there; ignore everything else in the reference."

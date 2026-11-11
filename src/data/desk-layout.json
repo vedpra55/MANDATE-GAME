@@ -1,0 +1,27 @@
+{
+  "stage": { "width": 1920, "height": 1080 },
+  "tiers": {
+    "1": {
+      "background": "scene-village-desk-empty",
+      "props": [
+        { "id": "calendar", "asset": "prop-calendar", "x": 955, "y": 131, "width": 200, "z": 2 },
+        { "id": "phone", "asset": "prop-phone", "x": 153, "y": 340, "width": 170, "z": 3 },
+        { "id": "cash", "asset": "prop-cash-tin", "x": 131, "y": 661, "width": 262, "z": 2 },
+        { "id": "ledger", "asset": "prop-ledger-closed", "x": 512, "y": 439, "width": 300, "z": 2 },
+        { "id": "newspaper", "asset": "prop-newspaper", "x": 459, "y": 755, "width": 430, "z": 2 },
+        { "id": "files", "asset": "prop-files", "x": 1404, "y": 431, "width": 400, "z": 2 },
+        {
+          "id": "writingPad",
+          "asset": "prop-writing-pad",
+          "x": 1344,
+          "y": 746,
+          "width": 290,
+          "z": 2
+        },
+        { "id": "diary", "asset": "prop-pa-diary", "x": 1560, "y": 735, "width": 170, "z": 3 },
+        { "id": "chai", "asset": "prop-chai", "x": 1753, "y": 501, "width": 184, "z": 2 }
+      ],
+      "hotspots": [{ "id": "bicycle", "x": 1480, "y": 640, "width": 440, "height": 440 }]
+    }
+  }
+}
