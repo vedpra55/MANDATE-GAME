@@ -138,9 +138,11 @@ export function applyStances(
     let stance = r.stance;
 
     // A win-win only counts if it is concrete and the speaker is believed.
+    let doubted = false;
     if (stance === 'win_win' && (r.quality < 2 || s.credibility < 0.75)) {
       notes.push({ day, kind: 'notBelieved', faultLine: fl });
       stance = 'evasive';
+      doubted = true;
     }
 
     if (stance === 'evasive') {
@@ -155,7 +157,9 @@ export function applyStances(
         statementId,
         effect: { trust, reputation: -1 },
       });
-      notes.push({ day, kind: 'stanceTaken', faultLine: fl, stance });
+      // Recorded, so the diary shows it and the rival does not ask again.
+      s.publicWord[fl] = { word: doubted ? 'win_win_doubted' : 'evasive', day };
+      if (!doubted) notes.push({ day, kind: 'stanceTaken', faultLine: fl, stance });
       continue;
     }
 
@@ -207,6 +211,7 @@ export function applyStances(
       effect: { trust, rivalTrust, mood },
     });
     s.stances[fl] = { stance, day, statementId };
+    s.publicWord[fl] = { word: stance, day };
     if (!same) notes.push({ day, kind: 'stanceTaken', faultLine: fl, stance });
   }
   return notes;

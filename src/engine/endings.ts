@@ -40,18 +40,32 @@ export function marginImpact(s: GameState, cells: Cell[], entryIndex: number): n
 
 export function topDeciders(s: GameState, n = 3): Decider[] {
   const cells = computeCells(s);
-  return s.log
-    .map((e, i) => ({
-      logId: e.id,
-      kind: e.kind,
-      actor: e.actor,
-      tola: e.tola,
-      issue: e.issue,
-      faultLine: e.faultLine,
-      stance: e.stance,
-      day: e.day,
-      impact: marginImpact(s, cells, i),
-    }))
+  // Group repeats of the same cause ("staying silent on the kiln", twice) into one line.
+  const groups = new Map<string, Decider>();
+  s.log.forEach((e, i) => {
+    const impact = marginImpact(s, cells, i);
+    const groupable = !['visit', 'statement', 'publicWorks', 'worksStarted'].includes(e.kind);
+    const key = groupable ? [e.kind, e.actor, e.faultLine, e.tola, e.issue].join('|') : `id${e.id}`;
+    const g = groups.get(key);
+    if (g) {
+      g.impact += impact;
+      g.count += 1;
+    } else {
+      groups.set(key, {
+        logId: e.id,
+        kind: e.kind,
+        actor: e.actor,
+        tola: e.tola,
+        issue: e.issue,
+        faultLine: e.faultLine,
+        stance: e.stance,
+        day: e.day,
+        impact,
+        count: 1,
+      });
+    }
+  });
+  return [...groups.values()]
     .filter((d) => Math.abs(d.impact) >= 1)
     .sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact))
     .slice(0, n);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Stamp } from '../components/Stamp.tsx';
 import { strings as S } from '../strings.ts';
+import { useGame } from '../../state/gameStore.ts';
 
 type TaskInfo = {
   id: string;
@@ -24,6 +25,8 @@ export function Settings({ onClose }: { onClose: () => void }) {
   const [data, setData] = useState<Payload | null>(null);
   const [failed, setFailed] = useState(false);
   const [saved, setSaved] = useState(false);
+  const autoEnd = useGame((s) => s.autoEndDay);
+  const setAutoEnd = useGame((s) => s.setAutoEndDay);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -56,6 +59,10 @@ export function Settings({ onClose }: { onClose: () => void }) {
   return (
     <div className="paper settings-panel">
       <h2>{S.settings.title}</h2>
+      <label className="auto-end">
+        <input type="checkbox" checked={autoEnd} onChange={(e) => setAutoEnd(e.target.checked)} />{' '}
+        {S.dusk.auto}
+      </label>
       {failed && <p className="muted">{S.settings.unreachable}</p>}
       {data && (
         <>

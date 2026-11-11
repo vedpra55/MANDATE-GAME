@@ -1,5 +1,6 @@
 import { useGame } from './state/gameStore.ts';
 import { Stage } from './ui/components/Stage.tsx';
+import { Dusk } from './ui/components/Dusk.tsx';
 import { Desk } from './ui/desk/Desk.tsx';
 import { Counting } from './ui/scenes/Counting.tsx';
 import { Title } from './ui/scenes/Title.tsx';
@@ -18,5 +19,10 @@ export function App() {
     ) : (
       <Desk />
     );
-  return <Stage>{view}</Stage>;
+  return (
+    <Stage>
+      {view}
+      {hasGame && scene !== 'title' && <Dusk />}
+    </Stage>
+  );
 }

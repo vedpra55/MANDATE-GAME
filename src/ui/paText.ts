@@ -57,7 +57,7 @@ export function noteText(n: PaNote, address: Address, rival = 'Rajendra Babu'): 
     case 'rivalMove':
       return S.rivalMoves[n.move](
         n.tola ? S.tolas[n.tola] : '',
-        n.issue ? S.issues[n.issue] : '',
+        n.faultLine ? fl(n.faultLine) : n.issue ? S.issues[n.issue] : '',
         rival,
       );
     case 'silence':
@@ -239,6 +239,8 @@ export function deciderText(d: Decider, rival = 'Rajendra Babu'): string {
       return `${rival} attacking your broken promise`;
     case 'rivalMock':
       return `${rival} mocking your promises`;
+    case 'rivalAttackDodge':
+      return `${rival} saying you won't take a stand on ${f}`;
     case 'rivalDoubt':
       return `${rival} calling your compromise hot air`;
     case 'rivalRally':

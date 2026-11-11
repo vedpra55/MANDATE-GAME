@@ -53,8 +53,8 @@ export function rivalWedge(s: GameState): PaNote | null {
   let best: FaultLineId | null = null;
   let bestScore = -1;
   for (const fl of s.faultLines) {
-    const st = s.stances[fl]?.stance;
-    if (st === 'side_a' || st === 'side_b' || st === 'win_win') continue;
+    // Never the same question twice, and never one you have already answered in public.
+    if (s.asked.includes(fl) || s.publicWord[fl]) continue;
     let a = 0;
     let b = 0;
     for (const g of GROUPS) {
@@ -69,7 +69,9 @@ export function rivalWedge(s: GameState): PaNote | null {
   }
   if (!best) return null;
   s.rival.lastWedgeDay = day;
-  s.pending.question = { faultLine: best, by: 'rival', askedDay: day + 1, dueDay: day + 1 };
+  s.asked.push(best);
+  // Asked tomorrow morning; due by the end of the day after.
+  s.pending.question = { faultLine: best, by: 'rival', askedDay: day + 1, dueDay: day + 2 };
   if (!s.known.faultLines.includes(best)) s.known.faultLines.push(best);
   record(s, {
     actor: 'rival',
@@ -86,6 +88,7 @@ export function punishSilence(s: GameState): PaNote[] {
   if (!q || s.clock.day < q.dueDay) return [];
   s.pending.question = null;
   if (q.by === 'donor') return donorAngry(s);
+  s.publicWord[q.faultLine] = { word: 'silent', day: s.clock.day };
   const trust: Partial<Record<GroupId, number>> = {};
   for (const g of GROUPS)
     trust[g] = -3.6 * (sideWeight(q.faultLine, 'side_a', g) + sideWeight(q.faultLine, 'side_b', g));

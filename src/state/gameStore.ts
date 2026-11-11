@@ -29,6 +29,14 @@ function loadSave(): GameState | null {
   }
 }
 
+function readAutoEnd(): boolean {
+  try {
+    return localStorage.getItem('mandate.autoEndDay') !== '0';
+  } catch {
+    return true;
+  }
+}
+
 function writeSave(s: GameState | null): void {
   try {
     if (s && s.phase !== 'ended') localStorage.setItem(SAVE_KEY, JSON.stringify(s));
@@ -48,6 +56,9 @@ type GameStore = {
   hasSave: boolean;
   /** True while the AI is reading the player's words. */
   thinking: boolean;
+  /** End the day automatically when no slots are left and nothing is waiting. */
+  autoEndDay: boolean;
+  setAutoEndDay: (on: boolean) => void;
   /** Whether the last AI call worked: shown in settings; the game plays either way. */
   aiStatus: 'unknown' | 'on' | 'offline';
   startNewGame: (name: string, address: Address) => void;
@@ -76,6 +87,15 @@ export const useGame = create<GameStore>((set, get) => ({
   phoneSeen: false,
   hasSave: loadSave() !== null,
   thinking: false,
+  autoEndDay: readAutoEnd(),
+  setAutoEndDay: (on) => {
+    try {
+      localStorage.setItem('mandate.autoEndDay', on ? '1' : '0');
+    } catch {
+      // ignore
+    }
+    set({ autoEndDay: on });
+  },
   aiStatus: 'unknown',
 
   startNewGame: (name, address) => {
@@ -113,7 +133,23 @@ export const useGame = create<GameStore>((set, get) => ({
       return false;
     }
     writeSave(state);
-    set({ game: state, lastError: null });
+    // A new morning with a question or a call waiting: Pintu hands you the phone.
+    const ringing =
+      action.type === 'endDay' &&
+      state.phase === 'campaign' &&
+      (state.pending.call || state.pending.question?.askedDay === state.clock.day);
+    set(
+      ringing
+        ? {
+            game: state,
+            lastError: null,
+            scene: 'desk',
+            selectedTola: null,
+            overlay: 'phone',
+            phoneSeen: true,
+          }
+        : { game: state, lastError: null },
+    );
     return true;
   },
 

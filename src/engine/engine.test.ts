@@ -149,11 +149,31 @@ describe('pressure', () => {
     for (let i = 0; i < 8 && !s.pending.question; i++) s = run(s, { type: 'endDay' });
     const q = s.pending.question!;
     expect(q.by).toBe('rival');
+    expect(q.dueDay).toBe(q.askedDay + 1); // a full day to answer
     const before = s.reputation;
-    s = run(s, { type: 'endDay' });
-    expect(s.pending.question).toBeNull();
+    while (s.clock.day <= q.dueDay) s = run(s, { type: 'endDay' });
+    expect(s.pending.question?.faultLine).not.toBe(q.faultLine);
     expect(s.log.some((e) => e.kind === 'silence' && e.faultLine === q.faultLine)).toBe(true);
     expect(s.reputation).toBeLessThan(before);
+  });
+
+  it('a dodge is recorded, and the rival never asks the same question twice', () => {
+    let s = run(campaign(), {
+      type: 'statement',
+      text: 'Purvi tola ka handpump theek hoga. Mazdoor ka samman hoga.',
+    });
+    for (let i = 0; i < 8 && !s.pending.question; i++) s = run(s, { type: 'endDay' });
+    const fl = s.pending.question!.faultLine;
+    s = run(s, { type: 'answer', text: 'Dekhiye, sab ka bhala hoga, hum sab milkar sochenge.' });
+    expect(s.publicWord[fl]?.word).toMatch(/evasive|win_win_doubted/);
+    const asked: string[] = [];
+    for (let i = 0; i < 18 && s.phase === 'campaign'; i++) {
+      s = run(s, { type: 'endDay' });
+      const q = s.pending.question;
+      if (q && q.askedDay === s.clock.day) asked.push(q.faultLine);
+    }
+    expect(asked).not.toContain(fl);
+    expect(new Set(asked).size).toBe(asked.length);
   });
 
   it('the donor calls on day 3: yes fills the tin and writes a favour; no funds the rival', () => {

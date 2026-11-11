@@ -30,7 +30,8 @@ export function EndCard() {
             <ol>
               {r.deciders.map((d) => (
                 <li key={d.logId}>
-                  {deciderText(d, game.rival.name)}{' '}
+                  {deciderText(d, game.rival.name)}
+                  {d.count > 1 ? ` (${E.times(d.count)})` : ''}{' '}
                   <span className={d.impact >= 0 ? 'helped' : 'hurt'}>
                     ({d.impact >= 0 ? E.helped : E.hurt}, {E.votes(Math.round(Math.abs(d.impact)))})
                   </span>

@@ -204,6 +204,12 @@ export const en = {
     divides: 'What divides the village',
     unknownDivides: "There may be more fights I don't know about yet.",
     yourWord: 'Your word:',
+    words: {
+      win_win: 'a way for both sides (believed)',
+      win_win_doubted: "you offered a compromise, but people don't believe it yet",
+      evasive: 'you dodged it',
+      silent: 'you stayed silent',
+    },
     noPosition: 'you have said nothing yet',
     works: 'Work going on',
     due: (d: number) => `due day ${d}`,
@@ -224,6 +230,11 @@ export const en = {
     dueToday: 'Answer today. Silence will be reported.',
   },
   thinking: 'Pintu is listening…',
+  dusk: {
+    text: 'Shaam ho gayi. The day is done…',
+    wait: 'Wait',
+    auto: 'End the day by itself when I have nothing left to do',
+  },
   files: { title: 'Janta darbar', hint: 'Hearings at the chaupal arrive in a later build.' },
   cash: { title: 'Cash in hand' },
 
@@ -324,6 +335,7 @@ export const en = {
     helped: 'helped',
     hurt: 'hurt',
     votes: (n: number) => `about ${n} vote${n === 1 ? '' : 's'}`,
+    times: (n: number) => (n === 2 ? 'twice' : `${n} times`),
     ledger: (made: number, kept: number, broken: number, open: number) =>
       `${made} promises made: ${kept} kept, ${broken} broken, ${open} still open.`,
     result: (you: number, rival: number, others: number) =>
@@ -343,6 +355,8 @@ export const en = {
       `${r} is laughing at your promises: 'Itna paisa kahan se aayega?'`,
     doubtSolution: (_t: string, _i: string, r: string) =>
       `${r} says your compromise is hot air: 'Kab hoga? Sab hawa hai.'`,
+    attackDodge: (_t: string, f: string, r: string) =>
+      `${r} is telling everyone you still won't say where you stand on ${f}.`,
     lieLow: () => '',
     lastNight: (t: string) => `Envelopes went round in ${t} last night.`,
   } satisfies Record<RivalMove, (tola: string, issue: string, rival: string) => string>,

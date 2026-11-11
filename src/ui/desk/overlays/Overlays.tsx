@@ -127,6 +127,15 @@ function Phone() {
   const call = game.pending.call;
   const q = game.pending.question;
   const answered = game.statements.filter((st) => st.channel === 'answer').at(-1);
+  const verdict = answered
+    ? [...game.paNotes]
+        .reverse()
+        .find(
+          (n) =>
+            (n.kind === 'stanceTaken' || n.kind === 'notBelieved' || n.kind === 'contradiction') &&
+            n.day === answered.day,
+        )
+    : undefined;
   const donorNote = [...game.paNotes]
     .reverse()
     .find((n) => n.kind === 'donorResult' || n.kind === 'favourLeaked');
@@ -164,6 +173,11 @@ function Phone() {
         {answered && !incoming && (
           <div className="phone-msg mine">
             <div>{answered.text}</div>
+            {verdict && (
+              <div className="phone-pa">
+                {S.pa}: {noteText(verdict, game.player.address, game.rival.name)}
+              </div>
+            )}
             {answered.voices?.pa && (
               <div className="phone-pa">
                 {S.pa}: {answered.voices.pa}
@@ -434,16 +448,17 @@ function Diary() {
           <h3 className="diary-h3">{S.diary.divides}</h3>
           <ul className="divides hand">
             {game.known.faultLines.map((f) => {
-              const st = game.stances[f];
+              const w = game.publicWord[f];
+              const label = !w
+                ? null
+                : w.word === 'side_a' || w.word === 'side_b'
+                  ? stanceLabel(f, w.word)
+                  : S.diary.words[w.word];
               return (
                 <li key={f}>
                   <strong>{S.faultLines[f].name}</strong>
                   <span className="muted"> {S.diary.yourWord} </span>
-                  {st ? (
-                    stanceLabel(f, st.stance)
-                  ) : (
-                    <span className="muted">{S.diary.noPosition}</span>
-                  )}
+                  {label ?? <span className="muted">{S.diary.noPosition}</span>}
                 </li>
               );
             })}

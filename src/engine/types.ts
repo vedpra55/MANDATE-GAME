@@ -122,6 +122,12 @@ export type FaultLineData = {
 };
 
 /** A public position, as the village remembers it. */
+/** The last thing the player said in public on a fault line, whatever it was (shown in the diary). */
+export type PublicWord = {
+  word: 'side_a' | 'side_b' | 'win_win' | 'win_win_doubted' | 'evasive' | 'silent';
+  day: number;
+};
+
 export type StanceRecord = {
   stance: 'side_a' | 'side_b' | 'win_win';
   day: number;
@@ -231,6 +237,7 @@ export type LogKind =
   | 'rivalAttack'
   | 'rivalMock'
   | 'rivalDoubt'
+  | 'rivalAttackDodge'
   | 'rivalRally'
   | 'rivalLastNight'
   | 'stance'
@@ -282,7 +289,14 @@ export type PaNote =
   | { day: number; kind: 'giftsFilmed'; tola: TolaId }
   | { day: number; kind: 'divisive' }
   | { day: number; kind: 'cadreUnpaid' }
-  | { day: number; kind: 'rivalMove'; move: RivalMove; tola?: TolaId; issue?: IssueId }
+  | {
+      day: number;
+      kind: 'rivalMove';
+      move: RivalMove;
+      tola?: TolaId;
+      issue?: IssueId;
+      faultLine?: FaultLineId;
+    }
   | { day: number; kind: 'silence' }
   | { day: number; kind: 'lastNight'; tola: TolaId }
   | { day: number; kind: 'pollingDay' }
@@ -352,6 +366,7 @@ export type RivalMove =
   | 'lieLow'
   | 'mockPromises'
   | 'doubtSolution'
+  | 'attackDodge'
   | 'lastNight';
 
 export type RivalState = {
@@ -361,6 +376,7 @@ export type RivalState = {
   heat: number;
   reputation: number;
   rallyDone: boolean;
+  attackedDodges: FaultLineId[];
   attackedPromiseIds: number[];
   lastMockDay: number;
   lastWedgeDay: number;
@@ -413,6 +429,8 @@ export type Decider = {
   stance?: Stance;
   day: number;
   impact: number;
+  /** How many log entries were grouped into this line ("twice"). */
+  count: number;
 };
 
 export type GameResult = {
@@ -445,6 +463,8 @@ export type GameState = {
   rival: RivalState;
   faultLines: FaultLineId[]; // the conflicts that exist in this village
   stances: Partial<Record<FaultLineId, StanceRecord>>; // the player's public positions
+  publicWord: Partial<Record<FaultLineId, PublicWord>>; // what you last said, dodges included
+  asked: FaultLineId[]; // fault lines the rival has already asked about (never twice)
   known: {
     grievances: Record<TolaId, IssueId[]>;
     faultLines: FaultLineId[];

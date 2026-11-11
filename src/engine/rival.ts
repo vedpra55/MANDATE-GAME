@@ -8,6 +8,7 @@ import {
   GROUPS,
   TOLAS,
   type Effect,
+  type FaultLineId,
   type GameState,
   type GroupId,
   type IssueId,
@@ -26,6 +27,7 @@ type Candidate = {
   tola?: TolaId;
   issue?: IssueId;
   promiseId?: number;
+  faultLine?: FaultLineId;
   effect: Effect;
 };
 
@@ -76,6 +78,21 @@ function candidates(s: GameState): Candidate[] {
         reputation: -1,
       },
     });
+  }
+  // A dodge, a silence or a disbelieved compromise: "he still won't say".
+  for (const [fl, w] of Object.entries(s.publicWord) as [
+    FaultLineId,
+    NonNullable<GameState['publicWord'][FaultLineId]>,
+  ][]) {
+    if (
+      !['evasive', 'silent', 'win_win_doubted'].includes(w.word) ||
+      s.rival.attackedDodges.includes(fl)
+    )
+      continue;
+    const trust: Partial<Record<GroupId, number>> = {};
+    for (const g of GROUPS)
+      trust[g] = -1.5 * (sideWeight(fl, 'side_a', g) + sideWeight(fl, 'side_b', g));
+    list.push({ move: 'attackDodge', faultLine: fl, effect: { trust, reputation: -1 } });
   }
   // A win-win announced but not yet delivered: "Kab hoga? Sab hawa hai."
   for (const p of s.promises) {
@@ -129,6 +146,7 @@ const KIND = {
   rally: 'rivalRally',
   mockPromises: 'rivalMock',
   doubtSolution: 'rivalDoubt',
+  attackDodge: 'rivalAttackDodge',
   lastNight: 'rivalLastNight',
 } as const;
 
@@ -162,14 +180,23 @@ export function rivalTurn(s: GameState, rng: Rng): PaNote[] {
     if (pick.tola && (pick.move === 'doorToDoor' || pick.move === 'sweets'))
       s.tolas[pick.tola].rivalLastVisit = day;
     if (pick.move === 'mockPromises') s.rival.lastMockDay = day;
+    if (pick.move === 'attackDodge' && pick.faultLine) s.rival.attackedDodges.push(pick.faultLine);
     record(s, {
       actor: 'rival',
       kind: KIND[pick.move],
       tola: pick.tola,
       issue: pick.issue,
+      faultLine: pick.faultLine,
       effect: pick.effect,
     });
-    notes.push({ day, kind: 'rivalMove', move: pick.move, tola: pick.tola, issue: pick.issue });
+    notes.push({
+      day,
+      kind: 'rivalMove',
+      move: pick.move,
+      tola: pick.tola,
+      issue: pick.issue,
+      faultLine: pick.faultLine,
+    });
   }
   return notes;
 }
