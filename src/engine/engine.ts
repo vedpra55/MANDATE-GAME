@@ -11,7 +11,8 @@ import { computeResult } from './endings.ts';
 import { answerDonor, judgeDonorAnswer, readCallFallback } from './interrupts.ts';
 import { interpretFallback, MAX_TEXT_LENGTH } from './interpret.ts';
 import { knowsGrievance } from './knowledge.ts';
-import { worksCost, type PromiseDraft } from './promises.ts';
+import { canDate, lastCampaignDay, worksCost, type PromiseDraft } from './promises.ts';
+import { setPromiseDate } from './dates.ts';
 import { createRng } from './rng.ts';
 import { applyStatement } from './statements.ts';
 import { endOfDay } from './tick.ts';
@@ -96,6 +97,14 @@ export function validate(s: GameState, a: Action): ActionError | null {
         return 'alreadyBuilding';
       return s.cash >= p.cost ? null : 'notEnoughCash';
     }
+    case 'setPromiseDate': {
+      const p = s.promises.find((pr) => pr.id === a.id);
+      if (!p || !canDate(p)) return 'nothingPending';
+      if (a.day === null) return null;
+      if (!Number.isInteger(a.day) || a.day <= s.clock.day || a.day > lastCampaignDay(s))
+        return 'invalidAmount';
+      return null;
+    }
     case 'gifts':
       if (!(a.amount > 0)) return 'invalidAmount';
       return s.cash >= a.amount ? null : 'notEnoughCash';
@@ -157,6 +166,9 @@ export function applyAction(
       break;
     case 'deliver':
       notes.push(...deliverSolution(s, rng, action.faultLine));
+      break;
+    case 'setPromiseDate':
+      notes.push(...setPromiseDate(s, action.id, action.day));
       break;
     case 'gifts':
       notes.push(...gifts(s, action.tola, action.amount));

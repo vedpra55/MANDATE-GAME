@@ -73,7 +73,9 @@ export function extractPromisesFallback(
       !ifElected && cost !== null && (days === null || days < campaignDaysLeft);
     const tola = mentionedTolas(sentence)[0] ?? contextTola;
     const defaultDays = cost === null ? 14 : cost <= 3000 ? 3 : cost <= 8000 ? 7 : 14;
+    const stated = days !== null || ifElected || cost === null;
     drafts.push({
+      dateSource: stated ? 'words' : 'default',
       day: state.clock.day,
       text: sentence.length > 140 ? `${sentence.slice(0, 137)}…` : sentence,
       issue,
@@ -123,6 +125,7 @@ export function draftsFromExtraction(
     tola: TolaId | 'none';
     when: 'during_campaign' | 'if_elected';
     deadline_days: number;
+    when_stated?: boolean;
   }[],
   contextTola: TolaId | null,
 ): PromiseDraft[] {
@@ -133,7 +136,9 @@ export function draftsFromExtraction(
       it.when === 'during_campaign' && cost !== null && it.deadline_days < left;
     const defaultDays = cost === null ? 14 : cost <= 3000 ? 3 : cost <= 8000 ? 7 : 14;
     const days = it.deadline_days > 0 ? it.deadline_days : defaultDays;
+    const stated = it.deadline_days > 0 || !!it.when_stated || cost === null;
     return {
+      dateSource: stated ? 'words' : 'default',
       day: state.clock.day,
       text: it.text.slice(0, 140),
       issue: it.issue,
@@ -144,4 +149,19 @@ export function draftsFromExtraction(
       beneficiaries: beneficiariesOf(state, it.issue),
     };
   });
+}
+
+/** The last day you can still deliver before polling (the silence day is the last campaign day). */
+export function lastCampaignDay(state: GameState): number {
+  return state.clock.day + state.clock.daysToPoll - 1;
+}
+
+/** Promises that still wait for you to say when ("Kab tak, bhaiya?"). */
+export function promisesNeedingDate(state: GameState): LedgerPromise[] {
+  return state.promises.filter((p) => p.status === 'open' && p.dateSource === 'default');
+}
+
+/** Can this promise's date be chosen? Only issue promises that works can fulfil. */
+export function canDate(p: LedgerPromise): boolean {
+  return p.status === 'open' && !p.faultLine && worksCost(p.issue) !== null;
 }

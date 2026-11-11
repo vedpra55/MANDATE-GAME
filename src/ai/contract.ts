@@ -510,8 +510,13 @@ export const PROMISE_SCHEMA = {
             type: 'integer',
             description: 'Days from today it is promised for; 0 if not stated',
           },
+          when_stated: {
+            type: 'boolean',
+            description:
+              'True only if the candidate said when: a date, a period ("in two weeks", "by Holi") or explicitly "after I win"',
+          },
         },
-        required: ['text', 'issue', 'tola', 'when', 'deadline_days'],
+        required: ['text', 'issue', 'tola', 'when', 'deadline_days', 'when_stated'],
         additionalProperties: false,
       },
     },
@@ -529,6 +534,7 @@ export const extractedPromisesSchema = z.object({
         tola: z.enum([...TOLAS, 'none']),
         when: z.enum(['during_campaign', 'if_elected']),
         deadline_days: z.number().int().min(0).max(365),
+        when_stated: z.boolean().optional(),
       }),
     )
     .max(3),

@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { bandOfTola } from '../../../engine/pa.ts';
 import { pollRanges } from '../../../engine/polls.ts';
+import { canDate, lastCampaignDay, promisesNeedingDate } from '../../../engine/promises.ts';
 import { TOLAS, type GameState, type Statement } from '../../../engine/types.ts';
 import { FAULT_LINE_DATA } from '../../../engine/world.ts';
 import { useGame } from '../../../state/gameStore.ts';
@@ -68,8 +69,28 @@ export function Reactions({
         </p>
       ))}
       {!v && statement.source === 'ai' && <p className="muted">…</p>}
-      {statement.source === 'fallback' && game.statements.length > 1 && null}
+      {promisesNeedingDate(game).length > 0 && <KabTak />}
     </div>
+  );
+}
+
+/** A promise without a date: Pintu asks, and the stamp opens the bahi-khata on the slip. */
+function KabTak() {
+  const open = useGame((s) => s.open);
+  const goTo = useGame((s) => s.goTo);
+  return (
+    <p className="kab-tak">
+      <span className="hand">{S.ledger.kabTakShort}</span>{' '}
+      <Stamp
+        className="small"
+        onClick={() => {
+          goTo('desk');
+          open('ledger');
+        }}
+      >
+        {S.ledger.openSlip}
+      </Stamp>
+    </p>
   );
 }
 
@@ -223,7 +244,17 @@ function Phone() {
  */
 function Ledger() {
   const game = useGame((s) => s.game)!;
+  const dispatch = useGame((s) => s.dispatch);
+  const [editing, setEditing] = useState<number | null>(null);
   const L = S.ledger;
+  const waiting = promisesNeedingDate(game);
+  const slipFor = game.promises.find((p) => p.id === editing && canDate(p)) ?? waiting[0] ?? null;
+  const first = game.clock.day + 1;
+  const last = lastCampaignDay(game);
+  const days = Array.from({ length: Math.max(0, last - first + 1) }, (_, i) => first + i);
+  const choose = (day: number | null) => {
+    if (slipFor && dispatch({ type: 'setPromiseDate', id: slipFor.id, day })) setEditing(null);
+  };
   return (
     <div className="ledger-spread">
       <LedgerPage
@@ -232,12 +263,64 @@ function Ledger() {
         empty={L.noPromises}
         rows={game.promises.map((p) => [
           String(p.day),
-          `${p.faultLine ? solutionLabel(p.faultLine) : p.text} (${p.deadlineDay ? L.due(p.deadlineDay) : L.ifElected})`,
+          <>
+            {p.faultLine ? solutionLabel(p.faultLine) : p.text}{' '}
+            {canDate(p) && p.status === 'open' ? (
+              <button
+                type="button"
+                className={`date-tag${p.dateSource === 'default' ? ' undated' : ''}`}
+                onClick={() => setEditing(p.id)}
+                title={L.changeDate}
+              >
+                (
+                {p.dateSource === 'default'
+                  ? L.noDate
+                  : p.deadlineDay
+                    ? L.due(p.deadlineDay)
+                    : L.ifElected}
+                )
+              </button>
+            ) : (
+              `(${p.deadlineDay ? L.due(p.deadlineDay) : L.ifElected})`
+            )}
+          </>,
           L.status[p.status],
         ])}
         statusColumn
         kind="promises"
       />
+      {slipFor && game.phase === 'campaign' && (
+        <div className="date-slip" role="dialog" aria-label={L.kabTak}>
+          <p className="hand">
+            {S.pa}: {L.kabTak.replace('{address}', game.player.address)}
+          </p>
+          <p className="slip-promise">“{slipFor.text}”</p>
+          {slipFor.dateSource !== 'default' && <p className="muted">{L.changeWarning}</p>}
+          <div className="slip-days">
+            {days.map((d) => (
+              <button
+                type="button"
+                key={d}
+                className={
+                  slipFor.deadlineDay === d && slipFor.dateSource !== 'default' ? 'on' : ''
+                }
+                onClick={() => choose(d)}
+              >
+                {d}
+              </button>
+            ))}
+            <button type="button" className="after-win" onClick={() => choose(null)}>
+              {L.afterWin}
+            </button>
+          </div>
+          <p className="muted small">{L.dateHint}</p>
+          {editing !== null && (
+            <button type="button" className="slip-close" onClick={() => setEditing(null)}>
+              ×
+            </button>
+          )}
+        </div>
+      )}
       <LedgerPage
         title={L.favours}
         columns={[L.colDay, L.colOwedTo, L.colAsk]}
@@ -259,7 +342,7 @@ function LedgerPage({
 }: {
   title: string;
   columns: [string, string, string];
-  rows: string[][];
+  rows: ReactNode[][];
   empty: string;
   kind: 'promises' | 'favours';
   statusColumn?: boolean;
@@ -289,7 +372,11 @@ function LedgerPage({
               {r.map((cell, j) => (
                 <span
                   key={j}
-                  className={statusColumn && j === 2 ? `status status-${cell}` : undefined}
+                  className={
+                    statusColumn && j === 2 && typeof cell === 'string'
+                      ? `status status-${cell}`
+                      : undefined
+                  }
                 >
                   {cell}
                 </span>

@@ -227,27 +227,15 @@ export function applyStatement(
     );
     if (duplicate) continue;
     s.promises.push({ ...d, id: s.nextId++, status: 'open' });
-    notes.push({ day, kind: 'promiseNoted', issue: d.issue, deadlineDay: d.deadlineDay });
-    if (d.when === 'if_elected' && d.cost >= 5000 && openBigPromises(s) > 6) {
-      // Promise inflation: "itna paisa kahan se aayega?" Credibility falls and sceptics cool.
-      record(s, {
-        actor: 'player',
-        kind: 'statement',
-        statementId: statement.id,
-        effect: {
-          credibility: -0.03,
-          trust: {
-            ...allGroups(-0.5),
-            elders_w: -1.5,
-            elders_m: -1.5,
-            traders_w: -1.5,
-            traders_m: -1.5,
-          },
-        },
-      });
-    }
+    notes.push({
+      day,
+      kind: 'promiseNoted',
+      issue: d.issue,
+      deadlineDay: d.deadlineDay,
+      needsDate: d.dateSource === 'default',
+    });
+    checkInflation(s, d, statement.id);
   }
-
   // --- what the PA notices
   if (reading.addressesEvaluator >= 0.5 || reading.coherent < 0.5) {
     notes.unshift({ day, kind: 'confused' });
@@ -305,4 +293,28 @@ export function openBigPromises(s: GameState): number {
   return s.promises.filter(
     (pr) => pr.status === 'open' && pr.when === 'if_elected' && pr.cost >= 5000,
   ).length;
+}
+
+/** Promise inflation: "itna paisa kahan se aayega?" Credibility falls and sceptics cool. */
+export function checkInflation(
+  s: GameState,
+  p: { when: 'during_campaign' | 'if_elected'; cost: number },
+  statementId?: number,
+): void {
+  if (p.when !== 'if_elected' || p.cost < 5000 || openBigPromises(s) <= 6) return;
+  record(s, {
+    actor: 'player',
+    kind: 'statement',
+    statementId,
+    effect: {
+      credibility: -0.03,
+      trust: {
+        ...allGroups(-0.5),
+        elders_w: -1.5,
+        elders_m: -1.5,
+        traders_w: -1.5,
+        traders_m: -1.5,
+      },
+    },
+  });
 }

@@ -35,7 +35,11 @@ export function noteText(n: PaNote, address: Address, rival = 'Rajendra Babu'): 
     case 'noEffect':
       return `Nobody really reacted to that, ${A}.`;
     case 'promiseNoted':
-      return `I've written it in the bahi-khata: ${S.issues[n.issue]}${n.deadlineDay ? `, by day ${n.deadlineDay}` : ', if we win'}.`;
+      return n.needsDate
+        ? `I've written ${S.issues[n.issue]} in the bahi-khata. Kab tak, ${A}? You didn't say when.`
+        : `I've written it in the bahi-khata: ${S.issues[n.issue]}${n.deadlineDay ? `, by day ${n.deadlineDay}` : ', if we win'}.`;
+    case 'promiseDateChanged':
+      return `${A}, people noticed you moved the date on ${S.issues[n.issue]}. "Tareekh pe tareekh."`;
     case 'promiseKept':
       return `${n.tola ? S.tolas[n.tola] : 'The village'} saw you keep your word on ${S.issues[n.issue]}. "Isne kaha tha, aur kiya."`;
     case 'promiseBroken':
@@ -198,6 +202,10 @@ export function deciderText(d: Decider, rival = 'Rajendra Babu'): string {
       return `Keeping your ${i} promise`;
     case 'promiseBroken':
       return `Breaking your ${i} promise`;
+    case 'promiseDated':
+      return `Giving a date for ${i}`;
+    case 'promiseDateChanged':
+      return `Moving the date on ${i}`;
     case 'divisive':
       return `Your divisive remarks (${day})`;
     case 'notice':

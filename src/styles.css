@@ -1345,3 +1345,67 @@ button {
   font-size: 20px;
   margin-bottom: 16px;
 }
+
+.date-tag {
+  font: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--indigo);
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+.date-tag.undated {
+  color: var(--vermilion);
+  font-weight: 600;
+}
+.date-slip {
+  position: absolute;
+  right: 60px;
+  bottom: 40px;
+  width: 560px;
+  padding: 18px 22px 16px;
+  background: var(--paper-light);
+  border: 2px solid var(--ink);
+  box-shadow: 6px 8px 0 rgba(36, 29, 26, 0.35);
+  transform: rotate(-1.2deg);
+  z-index: 5;
+}
+.date-slip .hand {
+  font-size: 26px;
+  margin: 0 0 6px;
+}
+.date-slip .slip-promise {
+  font-style: italic;
+  margin: 0 0 8px;
+}
+.slip-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+.slip-days button {
+  font: 600 18px var(--font-body);
+  min-width: 40px;
+  padding: 6px 8px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  cursor: pointer;
+}
+.slip-days button:hover,
+.slip-days button.on {
+  background: var(--marigold);
+}
+.slip-days .after-win {
+  padding: 6px 14px;
+}
+.slip-close {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 26px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}

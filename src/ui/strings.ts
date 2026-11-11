@@ -175,6 +175,15 @@ export const en = {
     status: { open: 'open', kept: 'kept', broken: 'broken' },
     due: (day: number) => `due day ${day}`,
     ifElected: 'if elected',
+    noDate: 'when? set a date',
+    changeDate: 'Choose or change the date',
+    kabTak: 'Kab tak, {address}? Pick the day you will have it done, or after the win.',
+    changeWarning: 'You already gave a date. Moving it is public: people will notice.',
+    afterWin: 'After I win',
+    kabTakShort: 'Kab tak? You promised it but did not say when.',
+    openSlip: 'Set the date',
+    dateHint:
+      'A near date is believed more, and is harder to keep. "After I win" costs nothing today.',
   },
 
   newspaper: {

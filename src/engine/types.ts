@@ -166,6 +166,12 @@ export type LedgerPromise = {
   tola: TolaId | null;
   when: 'during_campaign' | 'if_elected';
   deadlineDay: number | null;
+  /**
+   * Who set the date: your own words, you on the slip, or nobody yet (a provisional date the
+   * engine picked; Pintu asks "Kab tak, bhaiya?"). Missing on older saves = words.
+   */
+  dateSource?: 'words' | 'player' | 'default';
+  dateChanges?: number;
   cost: number;
   status: 'open' | 'kept' | 'broken';
   beneficiaries: GroupId[];
@@ -252,7 +258,9 @@ export type LogKind =
   | 'donorAccepted'
   | 'donorRefused'
   | 'favourLeaked'
-  | 'donorAngry';
+  | 'donorAngry'
+  | 'promiseDated'
+  | 'promiseDateChanged';
 
 export type LogEntry = {
   id: number;
@@ -279,7 +287,14 @@ export type PaNote =
   | { day: number; kind: 'tolaShift'; tola: TolaId; band: Band; up: boolean }
   | { day: number; kind: 'confused' }
   | { day: number; kind: 'noEffect' }
-  | { day: number; kind: 'promiseNoted'; issue: IssueId; deadlineDay: number | null }
+  | {
+      day: number;
+      kind: 'promiseNoted';
+      issue: IssueId;
+      deadlineDay: number | null;
+      needsDate?: boolean;
+    }
+  | { day: number; kind: 'promiseDateChanged'; issue: IssueId }
   | { day: number; kind: 'promiseKept'; issue: IssueId; tola: TolaId | null }
   | { day: number; kind: 'promiseBroken'; issue: IssueId; tola: TolaId | null }
   | { day: number; kind: 'deadlineSoon'; issue: IssueId; daysLeft: number }
@@ -510,6 +525,8 @@ export type Action =
   | { type: 'answer'; text: string }
   | { type: 'answerCall'; text: string }
   | { type: 'deliver'; faultLine: FaultLineId }
+  /** Choose when an open promise is due: a campaign day, or null for "after I win". No slot. */
+  | { type: 'setPromiseDate'; id: number; day: number | null }
   | { type: 'assignBooths'; plan: Record<TolaId, number> }
   | { type: 'endDay' }
   | { type: 'beginCounting' }

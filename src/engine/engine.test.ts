@@ -206,6 +206,39 @@ describe('pressure', () => {
   });
 });
 
+describe('promise dates', () => {
+  it('an undated promise waits for your date; the first choice is free, moving it costs', () => {
+    let s = run(campaign(), {
+      type: 'visit',
+      tola: 'purvi',
+      text: 'Main purvi tola ka handpump theek karwaungi.',
+    });
+    const p = s.promises.find((pr) => pr.issue === 'water')!;
+    expect(p.dateSource).toBe('default');
+    expect(validate(s, { type: 'setPromiseDate', id: p.id, day: s.clock.day })).toBe(
+      'invalidAmount',
+    );
+    const cred = s.credibility;
+    s = run(s, { type: 'setPromiseDate', id: p.id, day: s.clock.day + 5 });
+    expect(s.credibility).toBe(cred);
+    expect(s.promises.find((pr) => pr.id === p.id)!.deadlineDay).toBe(s.clock.day + 5);
+    s = run(s, { type: 'setPromiseDate', id: p.id, day: null });
+    expect(s.credibility).toBeLessThan(cred);
+    expect(s.promises.find((pr) => pr.id === p.id)!.when).toBe('if_elected');
+  });
+
+  it('a date in your own words is kept as you said it', () => {
+    const s = run(campaign(), {
+      type: 'visit',
+      tola: 'purvi',
+      text: 'Main do hafte mein purvi tola ka handpump theek karwaungi.',
+    });
+    const p = s.promises.find((pr) => pr.issue === 'water')!;
+    expect(p.dateSource).toBe('words');
+    expect(p.deadlineDay).toBe(s.clock.day + 14);
+  });
+});
+
 describe('election', () => {
   it('counts round by round to a result and names what decided it', () => {
     const s = playGame('coalition', 3);
