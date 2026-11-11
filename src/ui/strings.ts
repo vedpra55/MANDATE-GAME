@@ -252,6 +252,7 @@ export const en = {
   cash: { title: 'Cash in hand' },
 
   map: {
+    people: 'People you know here',
     rivalWasHere: (r: string) => `${r}'s people were here and promised this`,
     title: 'The village',
     hint: 'Pick a tola to visit.',

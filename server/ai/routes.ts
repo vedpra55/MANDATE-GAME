@@ -59,8 +59,18 @@ const voicesInput = z.object({
     language: z.enum(['hindi', 'english', 'hinglish', 'other']),
     candidateSaid: z.string().max(MAX_TEXT).nullable(),
     summary: z.string().max(400),
-    reactions: z.array(z.object({ who: z.string().max(80), verdict: z.string().max(80) })).max(4),
+    reactions: z
+      .array(
+        z.object({
+          who: z.string().max(60),
+          about: z.string().max(160),
+          verdict: z.string().max(80),
+        }),
+      )
+      .max(4),
     paFacts: z.array(z.string().max(240)).max(4),
+    memory: z.array(z.string().max(300)).max(8),
+    avoid: z.array(z.string().max(240)).max(6),
   }),
 });
 

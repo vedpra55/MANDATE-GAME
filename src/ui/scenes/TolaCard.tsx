@@ -6,6 +6,8 @@ import { worksCost } from '../../engine/promises.ts';
 import type { IssueId, TolaId } from '../../engine/types.ts';
 import { useGame } from '../../state/gameStore.ts';
 import { Stamp } from '../components/Stamp.tsx';
+import { residentsOf } from '../../engine/residents.ts';
+import { art } from '../assets.ts';
 import { Reactions } from '../desk/overlays/Overlays.tsx';
 import { noteText } from '../paText.ts';
 import { strings as S } from '../strings.ts';
@@ -58,6 +60,17 @@ export function TolaCard({ tola }: { tola: TolaId }) {
       <p className="hand pintu-line">
         {S.map.pintuSays} {S.bands[band]}. {S.map.tally(range.low, range.high)}
       </p>
+      <ul className="residents" aria-label={S.map.people}>
+        {residentsOf(tola).map((r) => {
+          const face = art(r.portrait);
+          return (
+            <li key={r.id} title={`${r.name}, ${r.age}: ${r.about}`}>
+              <img src={face.src} srcSet={face.srcSet} alt="" />
+              <span className="hand">{r.name}</span>
+            </li>
+          );
+        })}
+      </ul>
       {error && <p className="hand pintu-line flash">{S.errors[error]}</p>}
       {acted && !error && lastVisit?.day === game.clock.day ? (
         <Reactions

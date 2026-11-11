@@ -9,6 +9,9 @@ import { Stamp } from '../../components/Stamp.tsx';
 import { openingMessages } from '../../content.ts';
 import { noteText, solutionLabel, stanceLabel, storyHeadline } from '../../paText.ts';
 import { strings as S } from '../../strings.ts';
+import { offlineQuotes } from '../../offlineVoices.ts';
+import { RESIDENTS } from '../../../engine/residents.ts';
+import { art } from '../../assets.ts';
 
 /** Whichever desk object is picked up, shown large over a dimmed desk. Esc or click outside closes. */
 export function Overlays() {
@@ -58,16 +61,26 @@ export function Reactions({
 }) {
   if (!statement) return null;
   const v = statement.voices;
+  const quotes =
+    v?.quotes ??
+    (statement.source === 'fallback' && statement.channel !== 'declaration'
+      ? offlineQuotes(game, statement)
+      : []);
   return (
     <div className="reactions">
       <p className="hand pintu-line">
         {S.pa}: {v?.pa ?? fallbackNote}
       </p>
-      {v?.quotes?.map((q, i) => (
-        <p key={i} className="quote-line">
-          <span className="hand">"{q.text}"</span> <span className="muted">— {q.who}</span>
-        </p>
-      ))}
+      {quotes.map((q, i) => {
+        const r = RESIDENTS.find((x) => x.name === q.who);
+        const face = r ? art(r.portrait) : null;
+        return (
+          <p key={i} className="quote-line">
+            {face && <img className="quote-face" src={face.src} srcSet={face.srcSet} alt="" />}
+            <span className="hand">"{q.text}"</span> <span className="muted">— {q.who}</span>
+          </p>
+        );
+      })}
       {!v && statement.source === 'ai' && <p className="muted">…</p>}
       {promisesNeedingDate(game).length > 0 && <KabTak />}
     </div>

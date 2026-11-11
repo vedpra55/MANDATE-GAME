@@ -4,6 +4,7 @@ import { interpretFallback } from './interpret.ts';
 import { createRng } from './rng.ts';
 import { playGame } from './sim.ts';
 import { rivalPromise } from './rivalPromises.ts';
+import { speakerFor, tolaMemory } from './residents.ts';
 import { GROUPS, TOLAS, type Action, type GameState } from './types.ts';
 
 /** A fixed village (no variation): fault lines pond, wages, kiln; the dynast. */
@@ -265,9 +266,36 @@ describe('the visible rival', () => {
   });
 
   it('when you promised first, his promise is the me-too', () => {
-    const s = run(campaign(), { type: 'visit', tola: 'purvi', text: 'Handpump theek karwa denge.' });
+    const s = run(campaign(), {
+      type: 'visit',
+      tola: 'purvi',
+      text: 'Handpump theek karwa denge.',
+    });
     const p = rivalPromise(structuredClone(s), 'water', 'purvi');
     expect(p.meToo).toBe(true);
+  });
+});
+
+describe('memory', () => {
+  it('a tola remembers what you said there, and notices when you repeat it', () => {
+    let s = run(campaign(), { type: 'visit', tola: 'purvi', text: 'Handpump theek karwa denge.' });
+    s = run(s, { type: 'visit', tola: 'purvi', text: 'Handpump zaroor theek hoga.' });
+    const st = s.statements.at(-1)!;
+    const m = tolaMemory(s, 'purvi', st);
+    expect(m.visits).toHaveLength(1);
+    expect(m.repeating).toBe(true);
+    expect(m.promises.some((p) => p.issue === 'water')).toBe(true);
+  });
+
+  it('named residents of the tola answer for their group, two different people', () => {
+    const s = campaign();
+    const taken = new Set<string>();
+    const a = speakerFor(s, 'elders_m', 'purvi', taken)!;
+    taken.add(a.id);
+    const b = speakerFor(s, 'elders_m', 'purvi', taken)!;
+    expect(a.tola).toBe('purvi');
+    expect(a.group).toBe('elders_m');
+    expect(b.id).not.toBe(a.id);
   });
 });
 

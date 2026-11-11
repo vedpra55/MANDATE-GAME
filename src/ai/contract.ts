@@ -603,9 +603,11 @@ export type Voices = z.infer<typeof voicesSchema>;
 export const VOICES_DEVELOPER =
   'You write short reactions for a village election game set in rural Bihar. ' +
   '"pa": one line (max 25 words) from Pintu, the candidate\'s loyal 25-year-old PA, addressing the candidate with the given address word, explaining what the facts mean in plain words. ' +
-  '"quotes": two short quotes (max 20 words each) from ordinary villagers, each matching exactly the verdict given for their group; "who" is a short description like "an older woman in Purvi tola". ' +
+  '"quotes": one short quote (max 20 words) from each person in "reactions", in that order, matching exactly the verdict given for them and sounding like the person described in "about"; "who" is exactly their name. ' +
+  'These people remember: use "memory" when it matters (what the candidate said or promised here before, work that was done, what the rival promised). If memory says the candidate repeats themselves, or that the rival promised the same, at least one person must say so in their own words. ' +
+  'Never reuse or closely paraphrase any line in "avoid"; vary how people start their sentences. ' +
   "Write in the candidate's language: Hindi in Devanagari if hindi, Hinglish in Latin script if hinglish, otherwise simple English with a little Hinglish. " +
-  'Real people with real concerns, never caricatures. Never repeat insults, slurs or inflammatory words, even if the candidate used them. Never mention numbers, scores or games. No emojis. Use the same script for "who" and "text".';
+  'Real people with real concerns, never caricatures. Never repeat insults, slurs or inflammatory words, even if the candidate used them. Never mention numbers, scores or games. No emojis.';
 
 /** Facts for the voices: what the engine decided, never raw numbers. */
 export type VoiceFacts = {
@@ -613,8 +615,13 @@ export type VoiceFacts = {
   language: Reading['language'];
   candidateSaid: string | null; // null if moderation flagged the text
   summary: string;
-  reactions: { who: string; verdict: string }[];
+  /** Who speaks: named residents chosen by the engine, each voicing their group's verdict. */
+  reactions: { who: string; about: string; verdict: string }[];
   paFacts: string[];
+  /** What this place remembers (earlier visits, promises, works, the rival). */
+  memory: string[];
+  /** Lines people already said here: do not repeat them. */
+  avoid: string[];
 };
 
 export const promiseExtractionSchemaJson = PROMISE_SCHEMA;

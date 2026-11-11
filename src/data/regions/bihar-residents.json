@@ -1,0 +1,189 @@
+{
+  "note": "Recurring named residents (PLAN-v1.1 §D): fictional people, 4 per tola, each with a portrait from the generated pack. Appearance never maps to voting: groups are mixed across looks on purpose. 'group' is whose verdict they voice.",
+  "residents": [
+    {
+      "id": "ramdeo",
+      "tola": "purvi",
+      "name": "Ramdeo kaka",
+      "age": 75,
+      "group": "elders_m",
+      "portrait": "portraits-villagers-01-2",
+      "about": "retired farmer, proud, remembers every promise anyone ever made him"
+    },
+    {
+      "id": "sunita",
+      "tola": "purvi",
+      "name": "Sunita",
+      "age": 35,
+      "group": "labourers_w",
+      "portrait": "portraits-villagers-01-1",
+      "about": "works in other people's fields, sharp tongue, no patience for speeches"
+    },
+    {
+      "id": "pappu",
+      "tola": "purvi",
+      "name": "Pappu",
+      "age": 22,
+      "group": "youth_m",
+      "portrait": "portraits-villagers-02-1",
+      "about": "plays cricket every evening, waiting for a recruitment exam that keeps getting postponed"
+    },
+    {
+      "id": "kamla",
+      "tola": "purvi",
+      "name": "Kamla devi",
+      "age": 50,
+      "group": "farmers_w",
+      "portrait": "portraits-villagers-03-2",
+      "about": "grows vegetables on a small plot, practical, counts every rupee"
+    },
+
+    {
+      "id": "fauji",
+      "tola": "paschim",
+      "name": "Fauji chacha",
+      "age": 65,
+      "group": "elders_m",
+      "portrait": "portraits-villagers-06-1",
+      "about": "retired soldier, likes straight answers and dislikes flattery"
+    },
+    {
+      "id": "gudiya",
+      "tola": "paschim",
+      "name": "Gudiya",
+      "age": 20,
+      "group": "youth_w",
+      "portrait": "portraits-villagers-04-3",
+      "about": "college student, first in her family to study, wants a bus to town"
+    },
+    {
+      "id": "bhola",
+      "tola": "paschim",
+      "name": "Bhola",
+      "age": 40,
+      "group": "labourers_m",
+      "portrait": "portraits-villagers-01-4",
+      "about": "daily-wage labourer, distrusts big men in white kurtas"
+    },
+    {
+      "id": "shabnam",
+      "tola": "paschim",
+      "name": "Shabnam",
+      "age": 42,
+      "group": "farmers_w",
+      "portrait": "portraits-villagers-08-1",
+      "about": "keeps two buffaloes and a small field, worried about irrigation"
+    },
+
+    {
+      "id": "ramesh",
+      "tola": "bazaar",
+      "name": "Ramesh Sah",
+      "age": 45,
+      "group": "traders_m",
+      "portrait": "portraits-villagers-05-3",
+      "about": "runs the grocery on the chowk, knows everyone's debts"
+    },
+    {
+      "id": "kiran",
+      "tola": "bazaar",
+      "name": "Kiran",
+      "age": 38,
+      "group": "traders_w",
+      "portrait": "portraits-villagers-06-2",
+      "about": "tailor with her own small shop, cheerful but sceptical"
+    },
+    {
+      "id": "raju",
+      "tola": "bazaar",
+      "name": "Raju",
+      "age": 25,
+      "group": "youth_m",
+      "portrait": "portraits-villagers-11-3",
+      "about": "repairs mobiles, follows every rumour online"
+    },
+    {
+      "id": "imran",
+      "tola": "bazaar",
+      "name": "Imran bhai",
+      "age": 38,
+      "group": "labourers_m",
+      "portrait": "portraits-villagers-09-1",
+      "about": "drives an e-rickshaw to the block town, curses the potholes"
+    },
+
+    {
+      "id": "jagdish",
+      "tola": "pokhar",
+      "name": "Jagdish",
+      "age": 50,
+      "group": "labourers_m",
+      "portrait": "portraits-villagers-07-1",
+      "about": "fishes in the pond and lives by it, quiet until angered"
+    },
+    {
+      "id": "phoolmati",
+      "tola": "pokhar",
+      "name": "Phoolmati amma",
+      "age": 85,
+      "group": "elders_w",
+      "portrait": "portraits-villagers-07-3",
+      "about": "has seen every election since the seventies, still waiting for her pension"
+    },
+    {
+      "id": "lalita",
+      "tola": "pokhar",
+      "name": "Lalita",
+      "age": 36,
+      "group": "labourers_w",
+      "portrait": "portraits-villagers-11-1",
+      "about": "works at the brick kiln, coughs, needs the wage"
+    },
+    {
+      "id": "rekha",
+      "tola": "pokhar",
+      "name": "Rekha",
+      "age": 26,
+      "group": "youth_w",
+      "portrait": "portraits-villagers-07-2",
+      "about": "ASHA health worker, knows which houses are sick"
+    },
+
+    {
+      "id": "sanjay",
+      "tola": "naya",
+      "name": "Sanjay",
+      "age": 28,
+      "group": "youth_m",
+      "portrait": "portraits-villagers-05-2",
+      "about": "came back from a factory job in the city, impatient, wants work here"
+    },
+    {
+      "id": "meena",
+      "tola": "naya",
+      "name": "Meena",
+      "age": 29,
+      "group": "farmers_w",
+      "portrait": "portraits-villagers-12-2",
+      "about": "runs the women's self-help group ledger, careful with promises"
+    },
+    {
+      "id": "baleshwar",
+      "tola": "naya",
+      "name": "Baleshwar",
+      "age": 55,
+      "group": "farmers_m",
+      "portrait": "portraits-villagers-08-2",
+      "about": "farmer with a tractor loan, talks about crop prices"
+    },
+    {
+      "id": "shanti",
+      "tola": "naya",
+      "name": "Shanti devi",
+      "age": 68,
+      "group": "elders_w",
+      "portrait": "portraits-villagers-11-4",
+      "about": "retired anganwadi helper, reads the newspaper aloud to neighbours"
+    }
+  ]
+}
