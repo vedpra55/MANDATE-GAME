@@ -348,8 +348,8 @@ Out of scope for MVP: tiers 2–5, party founding, governing phase, mobile layou
 2. **Build the asset tooling** in `/tools/assets/`: `manifest.json` format, `generate.mjs` (reads `style-block.txt` + references, calls the OpenAI image API, saves 4 variants per asset), `review.html`, `slice.mjs`, `optimize.mjs`. **Ask the owner before running any batch that spends API credits.**
 3. **Phase 0 style exploration:** write prompts for the 3 style directions (A/B/C) of the village desk scene. Generate, let the owner pick, then draft `style-bible.md`.
 4. **Desk prototype with placeholders:** while art is in progress, build the village desk in React using placeholder shapes positioned from `desk-layout.json`: clickable phone, flippable register, tear-off calendar, newspaper with live text. Swap in real art as it arrives.
-5. **Engine skeleton:** `GameState`, day/slot loop, blocs, ledgers, with unit tests. No AI yet; use stubbed interpreter output.
-6. **Wire the interpreter:** one server endpoint that takes player text + relevant state and returns schema-validated JSON. Apply effects in the engine. Show PA whisper + voter quotes.
+5. **Engine skeleton:** `GameState`, day/slot loop, blocs, ledgers, with unit tests. No AI yet; use stubbed interpreter output. Full design: `docs/ENGINE.md` (milestones E1–E3).
+6. **Wire the interpreter:** one server endpoint that takes player text + relevant state and returns schema-validated JSON. Apply effects in the engine. Show PA whisper + voter quotes. Design: `docs/ENGINE.md` (milestones E4–E7).
 
 Work in small, reviewable steps. After each step, summarise what changed and what's next.
 
@@ -408,3 +408,7 @@ Work in small, reviewable steps. After each step, summarise what changed and wha
 | 2026-11-11 | Desk prototype (step 4): fixed 1920×1080 stage scaled to fit; props placed from `src/data/desk-layout.json` (positions measured from the master desk); every system opens as a physical object overlay; rubber stamps are the only buttons. Fonts: Rozha One (display), Hind (body), Kalam (handwriting); all three cover Devanagari. |
 | 2026-11-11 | UI state: Zustand store in `src/state/` binds the pure engine to React; placeholder world content lives in `src/ui/content.ts` until the engine and AI are wired. |
 | 2026-11-11 | Reading views with live text (open ledger, newspaper, diary, phone, sheets) are built in code with generated textures, never live text over a painted page: painted rules and perspective can never line up with HTML text. Generated "open" art is for decoration only. |
+| 2026-11-11 | Engine design in `docs/ENGINE.md`: three layers. (1) Engine: pure TS owns every number and rule. (2) Decide: OpenAI Decisions API (`/v1/decisions`, `gpt-6-luna`) measures player text and makes NPC choices as probabilities over engine-defined options. (3) Generate: Responses API extracts promises and writes all character text, voicing the engine's verdict. The brief's "Judge" role is split between Decide (classification/scoring) and Generate (structured extraction). |
+| 2026-11-11 | Text models (verified on the account): `gpt-6-luna` for high-volume generation, `gpt-6.1-terra` for key characters' writing, `gpt-6.1-sol` for the region director, `omni-moderation-latest` for safety. Configured in one server file. |
+| 2026-11-11 | Free will = fixed verbs (priced by the engine) × chosen targets × free words; NPCs choose among engine options with Decide probabilities sampled by a seeded RNG; every AI answer is logged so games replay exactly. |
+| 2026-11-11 | MVP voter model: 5 interest blocs (farmers, labourers, youth, traders, elders) × gender cross-cut × 5 tolas = 50 vote cells; opinion leaders spread influence. |
