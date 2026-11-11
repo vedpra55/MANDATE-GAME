@@ -11,12 +11,17 @@ const base = {
 };
 
 describe('prompt', () => {
-  it('keeps the fixed order STYLE, SUBJECT, TECHNICAL and strips comment lines', () => {
+  it('orders use, subject, style, constraints and strips comment lines', () => {
     const prompt = buildPrompt('# note to self\nFlat colour, thick lines.', base);
     expect(prompt).not.toContain('note to self');
-    const order = ['STYLE:', 'Flat colour', 'SUBJECT:', 'An old rotary phone.', 'TECHNICAL:'].map(
-      (s) => prompt.indexOf(s),
-    );
+    const order = [
+      'Intended use:',
+      'Subject:',
+      'An old rotary phone.',
+      'Style:',
+      'Flat colour',
+      'Constraints:',
+    ].map((s) => prompt.indexOf(s));
     expect(order.every((i) => i >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
   });

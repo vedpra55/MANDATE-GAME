@@ -1,0 +1,7 @@
+# Style direction A: hand-painted signboard. Flat colour, thick lines.
+Medium: hand-painted Indian shop-signboard and truck-art illustration, as if painted with enamel sign paint on a flat board by a village sign painter. Flat 2D illustration, not photorealistic, not a 3D render.
+Line: thick, confident dark-brown outlines with slightly uneven brush weight; hand-made, a little imperfect, never vector-perfect.
+Colour: flat areas of bold, saturated enamel colour with no gradients. Limited palette of about eight colours: marigold yellow, vermilion red, deep indigo, leaf green, turmeric ochre, warm cream, earth brown, near-black.
+Shading: one flat darker tone per colour for shadows, cut as clean painted shapes; faint visible brush strokes inside fills; a few tiny paint chips.
+Light: warm late-afternoon sunlight from the top-left, shadows falling to the bottom-right.
+Mood: bold, cheerful, graphic, instantly readable even at small sizes.

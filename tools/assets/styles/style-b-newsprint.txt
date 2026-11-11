@@ -1,0 +1,7 @@
+# Style direction B: newspaper/print. Halftone texture, muted palette.
+Medium: vintage Indian newsprint and letterpress illustration, like an editorial drawing in a 1970s–80s Hindi newspaper or an old matchbox-label print. Flat 2D illustration, not photorealistic, not a 3D render.
+Line: fine black ink linework of varying weight, slightly rough and hand-drawn.
+Colour: muted, limited palette on off-white newsprint: ink black, faded vermilion, dusty indigo, ochre, pale leaf green, warm grey.
+Shading: visible halftone dot screens and cross-hatching instead of gradients; slight misregistration between colour layers; soft paper grain and fibre texture across the whole image.
+Light: warm late-afternoon sunlight from the top-left, shadows falling to the bottom-right.
+Mood: calm, documentary, a little worn and nostalgic.

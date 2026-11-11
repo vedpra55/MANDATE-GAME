@@ -5,14 +5,52 @@
     "quality": "medium",
     "variants": 4,
     "styleBlockFile": "style-block.txt",
-    "references": ["references"]
+    "references": [
+      "references"
+    ]
   },
   "assets": [
+    {
+      "id": "phase0.desk-style-a",
+      "category": "scenes",
+      "kind": "image",
+      "description": "The player's desk at the start of the game: the open-air workspace of a village sarpanch candidate in a fictional village in rural Bihar, north India. Seen from directly above: a flat top-down view with no perspective distortion.\nComposition (16:9): a woven rope charpai with a wooden frame fills the middle two-thirds of the frame and serves as the desk. The centre of the charpai is left clear and uncluttered, because the game places a sheet of paper there. Along the top edge, the base of a thick neem tree trunk with gnarled roots; a tear-off wall calendar with blank pages hangs on a nail in the trunk. The ground around the charpai is packed earth with a few fallen neem leaves.\nObjects, each clearly separated with space around it so it can be cut out later:\n- left side: an old cream rotary landline phone with a coiled cord; a dented tin cash box\n- on the charpai, near its edges: a red cloth-bound bahi-khata ledger; a folded newspaper whose columns are suggested by grey blocks with no readable letters; a small stack of paper files tied with cotton string; a small spiral notebook with a pencil\n- right side: a glass of milky chai on a small steel saucer\n- bottom-right corner: the front wheel and handlebars of an old black bicycle entering the frame\nDappled neem-leaf shadows fall across the scene.",
+      "size": "2048x1152",
+      "background": "opaque",
+      "displayWidth": 1920,
+      "status": "generated",
+      "notes": "Phase 0 style direction A.",
+      "styleBlockFile": "styles/style-a-signboard.txt"
+    },
+    {
+      "id": "phase0.desk-style-b",
+      "category": "scenes",
+      "kind": "image",
+      "description": "The player's desk at the start of the game: the open-air workspace of a village sarpanch candidate in a fictional village in rural Bihar, north India. Seen from directly above: a flat top-down view with no perspective distortion.\nComposition (16:9): a woven rope charpai with a wooden frame fills the middle two-thirds of the frame and serves as the desk. The centre of the charpai is left clear and uncluttered, because the game places a sheet of paper there. Along the top edge, the base of a thick neem tree trunk with gnarled roots; a tear-off wall calendar with blank pages hangs on a nail in the trunk. The ground around the charpai is packed earth with a few fallen neem leaves.\nObjects, each clearly separated with space around it so it can be cut out later:\n- left side: an old cream rotary landline phone with a coiled cord; a dented tin cash box\n- on the charpai, near its edges: a red cloth-bound bahi-khata ledger; a folded newspaper whose columns are suggested by grey blocks with no readable letters; a small stack of paper files tied with cotton string; a small spiral notebook with a pencil\n- right side: a glass of milky chai on a small steel saucer\n- bottom-right corner: the front wheel and handlebars of an old black bicycle entering the frame\nDappled neem-leaf shadows fall across the scene.",
+      "size": "2048x1152",
+      "background": "opaque",
+      "displayWidth": 1920,
+      "status": "generated",
+      "notes": "Phase 0 style direction B.",
+      "styleBlockFile": "styles/style-b-newsprint.txt"
+    },
+    {
+      "id": "phase0.desk-style-c",
+      "category": "scenes",
+      "kind": "image",
+      "description": "The player's desk at the start of the game: the open-air workspace of a village sarpanch candidate in a fictional village in rural Bihar, north India. Seen from directly above: a flat top-down view with no perspective distortion.\nComposition (16:9): a woven rope charpai with a wooden frame fills the middle two-thirds of the frame and serves as the desk. The centre of the charpai is left clear and uncluttered, because the game places a sheet of paper there. Along the top edge, the base of a thick neem tree trunk with gnarled roots; a tear-off wall calendar with blank pages hangs on a nail in the trunk. The ground around the charpai is packed earth with a few fallen neem leaves.\nObjects, each clearly separated with space around it so it can be cut out later:\n- left side: an old cream rotary landline phone with a coiled cord; a dented tin cash box\n- on the charpai, near its edges: a red cloth-bound bahi-khata ledger; a folded newspaper whose columns are suggested by grey blocks with no readable letters; a small stack of paper files tied with cotton string; a small spiral notebook with a pencil\n- right side: a glass of milky chai on a small steel saucer\n- bottom-right corner: the front wheel and handlebars of an old black bicycle entering the frame\nDappled neem-leaf shadows fall across the scene.",
+      "size": "2048x1152",
+      "background": "opaque",
+      "displayWidth": 1920,
+      "status": "generated",
+      "notes": "Phase 0 style direction C.",
+      "styleBlockFile": "styles/style-c-blend.txt"
+    },
     {
       "id": "scene.village-desk",
       "category": "scenes",
       "kind": "image",
-      "description": "Top-down view of a village sarpanch candidate's workspace in a fictional north Indian village: a woven charpai under the shade of a neem tree, used as a desk. On it: a red cloth bahi-khata ledger, a folded newspaper (blank, no readable text), a small stack of tied paper files, a glass of chai, an old landline phone, a dented tin cash box and a small spiral notebook. A tear-off wall calendar hangs on a nail in the neem trunk at the top of the frame. A bicycle leans at the edge. Dappled leaf shadows. Leave clear open space in the centre of the charpai for a sheet of paper.",
+      "description": "The player's desk at the start of the game: the open-air workspace of a village sarpanch candidate in a fictional village in rural Bihar, north India. Seen from directly above: a flat top-down view with no perspective distortion.\nComposition (16:9): a woven rope charpai with a wooden frame fills the middle two-thirds of the frame and serves as the desk. The centre of the charpai is left clear and uncluttered, because the game places a sheet of paper there. Along the top edge, the base of a thick neem tree trunk with gnarled roots; a tear-off wall calendar with blank pages hangs on a nail in the trunk. The ground around the charpai is packed earth with a few fallen neem leaves.\nObjects, each clearly separated with space around it so it can be cut out later:\n- left side: an old cream rotary landline phone with a coiled cord; a dented tin cash box\n- on the charpai, near its edges: a red cloth-bound bahi-khata ledger; a folded newspaper whose columns are suggested by grey blocks with no readable letters; a small stack of paper files tied with cotton string; a small spiral notebook with a pencil\n- right side: a glass of milky chai on a small steel saucer\n- bottom-right corner: the front wheel and handlebars of an old black bicycle entering the frame\nDappled neem-leaf shadows fall across the scene.",
       "size": "2048x1152",
       "background": "opaque",
       "displayWidth": 1920,
@@ -26,9 +64,12 @@
       "size": "1024x1024",
       "background": "transparent",
       "displayWidth": 220,
+      "status": "todo",
       "model": "gpt-image-2.6-sunburst",
-      "references": ["references", "@picked:scene.village-desk"],
-      "status": "todo"
+      "references": [
+        "references",
+        "@picked:scene.village-desk"
+      ]
     },
     {
       "id": "character.pa",
