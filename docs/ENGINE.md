@@ -642,15 +642,16 @@ around those facts.
 
 ## 14. Build order (each milestone ends playable and tested)
 
-| Milestone                    | Delivers                                                                                                                                                             | AI                |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| **E1 State and loop**        | `GameState`, seeded RNG, region JSON (5 tolas × 10 groups), action catalog and validation, reducer, day tick. Desk calendar, cash and ledger read real engine state. | none              |
-| **E2 Statements (fallback)** | Statement pipeline with lexicon fallback, trust formula, promise ledger (simple extraction stub), statement history, PA diary from the engine. Writing pad wired.    | none              |
-| **E3 Election**              | Vote model, poll ranges, counting day rounds, end card with attribution. **A full game is playable end to end.**                                                     | none              |
-| **E4 AI wiring**             | Server `/api/decide`, `/api/generate`, `/api/moderate`; statement question set; promise extraction; PA and quote voices; tape recording; fallback switch.            | Decide + Generate |
-| **E5 Living village**        | Chaupal grievances, donor, scandal, rival agent, event director, media headlines, tola visits on the map.                                                            | Decide + Generate |
-| **E6 Rally**                 | Rally scene with live crowd reaction.                                                                                                                                | Decide (live)     |
-| **E7 Balance**               | Simulation harness, calibration set, tuning pass.                                                                                                                    | recorded          |
+| Milestone                    | Delivers                                                                                                                                                                                                                              | AI                |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| **E1 State and loop**        | `GameState`, seeded RNG, region JSON (5 tolas × 10 groups), action catalog and validation, reducer, day tick. Desk calendar, cash and ledger read real engine state.                                                                  | none              |
+| **E2 Statements (fallback)** | Statement pipeline with lexicon fallback, trust formula, promise ledger (simple extraction stub), statement history, PA diary from the engine. Writing pad wired.                                                                     | none              |
+| **E3 Election**              | Vote model, poll ranges, counting day rounds, end card with attribution. **A full game is playable end to end.**                                                                                                                      | none              |
+| **C1–C6 Challenge layer**    | Fault lines with stance and win-wins, fog of war, procedural village, rival wedges, scarcity (works take days, booth assignment), rebalance. Design: `docs/CHALLENGE.md`. Built before AI wiring so Decide measures the right things. | none (fallback)   |
+| **E4 AI wiring**             | Server `/api/decide`, `/api/generate`, `/api/moderate`; statement question set; promise extraction; PA and quote voices; tape recording; fallback switch.                                                                             | Decide + Generate |
+| **E5 Living village**        | Chaupal grievances, donor, scandal, rival agent, event director, media headlines, tola visits on the map.                                                                                                                             | Decide + Generate |
+| **E6 Rally**                 | Rally scene with live crowd reaction.                                                                                                                                                                                                 | Decide (live)     |
+| **E7 Balance**               | Simulation harness, calibration set, tuning pass.                                                                                                                                                                                     | recorded          |
 
 Credits: E4–E6 make real API calls only for development checks at a small scale; any bulk run (the
 calibration set, many test games) is announced before running.
