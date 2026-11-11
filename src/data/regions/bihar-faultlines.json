@@ -1,0 +1,391 @@
+{
+  "note": "Interest conflicts for a Bihar village. Never identity or faith. Words are for the offline fallback; the AI reads meaning.",
+  "faultLines": [
+    {
+      "id": "pond",
+      "issue": "water",
+      "topic": [
+        "pond",
+        "pokhar",
+        "talab",
+        "taalab",
+        "encroach",
+        "kabza",
+        "qabza",
+        "तालाब",
+        "पोखर",
+        "कब्जा"
+      ],
+      "hot": {
+        "pokhar": "side_a",
+        "paschim": "side_b"
+      },
+      "sideA": {
+        "groups": {
+          "labourers": 1,
+          "youth": 0.3
+        },
+        "words": [
+          "no house will",
+          "no home will",
+          "nobody's house",
+          "ghar nahi tootega",
+          "ghar nahi tutega",
+          "koi ghar nahi",
+          "ghar nahi hatega",
+          "basne do",
+          "rehne do",
+          "homes will stay",
+          "houses will stay",
+          "families will stay",
+          "घर नहीं टूटेगा"
+        ]
+      },
+      "sideB": {
+        "groups": {
+          "farmers": 1,
+          "elders": 0.4
+        },
+        "words": [
+          "clear the encroachment",
+          "remove the encroachment",
+          "remove encroachment",
+          "encroachment will go",
+          "kabza hatega",
+          "kabza hataenge",
+          "kabza hatayenge",
+          "free the pond",
+          "pond for the farmers",
+          "pond for farmers",
+          "houses must go",
+          "कब्जा हटेगा"
+        ]
+      },
+      "winWin": {
+        "elements": [
+          ["desilt", "dig out", "deepen", "khudai", "gehra", "mgnrega", "nrega", "खुदाई"],
+          ["patta", "papers", "registry", "title deed", "पट्टा"],
+          ["no new", "naya kabza nahi", "aage koi", "no further", "नया कब्जा नहीं"],
+          ["irrigation", "sinchai", "kisan ko paani", "farmers get water", "सिंचाई"]
+        ],
+        "cost": 10000,
+        "days": 10
+      },
+      "describe": {
+        "topic": "the pond dispute: labourer families who built homes on the pond land, and farmers who need the pond for irrigation and flood control",
+        "sideA": "protect the families: no homes on the pond land will be broken",
+        "sideB": "clear the encroachment and give the pond back to the farmers",
+        "winWin": "a concrete plan that serves both sides, e.g. desilting the pond with rural-jobs work, papers for existing homes and no new encroachment",
+        "question": "Will the new candidate break poor families' homes, or let the pond die and the farmers' fields dry up? Which side are you on?"
+      }
+    },
+    {
+      "id": "wages",
+      "issue": "wages_work",
+      "topic": [
+        "wage",
+        "mazdoori",
+        "majduri",
+        "mazduri",
+        "dihadi",
+        "daily rate",
+        "मजदूरी",
+        "दिहाड़ी"
+      ],
+      "hot": {
+        "purvi": "side_a",
+        "paschim": "side_b"
+      },
+      "sideA": {
+        "groups": {
+          "labourers": 1,
+          "youth": 0.3
+        },
+        "words": [
+          "wages will rise",
+          "higher wage",
+          "raise the wage",
+          "mazdoori badhegi",
+          "majduri badhegi",
+          "dihadi badhegi",
+          "badhegi mazdoori",
+          "fair wage for labour",
+          "मजदूरी बढ़ेगी"
+        ]
+      },
+      "sideB": {
+        "groups": {
+          "farmers": 1,
+          "elders": 0.3
+        },
+        "words": [
+          "wages stay",
+          "farmers cannot pay",
+          "farmers can't pay",
+          "kisan nahi de sakta",
+          "mazdoori nahi badhegi",
+          "no wage rise",
+          "मजदूरी नहीं बढ़ेगी"
+        ]
+      },
+      "winWin": {
+        "elements": [
+          ["mgnrega", "nrega", "job card", "sarkari kaam", "मनरेगा"],
+          ["lean season", "off season", "khali mahine", "jab khet mein kaam nahi"],
+          ["committee", "samiti", "baithak", "sit together", "both sides", "dono paksh", "समिति"],
+          ["harvest", "katai", "kataai", "कटाई"]
+        ],
+        "cost": 4000,
+        "days": 7
+      },
+      "describe": {
+        "topic": "harvest wages: landless labourers want a higher daily wage; farmers, who employ them, say they cannot pay more",
+        "sideA": "support a higher daily wage for labourers",
+        "sideB": "back the farmers: wages stay where they are",
+        "winWin": "a concrete arrangement both can accept, e.g. rural-jobs work in the lean season plus a farmer-labourer wage committee at harvest",
+        "question": "Will the candidate raise the labourers' wage and ruin the small farmer, or keep the labourer poor? Answer straight."
+      }
+    },
+    {
+      "id": "plot",
+      "issue": "sports",
+      "topic": [
+        "plot",
+        "panchayat land",
+        "panchayat ki zameen",
+        "khali zameen",
+        "ground",
+        "maidan",
+        "playground",
+        "community hall",
+        "bhawan",
+        "मैदान",
+        "भवन"
+      ],
+      "hot": {
+        "naya": "side_a",
+        "bazaar": "side_b"
+      },
+      "sideA": {
+        "groups": {
+          "youth": 1
+        },
+        "words": [
+          "playground for the youth",
+          "ground for the youth",
+          "maidan banega",
+          "khel ka maidan",
+          "play ground will",
+          "playground will",
+          "खेल का मैदान"
+        ]
+      },
+      "sideB": {
+        "groups": {
+          "elders": 1,
+          "traders": 0.3
+        },
+        "words": [
+          "hall for the elders",
+          "community hall will",
+          "bhawan banega",
+          "samudayik bhawan",
+          "hall will be built",
+          "सामुदायिक भवन"
+        ]
+      },
+      "winWin": {
+        "elements": [
+          ["share", "both", "dono", "half", "aadha", "aadhe"],
+          ["morning", "subah", "evening", "shaam", "timings"],
+          ["ground", "maidan", "playground"],
+          ["hall", "bhawan", "shed"]
+        ],
+        "cost": 7500,
+        "days": 8
+      },
+      "describe": {
+        "topic": "the panchayat plot: the youth want a playground; the elders want a community hall on the same land",
+        "sideA": "give the plot to the youth for a playground",
+        "sideB": "build the elders' community hall on the plot",
+        "winWin": "a concrete sharing plan, e.g. a playground with a small hall or shed and agreed timings",
+        "question": "The panchayat plot: playground for the boys, or a hall for the elders? The candidate cannot have it both ways."
+      }
+    },
+    {
+      "id": "bazaarRoad",
+      "issue": "roads",
+      "topic": [
+        "widen",
+        "widening",
+        "chaudi",
+        "chauda",
+        "vendor",
+        "thela",
+        "rehri",
+        "stall",
+        "ठेला",
+        "चौड़ी"
+      ],
+      "hot": {
+        "bazaar": "side_a",
+        "purvi": "side_b"
+      },
+      "sideA": {
+        "groups": {
+          "traders": 1,
+          "youth": 0.2
+        },
+        "words": [
+          "road will be widened",
+          "widen the road",
+          "widen the bazaar",
+          "sadak chaudi hogi",
+          "chaudi sadak banegi",
+          "stalls must go",
+          "thele hatenge",
+          "सड़क चौड़ी होगी"
+        ]
+      },
+      "sideB": {
+        "groups": {
+          "labourers": 0.6,
+          "elders": 0.2
+        },
+        "words": [
+          "vendors will stay",
+          "no stall will",
+          "thela nahi hatega",
+          "rehri nahi hategi",
+          "stalls will stay",
+          "nobody's stall",
+          "ठेला नहीं हटेगा"
+        ]
+      },
+      "winWin": {
+        "elements": [
+          ["vendor zone", "haat", "weekly market", "new place", "alag jagah", "nayi jagah", "हाट"],
+          ["widen", "chaudi", "chauda"],
+          ["no one loses", "kisi ka nuksan nahi", "dono ka", "both"]
+        ],
+        "cost": 9000,
+        "days": 9
+      },
+      "describe": {
+        "topic": "widening the bazaar road: traders want it wide; street vendors and roadside houses would be removed",
+        "sideA": "widen the road even if stalls must go",
+        "sideB": "protect the vendors: no stall will be removed",
+        "winWin": "a concrete plan, e.g. widen the road and give vendors a new market place or weekly haat so nobody loses",
+        "question": "Will the candidate widen the bazaar road for the shops, or protect the thelas? Say it."
+      }
+    },
+    {
+      "id": "rationShop",
+      "issue": "ration",
+      "topic": ["ration shop", "ration dealer", "dealer", "kotedar", "pds", "राशन दुकान", "कोटेदार"],
+      "hot": {
+        "purvi": "side_a",
+        "bazaar": "side_b"
+      },
+      "sideA": {
+        "groups": {
+          "labourers": 1,
+          "elders": 0.3
+        },
+        "words": [
+          "action against the dealer",
+          "dealer will be removed",
+          "remove the dealer",
+          "kotedar hatega",
+          "dealer ki jaanch",
+          "inquiry against",
+          "cancel the licence",
+          "कोटेदार हटेगा"
+        ]
+      },
+      "sideB": {
+        "groups": {
+          "traders": 1
+        },
+        "words": [
+          "dealer is honest",
+          "no action against",
+          "dealer ko kuch nahi",
+          "leave the dealer",
+          "kotedar imandar",
+          "कोटेदार ईमानदार"
+        ]
+      },
+      "winWin": {
+        "elements": [
+          ["social audit", "public list", "list on the wall", "notice board", "suchi", "सूची"],
+          ["every month", "har mahine", "monthly"],
+          ["weigh", "weighing", "taraazu", "taraju", "receipt", "parchi"]
+        ],
+        "cost": 3000,
+        "days": 6
+      },
+      "describe": {
+        "topic": "the ration shop: labourers accuse the dealer of skimming; traders defend him as one of their own",
+        "sideA": "act against the ration dealer",
+        "sideB": "defend the dealer: no action against him",
+        "winWin": "a concrete transparency plan, e.g. a monthly public list on the wall and open weighing with receipts",
+        "question": "Is the ration dealer a thief, as the candidate's friends say? Or will the candidate apologise to an honest trader?"
+      }
+    },
+    {
+      "id": "kiln",
+      "issue": "health",
+      "topic": ["kiln", "bhatta", "brick", "eent", "chimney", "smoke", "dhuan", "भट्टा", "धुआं"],
+      "hot": {
+        "naya": "side_a",
+        "paschim": "side_b"
+      },
+      "sideA": {
+        "groups": {
+          "labourers": 0.6,
+          "youth": 0.4
+        },
+        "words": [
+          "kiln stays",
+          "kiln will stay",
+          "bhatta chalega",
+          "bhatta band nahi",
+          "jobs at the kiln",
+          "kiln will not close",
+          "भट्टा चलेगा"
+        ]
+      },
+      "sideB": {
+        "groups": {
+          "farmers": 0.8,
+          "elders": 0.5
+        },
+        "words": [
+          "close the kiln",
+          "kiln will close",
+          "bhatta band hoga",
+          "bhatta band karo",
+          "shut the kiln",
+          "भट्टा बंद"
+        ]
+      },
+      "winWin": {
+        "elements": [
+          ["filter", "zig-zag", "zigzag", "clean chimney", "tall chimney", "pollution control"],
+          ["jobs", "rozgar", "kaam"],
+          ["compensation", "muavza", "muavaza", "fields", "khet"]
+        ],
+        "cost": 6500,
+        "days": 8
+      },
+      "describe": {
+        "topic": "the brick kiln: it gives jobs to labourers and youth, but farmers and elders say its smoke ruins fields and lungs",
+        "sideA": "keep the kiln running for the jobs",
+        "sideB": "close the kiln for the fields and health",
+        "winWin": "a concrete plan, e.g. a cleaner zig-zag chimney or filters, jobs kept, compensation for damaged fields",
+        "question": "The kiln: jobs or lungs? The candidate must choose."
+      }
+    }
+  ]
+}

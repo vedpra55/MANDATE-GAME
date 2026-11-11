@@ -6,17 +6,17 @@
 import type { Rng } from './rng.ts';
 import type { CountingRound, CountingState, GameState, TolaId } from './types.ts';
 import { computeCells, totals } from './vote.ts';
-import region from '../data/regions/bihar-village.json';
+import region from '../data/regions/bihar-village.json' with { type: 'json' };
 
 const ORDER = region.countingOrder as TolaId[];
 
 export function buildCounting(s: GameState, rng: Rng): CountingState {
   const cells = computeCells(s);
-  const swing = rng.normal() * 0.015;
+  const swing = rng.normal() * 0.025;
   const rounds: CountingRound[] = ORDER.map((tola) => {
     const t = totals(cells, tola);
     const cast = t.player + t.rival + t.other;
-    const local = rng.normal() * 0.02;
+    const local = rng.normal() * 0.03;
     const turnoutNoise = 1 + rng.normal() * 0.03;
     let sp = Math.max(0.01, t.player / cast + swing + local);
     let sr = Math.max(0.01, t.rival / cast - swing - local);

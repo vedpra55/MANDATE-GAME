@@ -32,7 +32,7 @@ export function Counting() {
             <tr>
               <th />
               <th>{S.counting.you}</th>
-              <th>{S.rival}</th>
+              <th>{game.rival.name}</th>
               <th>{S.counting.others}</th>
             </tr>
           </thead>

@@ -7,6 +7,7 @@ import type {
   Band,
   EndingTag,
   EndingTitle,
+  FaultLineId,
   GroupId,
   IssueId,
   RivalMove,
@@ -119,9 +120,47 @@ export const en = {
     textTooLong: 'Too long. Keep it under 1,200 characters.',
     nothingToFix: 'Nothing to fix there.',
     invalidAmount: 'That amount makes no sense.',
+    nothingPending: 'Nobody is waiting for an answer.',
+    unknownGrievance: "You don't know that problem yet. Go and listen first.",
+    alreadyBuilding: 'Work is already going on there.',
+    tooManyWorkers: "You don't have that many workers.",
   } satisfies Record<ActionError, string>,
 
-  phone: { title: 'Messages', empty: 'No new messages.' },
+  faultLines: {
+    pond: {
+      name: 'The pond',
+      a: 'Protect the homes on the pond land',
+      b: 'Clear the encroachment for the farmers',
+    },
+    wages: {
+      name: 'Harvest wages',
+      a: "Raise the labourers' wage",
+      b: 'Back the farmers: wages stay',
+    },
+    plot: {
+      name: 'The panchayat plot',
+      a: 'A playground for the youth',
+      b: 'A hall for the elders',
+    },
+    bazaarRoad: {
+      name: 'The bazaar road',
+      a: 'Widen it, stalls must go',
+      b: 'Protect the vendors',
+    },
+    rationShop: { name: 'The ration shop', a: 'Act against the dealer', b: 'Defend the dealer' },
+    kiln: {
+      name: 'The brick kiln',
+      a: 'Keep it for the jobs',
+      b: 'Close it for fields and health',
+    },
+  } satisfies Record<FaultLineId, { name: string; a: string; b: string }>,
+  stanceWords: {
+    side_a: 'you sided with',
+    side_b: 'you sided with',
+    win_win: 'you offered a way for both',
+    none: '',
+    evasive: 'you dodged it',
+  },
 
   ledger: {
     promises: 'Promises made',
@@ -158,7 +197,33 @@ export const en = {
     declareCost: 'Free. Priya will remember it.',
   },
 
-  diary: { title: "Pintu's notes", tally: 'My tally (rough)', village: 'Whole village' },
+  diary: {
+    title: "Pintu's notes",
+    tally: 'My tally (rough)',
+    village: 'Whole village',
+    divides: 'What divides the village',
+    unknownDivides: "There may be more fights I don't know about yet.",
+    yourWord: 'Your word:',
+    noPosition: 'you have said nothing yet',
+    works: 'Work going on',
+    due: (d: number) => `due day ${d}`,
+  },
+  phone: {
+    title: 'Messages',
+    reply: 'Reply',
+    send: 'Send',
+    placeholder: 'Type your reply…',
+    donorFrom: 'Mahesh-ji (contractor)',
+    donorOffer:
+      'Namaste. I like what you are doing. ₹35,000 for your campaign, today. When you win, we will talk about a small favour. Haan ya na?',
+    donorDemand:
+      'Bhaiya-ji, now I need one small thing. Say in public that the brick kiln stays. My workers need it. You understand.',
+    priyaFrom: 'Priya (Gaon Ki Awaaz)',
+    wedge: (rival: string, q: string) =>
+      `${rival} said this at the chowk today: "${q}" Your answer, on record?`,
+    dueToday: 'Answer today. Silence will be reported.',
+  },
+  thinking: 'Pintu is listening…',
   files: { title: 'Janta darbar', hint: 'Hearings at the chaupal arrive in a later build.' },
   cash: { title: 'Cash in hand' },
 
@@ -171,6 +236,9 @@ export const en = {
     grievances: 'What hurts here',
     noGrievances: 'Nothing urgent right now.',
     visit: 'Go door to door',
+    unknown: "Pintu: I don't know what hurts here yet. Go and listen: ask people.",
+    deliver: 'Make your compromise happen',
+    building: (d: number) => `work under way, due day ${d}`,
     visitPlaceholder: 'What do you say at their doors?',
     works: 'Fix it yourself',
     gifts: 'Hand out money',
@@ -180,6 +248,25 @@ export const en = {
     recruitStrongman: 'Bring in a strongman',
     slotsLeft: (n: number) => `${n} part${n === 1 ? '' : 's'} of the day left`,
     silence: 'Silence period: only quiet visits, works and money now.',
+  },
+
+  booths: {
+    title: 'Polling day: who goes where?',
+    hint: 'Your workers bring your voters out. A booth with nobody of yours loses votes.',
+    workersLeft: (n: number) => `${n} worker${n === 1 ? '' : 's'} left`,
+    go: 'Send them out',
+  },
+
+  settings: {
+    title: 'Settings: AI models',
+    aiOn: 'AI on',
+    aiOff: 'AI off (offline play)',
+    noKey: 'No OpenAI key on the server: the game plays offline.',
+    readOnly: 'Settings are read-only here.',
+    save: 'Save',
+    saved: 'Saved.',
+    enabled: 'on',
+    unreachable: 'The game server is not running: the game plays offline.',
   },
 
   counting: {
@@ -230,6 +317,7 @@ export const en = {
       brokenPromises: 'Broken promises',
       openPromises: 'Open promises',
       giftsFilmed: 'Caught on video',
+      contradictions: 'Said two things',
     } satisfies Record<EndingTag, string>,
     masthead: 'Gram Samachar · Result special',
     decided: 'What decided it',
@@ -245,16 +333,19 @@ export const en = {
   },
 
   rivalMoves: {
-    doorToDoor: (t: string) => `Rajendra Babu's people went door to door in ${t}.`,
-    sweets: (t: string) => `Sweets from the old family in ${t} last night.`,
-    counterIssue: (_t: string, i: string) => `Rajendra Babu has started talking about ${i} too.`,
-    attackPromise: (_t: string, i: string) =>
-      `Rajendra Babu is telling everyone about your broken ${i} promise.`,
-    rally: () => 'Rajendra Babu held a big rally. People were bussed in.',
-    mockPromises: () => "Rajendra Babu is laughing at your promises: 'Itna paisa kahan se aayega?'",
+    doorToDoor: (t: string, _i: string, r: string) => `${r}'s people went door to door in ${t}.`,
+    sweets: (t: string, _i: string, r: string) => `Sweets from ${r}'s people in ${t} last night.`,
+    counterIssue: (_t: string, i: string, r: string) => `${r} has started talking about ${i} too.`,
+    attackPromise: (_t: string, i: string, r: string) =>
+      `${r} is telling everyone about your broken ${i} promise.`,
+    rally: (_t: string, _i: string, r: string) => `${r} held a big rally. People were bussed in.`,
+    mockPromises: (_t: string, _i: string, r: string) =>
+      `${r} is laughing at your promises: 'Itna paisa kahan se aayega?'`,
+    doubtSolution: (_t: string, _i: string, r: string) =>
+      `${r} says your compromise is hot air: 'Kab hoga? Sab hawa hai.'`,
     lieLow: () => '',
     lastNight: (t: string) => `Envelopes went round in ${t} last night.`,
-  } satisfies Record<RivalMove, (tola: string, issue: string) => string>,
+  } satisfies Record<RivalMove, (tola: string, issue: string, rival: string) => string>,
 } as const;
 
 export type Strings = typeof en;

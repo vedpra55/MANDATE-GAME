@@ -4,6 +4,8 @@ export type ServerConfig = {
   port: number;
   /** Server-side only. Never send this to the client or log it. */
   openaiApiKey: string | undefined;
+  /** Model settings may be changed only in development (or later behind an owner token). */
+  allowSettingsWrite: boolean;
 };
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
@@ -12,5 +14,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     throw new Error(`SERVER_PORT must be a positive integer, got "${env.SERVER_PORT}"`);
   }
   const key = env.OPENAI_API_KEY?.trim();
-  return { port, openaiApiKey: key ? key : undefined };
+  return {
+    port,
+    openaiApiKey: key ? key : undefined,
+    allowSettingsWrite: env.NODE_ENV !== 'production',
+  };
 }

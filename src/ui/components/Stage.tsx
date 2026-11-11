@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import layout from '../../data/desk-layout.json';
+import layout from '../../data/desk-layout.json' with { type: 'json' };
 
 const { width: W, height: H } = layout.stage;
 

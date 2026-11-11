@@ -2,7 +2,16 @@
  * End of day (ENGINE.md §5): filming rolls, tension, promise deadlines, cadre upkeep, the rival's
  * turn, drift, word of mouth, legal heat, tomorrow's newspaper, then the new day.
  */
-import { breakPromise } from './deeds.ts';
+import { breakPromise, completeProjects } from './deeds.ts';
+import {
+  donorCalls,
+  donorDemands,
+  expireCall,
+  neglect,
+  punishSilence,
+  rivalWedge,
+  rollLeaks,
+} from './interrupts.ts';
 import { promisesDue } from './promises.ts';
 import { rivalTurn, rivalWeakestTola } from './rival.ts';
 import { allGroups, record } from './state.ts';
@@ -32,6 +41,14 @@ const NEWS: Partial<Record<LogEntry['kind'], { kind: StoryKind; weight: number }
   rivalRally: { kind: 'rivalRally', weight: 6 },
   rivalAttack: { kind: 'rivalAttack', weight: 6 },
   rivalMock: { kind: 'rivalAttack', weight: 6 },
+  contradiction: { kind: 'contradiction', weight: 9 },
+  favourLeaked: { kind: 'favourLeaked', weight: 9 },
+  donorAngry: { kind: 'favourLeaked', weight: 9 },
+  rivalWedge: { kind: 'wedge', weight: 7 },
+  silence: { kind: 'silent', weight: 7 },
+  solutionDelivered: { kind: 'solution', weight: 7 },
+  stance: { kind: 'stance', weight: 5 },
+  evasion: { kind: 'dodge', weight: 4 },
   publicWorks: { kind: 'publicWorks', weight: 5 },
   promiseKept: { kind: 'promiseKept', weight: 5 },
   rivalSweets: { kind: 'rivalSweets', weight: 4 },
@@ -59,12 +76,22 @@ function pickStory(s: GameState, day: number): Story {
     if (!best || score > best.score) best = { e, score };
   }
   if (!best) return { day: day + 1, kind: 'quiet' };
-  return { day: day + 1, kind: NEWS[best.e.kind]!.kind, tola: best.e.tola, issue: best.e.issue };
+  return {
+    day: day + 1,
+    kind: NEWS[best.e.kind]!.kind,
+    tola: best.e.tola,
+    issue: best.e.issue,
+    faultLine: best.e.faultLine,
+    stance: best.e.stance,
+  };
 }
 
 export function endOfDay(s: GameState, rng: Rng): void {
   const day = s.clock.day;
   const notes: PaNote[] = [];
+
+  // 0. Projects that finish today (a project in progress also holds its promise's deadline).
+  notes.push(...completeProjects(s));
 
   // 1. Was anyone filmed handing out money today?
   for (const f of s.flags.pendingFilming) {
@@ -96,8 +123,20 @@ export function endOfDay(s: GameState, rng: Rng): void {
     s.flags.pendingTension = null;
   }
 
-  // 3. Promise deadlines.
-  for (const p of promisesDue(s)) notes.push(breakPromise(s, p.id));
+  // 3. Promise deadlines. Work visibly under way counts: people wait for it.
+  for (const p of promisesDue(s)) {
+    const underway = s.projects.some(
+      (pr) =>
+        pr.status === 'building' &&
+        (p.faultLine
+          ? pr.faultLine === p.faultLine
+          : pr.issue === p.issue && (p.tola === null || pr.tola === p.tola)),
+    );
+    if (!underway) notes.push(breakPromise(s, p.id));
+  }
+
+  // 3b. Questions left unanswered, calls not returned, secrets that leak.
+  notes.push(...punishSilence(s), ...expireCall(s), ...rollLeaks(s, rng));
 
   // 4. Tea and fuel for the workers.
   const upkeep = Math.ceil(s.cadre.size / 10) * 300;
@@ -110,8 +149,11 @@ export function endOfDay(s: GameState, rng: Rng): void {
     }
   }
 
-  // 5. The rival's turn.
+  // 5. The rival's turn, his wedge question for tomorrow, and tolas you have neglected.
   notes.push(...rivalTurn(s, rng));
+  const wedge = rivalWedge(s);
+  if (wedge) notes.push(wedge);
+  notes.push(...neglect(s));
 
   // 6. Drift: memories fade, the old family's base reasserts itself.
   for (const g of GROUPS) {
@@ -176,6 +218,10 @@ export function endOfDay(s: GameState, rng: Rng): void {
     }
     if (s.legalHeat >= 22 && s.legalHeat < 30 && !s.flags.noticeIssued)
       notes.push({ day: today, kind: 'heatWarning' });
+    const call = donorCalls(s);
+    if (call) notes.push(call);
+    const demand = donorDemands(s);
+    if (demand) notes.push(demand);
   }
   s.paNotes.push(...notes);
 }

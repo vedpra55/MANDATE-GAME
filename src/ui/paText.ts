@@ -2,21 +2,30 @@
  * Turns the engine's structured notes, stories and end-card deciders into sentences.
  * The engine never produces text; this keeps the game translatable.
  */
-import type { Address, Decider, PaNote, Story } from '../engine/types.ts';
+import type { Address, Decider, FaultLineId, PaNote, Stance, Story } from '../engine/types.ts';
+import { FAULT_LINE_DATA } from '../engine/world.ts';
 import { headlines } from './content.ts';
 import { strings as S } from './strings.ts';
-
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function addressWord(a: Address): string {
   return a === 'didi' ? 'Didi' : 'Bhaiya';
 }
 
-export function noteText(n: PaNote, address: Address): string {
+const fl = (f: FaultLineId) => S.faultLines[f].name.toLowerCase();
+
+export function stanceLabel(f: FaultLineId, st: Stance): string {
+  if (st === 'side_a') return S.faultLines[f].a;
+  if (st === 'side_b') return S.faultLines[f].b;
+  if (st === 'win_win') return 'A way for both sides';
+  if (st === 'evasive') return 'Dodged';
+  return '';
+}
+
+export function noteText(n: PaNote, address: Address, rival = 'Rajendra Babu'): string {
   const A = addressWord(address);
   switch (n.kind) {
     case 'welcome':
-      return `${A}, nomination is done! 21 days. Rajendra Babu's family is handing out sweets. They think nobody can beat them.`;
+      return `${A}, nomination is done! 21 days. ${rival}'s people are already going house to house. They think nobody can beat them.`;
     case 'groupShift':
       return `${A}, ${S.groups[n.group]} are ${n.up ? 'warming to you' : 'cooling'}: ${S.bands[n.band]}.`;
     case 'tolaShift':
@@ -38,27 +47,75 @@ export function noteText(n: PaNote, address: Address): string {
     case 'notice':
       return `A notice has come from the Election Commission, ${A}.`;
     case 'fir':
-      return `An FIR has been filed. Tomorrow morning we have to go to the police station.`;
+      return 'An FIR has been filed. Tomorrow morning we have to go to the police station.';
     case 'giftsFilmed':
       return `${A}… someone filmed the money in ${S.tolas[n.tola]}. It's on every phone.`;
     case 'divisive':
       return `${A}… what you said will not be forgotten. Not by anyone.`;
     case 'cadreUnpaid':
-      return `The workers haven't had tea money. They're grumbling.`;
+      return "The workers haven't had tea money. They're grumbling.";
     case 'rivalMove':
-      return S.rivalMoves[n.move](n.tola ? S.tolas[n.tola] : '', n.issue ? S.issues[n.issue] : '');
+      return S.rivalMoves[n.move](
+        n.tola ? S.tolas[n.tola] : '',
+        n.issue ? S.issues[n.issue] : '',
+        rival,
+      );
     case 'silence':
       return `Campaigning is over, ${A}. Only quiet visits today.`;
     case 'lastNight':
-      return `${A}… envelopes are going round in ${S.tolas[n.tola]} tonight. Rajendra Babu's people.`;
+      return `${A}… envelopes are going round in ${S.tolas[n.tola]} tonight. ${rival}'s people.`;
     case 'pollingDay':
-      return `Polling day. Nothing more to say, ${A}. Let's see who comes out.`;
+      return `Polling day. Nothing more to say, ${A}. Decide who goes to which booth.`;
+    case 'stanceTaken':
+      return n.stance === 'evasive'
+        ? `${A}, on ${fl(n.faultLine)} people heard you dodge it. Both sides noticed.`
+        : n.stance === 'win_win'
+          ? `${A}, on ${fl(n.faultLine)} you offered a way for both. Now it has to happen, or both will turn.`
+          : `${A}, on ${fl(n.faultLine)} you've chosen: "${stanceLabel(n.faultLine, n.stance)}". One side is happy. The other won't forget.`;
+    case 'notBelieved':
+      return `${A}, on ${fl(n.faultLine)} people didn't believe it. Too vague, or they don't trust us yet. They heard a dodge.`;
+    case 'contradiction':
+      return `${A}! On ${fl(n.faultLine)} you said one thing before and the opposite now. Everyone is repeating both.`;
+    case 'learned': {
+      const parts = [
+        ...n.issues.map((i) => S.issues[i]),
+        ...n.faultLines.map((f) => `a fight over ${fl(f)}`),
+      ];
+      return `In ${S.tolas[n.tola]} I learned: ${parts.join(', ')}.`;
+    }
+    case 'wedge':
+      return `${A}, ${rival} is asking about ${fl(n.faultLine)} in public. Priya wants your answer today. Check the phone.`;
+    case 'silent':
+      return `${A}, we didn't answer on ${fl(n.faultLine)}. The paper calls it silence. Both sides are angry.`;
+    case 'neglect':
+      return `${A}, ${S.tolas[n.tola]} says: "Woh to kabhi aaye hi nahi." ${rival}'s people were there.`;
+    case 'worksStarted':
+      return `Work has started in ${S.tolas[n.tola]}. The contractor says day ${n.dueDay}.`;
+    case 'worksDone':
+      return `The work in ${S.tolas[n.tola]} is finished. People can see it.`;
+    case 'worksLate':
+      return `${A}, the work in ${S.tolas[n.tola]} is late. The contractor says two more days.`;
+    case 'donorCall':
+      return `${A}, an unknown number keeps calling. Some contractor. Check the phone.`;
+    case 'donorDemand':
+      return `${A}… Mahesh-ji wants something for his money. Check the phone.`;
+    case 'donorResult':
+      return n.result === 'refused'
+        ? `You said no to Mahesh-ji. He went straight to ${rival}.`
+        : n.result === 'angry'
+          ? `Mahesh-ji is angry. He is telling everyone about the money he gave you.`
+          : `The money is in the tin. And Mahesh-ji's favour is in the bahi-khata.`;
+    case 'favourLeaked':
+      return `${A}… people know about Mahesh-ji's money. It's in every tea stall.`;
+    case 'boothsUnmanned':
+      return `${n.count} booth${n.count === 1 ? ' has' : 's have'} nobody of ours. We'll lose votes there.`;
   }
 }
 
-export function storyHeadline(st: Story): string {
+export function storyHeadline(st: Story, rival = 'Rajendra Babu'): string {
   const t = st.tola ? S.tolas[st.tola] : 'the village';
   const i = st.issue ? S.issues[st.issue] : '';
+  const f = st.faultLine ? S.faultLines[st.faultLine].name : '';
   switch (st.kind) {
     case 'quiet':
       return headlines[(st.day - 1) % headlines.length]!;
@@ -69,7 +126,8 @@ export function storyHeadline(st: Story): string {
     case 'visit':
       return `New candidate goes door to door in ${t}`;
     case 'publicWorks':
-      return `New candidate fixes ${i} in ${t} with own money`;
+    case 'worksDone':
+      return `New candidate fixes ${i || 'a long-standing problem'} in ${t} with own money`;
     case 'giftsFilmed':
       return `Video: cash handed out in ${t}`;
     case 'promiseBroken':
@@ -83,21 +141,38 @@ export function storyHeadline(st: Story): string {
     case 'fir':
       return 'FIR filed against new candidate';
     case 'rivalSweets':
-      return `Old family distributes sweets in ${t}`;
+      return `${rival}'s people distribute sweets in ${t}`;
     case 'rivalRally':
-      return 'Rajendra Babu draws a big crowd';
+      return `${rival} draws a big crowd`;
     case 'rivalAttack':
-      return "Rajendra Babu questions the newcomer's promises";
+      return `${rival} questions the newcomer's promises`;
     case 'rivalLastNight':
       return `Late-night cash in ${t}, villagers allege`;
     case 'pollingDay':
       return 'The village votes today';
+    case 'stance':
+      return st.stance === 'win_win'
+        ? `${f}: candidate proposes a way out for both sides`
+        : `${f}: candidate takes a side`;
+    case 'dodge':
+      return `Candidate dodges the ${f.toLowerCase()} question`;
+    case 'contradiction':
+      return `${f}: candidate says one thing, then the opposite`;
+    case 'wedge':
+      return `${rival} asks: where does the newcomer stand on ${f.toLowerCase()}?`;
+    case 'silent':
+      return `${f}: candidate stays silent`;
+    case 'solution':
+      return `${f}: the promised compromise is built`;
+    case 'favourLeaked':
+      return "Contractor's money in the new candidate's campaign";
   }
 }
 
-export function deciderText(d: Decider): string {
+export function deciderText(d: Decider, rival = 'Rajendra Babu'): string {
   const t = d.tola ? S.tolas[d.tola] : 'the village';
   const i = d.issue ? S.issues[d.issue] : '';
+  const f = d.faultLine ? S.faultLines[d.faultLine].name.toLowerCase() : '';
   const day = `day ${d.day}`;
   switch (d.kind) {
     case 'declaration':
@@ -107,7 +182,12 @@ export function deciderText(d: Decider): string {
     case 'visit':
       return `Going door to door in ${t} (${day})`;
     case 'publicWorks':
-      return `Fixing ${i} in ${t} (${day})`;
+    case 'worksStarted':
+      return `Fixing ${i || 'things'} in ${t} (${day})`;
+    case 'worksDone':
+      return `Finishing the work in ${t}`;
+    case 'solutionDelivered':
+      return `Delivering your compromise on ${f}`;
     case 'gifts':
       return `Cash handed out in ${t} (${day})`;
     case 'giftsFilmed':
@@ -128,21 +208,46 @@ export function deciderText(d: Decider): string {
       return 'Communal tension in the village';
     case 'cadreUnpaid':
       return 'Unpaid workers';
+    case 'stance':
+      return d.stance === 'win_win'
+        ? `Offering a way for both on ${f}`
+        : `Your side on ${f}: "${stanceLabel(d.faultLine!, d.stance!)}"`;
+    case 'evasion':
+      return `Dodging ${f} (${day})`;
+    case 'contradiction':
+      return `Saying two things on ${f}`;
+    case 'silence':
+      return `Staying silent on ${f}`;
+    case 'neglect':
+      return `Neglecting ${t}`;
+    case 'donorAccepted':
+      return "Taking Mahesh-ji's money";
+    case 'donorRefused':
+      return "Refusing Mahesh-ji's money";
+    case 'favourLeaked':
+    case 'donorAngry':
+      return "Mahesh-ji's money coming out";
+    case 'rivalWedge':
+      return `${rival} raising ${f}`;
     case 'rivalDoorToDoor':
-      return `Rajendra Babu's door-to-door in ${t}`;
+      return `${rival}'s door-to-door in ${t}`;
     case 'rivalSweets':
-      return `Rajendra Babu's sweets in ${t}`;
+      return `${rival}'s sweets in ${t}`;
     case 'rivalCounterIssue':
-      return `Rajendra Babu taking up ${i}`;
+      return `${rival} taking up ${i}`;
     case 'rivalAttack':
-      return 'Rajendra Babu attacking your broken promise';
+      return `${rival} attacking your broken promise`;
     case 'rivalMock':
-      return 'Rajendra Babu mocking your promises';
+      return `${rival} mocking your promises`;
+    case 'rivalDoubt':
+      return `${rival} calling your compromise hot air`;
     case 'rivalRally':
-      return "Rajendra Babu's rally";
+      return `${rival}'s rally`;
     case 'rivalLastNight':
-      return `Rajendra Babu's envelopes in ${t}`;
+      return `${rival}'s envelopes in ${t}`;
   }
 }
 
-export { cap };
+export function solutionLabel(f: FaultLineId): string {
+  return `${S.faultLines[f].name}: ${FAULT_LINE_DATA[f].describe.winWin.replace(/^a concrete (plan|arrangement|sharing plan|transparency plan) (that serves both sides|both can accept)?,? ?(e\.g\. )?/, '')}`;
+}

@@ -2,13 +2,14 @@
  * Applying a Reading of player text to the world: the trust formula (ENGINE.md §7.2), tone
  * effects (§7.3), the divisive path (§7.4) and promises (§7.5).
  */
-import { extractPromisesFallback } from './promises.ts';
+import { extractPromisesFallback, type PromiseDraft } from './promises.ts';
 import { allGroups, clamp, record, slotIndex, tolaVoters } from './state.ts';
 import {
   GROUPS,
   TOLAS,
   type Channel,
   type Effect,
+  type FaultLineId,
   type GameState,
   type GroupId,
   type IssueId,
@@ -20,8 +21,10 @@ import {
 } from './types.ts';
 import type { Rng } from './rng.ts';
 import { bandOfTrust, bandOfTola } from './pa.ts';
+import { applyStances } from './faultlines.ts';
+import { learnTola } from './knowledge.ts';
 
-const K: Record<Channel, number> = { declaration: 4, pad: 12, visit: 16 };
+const K: Record<Channel, number> = { declaration: 4, pad: 12, visit: 13, answer: 10 };
 const MAX_DELTA = 12;
 
 function mainIssue(reading: Reading): IssueId | null {
@@ -81,6 +84,8 @@ export function applyStatement(
   reading: Reading,
   channel: Channel,
   tola: TolaId | null,
+  forced: FaultLineId | null = null,
+  extracted?: PromiseDraft[],
 ): StatementOutcome {
   const day = s.clock.day;
   const notes: PaNote[] = [];
@@ -118,13 +123,15 @@ export function applyStatement(
     tone: reading.tone,
     flags,
     source: reading.source,
+    reading: reading.source === 'ai' ? reading : undefined,
   };
   s.statements.push(statement);
   if (issue) s.rival.memory.issueFocus[issue] = (s.rival.memory.issueFocus[issue] ?? 0) + 1;
 
   // --- trust and mood
   const trust: Partial<Record<GroupId, number>> = {};
-  const aud = channel === 'pad' ? 0.5 : channel === 'visit' ? 0.35 : 0.3;
+  const aud =
+    channel === 'pad' ? 0.5 : channel === 'visit' ? 0.35 : channel === 'answer' ? 0.6 : 0.3;
   let moodNumerator = 0;
   for (const g of GROUPS) {
     const raw = groupDelta(s, reading, g, channel, tola, repetition);
@@ -140,7 +147,7 @@ export function applyStatement(
     ).length;
     const badWords =
       reading.tone === 'divisive' || reading.addressesEvaluator >= 0.5 || reading.coherent < 0.5;
-    const presence = badWords ? 0 : 3 * Math.pow(0.6, recentVisits);
+    const presence = badWords ? 0 : 2.5 * Math.pow(0.6, recentVisits);
     effect.mood = {
       [tola]: clamp(moodNumerator / tolaVoters(s, tola) + presence, -MAX_DELTA, MAX_DELTA),
     };
@@ -192,8 +199,27 @@ export function applyStatement(
     notes.push({ day, kind: 'divisive' });
   }
 
+  // --- fault lines: sides, win-wins, evasion, contradictions
+  notes.push(...applyStances(s, reading, channel, statement.id, forced));
+
+  // --- what a visit teaches you about the tola
+  if (tola && channel === 'visit') {
+    s.tolas[tola].lastVisit = day;
+    const learned = learnTola(s, tola, reading.listens >= 0.5 ? 'listen' : 'glance');
+    if (learned) notes.push(learned);
+  }
+
   // --- promises (a repeat of an open promise reinforces it instead of duplicating it)
-  const drafts = channel === 'declaration' ? [] : extractPromisesFallback(s, text, reading, tola);
+  // A believed win-win already wrote its own promise: do not log the same thing twice.
+  const solvedIssues = s.promises
+    .filter(
+      (p) =>
+        p.faultLine && p.status === 'open' && s.stances[p.faultLine]?.statementId === statement.id,
+    )
+    .map((p) => p.issue);
+  const drafts = (
+    channel === 'declaration' ? [] : (extracted ?? extractPromisesFallback(s, text, reading, tola))
+  ).filter((d) => !solvedIssues.includes(d.issue));
   for (const d of drafts) {
     const duplicate = s.promises.some(
       (pr) =>
@@ -202,14 +228,14 @@ export function applyStatement(
     if (duplicate) continue;
     s.promises.push({ ...d, id: s.nextId++, status: 'open' });
     notes.push({ day, kind: 'promiseNoted', issue: d.issue, deadlineDay: d.deadlineDay });
-    if (d.when === 'if_elected' && d.cost >= 5000 && openBigPromises(s) > 4) {
+    if (d.when === 'if_elected' && d.cost >= 5000 && openBigPromises(s) > 6) {
       // Promise inflation: "itna paisa kahan se aayega?" Credibility falls and sceptics cool.
       record(s, {
         actor: 'player',
         kind: 'statement',
         statementId: statement.id,
         effect: {
-          credibility: -0.05,
+          credibility: -0.03,
           trust: {
             ...allGroups(-0.5),
             elders_w: -1.5,

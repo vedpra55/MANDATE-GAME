@@ -1,10 +1,11 @@
-import layout from '../../data/desk-layout.json';
+import layout from '../../data/desk-layout.json' with { type: 'json' };
 import { useGame, type OverlayId } from '../../state/gameStore.ts';
 import { art } from '../assets.ts';
 import { EndCard } from '../components/EndCard.tsx';
 import { openingMessages } from '../content.ts';
 import { Calendar } from './Calendar.tsx';
 import { Declaration, Overlays } from './overlays/Overlays.tsx';
+import { BoothPlan } from './BoothPlan.tsx';
 
 const tier = layout.tiers['1'];
 const LABELS: Record<string, string> = {
@@ -24,7 +25,9 @@ export function Desk() {
   const open = useGame((s) => s.open);
   const goTo = useGame((s) => s.goTo);
   const phoneSeen = useGame((s) => s.phoneSeen);
-  const unread = phoneSeen ? 0 : openingMessages.length;
+  const overlay = useGame((s) => s.overlay);
+  const waiting = (game.pending.call ? 1 : 0) + (game.pending.question ? 1 : 0);
+  const unread = waiting || (phoneSeen ? 0 : openingMessages.length);
   const bg = art(tier.background);
   const campaign = game.phase === 'campaign';
 
@@ -66,7 +69,13 @@ export function Desk() {
         />
       ))}
 
-      {game.phase === 'nomination' ? <Declaration /> : <Overlays />}
+      {game.phase === 'nomination' ? (
+        <Declaration />
+      ) : overlay === 'booths' ? (
+        <BoothPlan />
+      ) : (
+        <Overlays />
+      )}
       {game.phase === 'ended' && <EndCard />}
     </div>
   );

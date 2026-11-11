@@ -22,7 +22,7 @@ export function EndCard() {
         <p className="end-name">{game.player.name}</p>
         <p className="end-line">{E.lines[r.title]}</p>
         {r.title !== 'barred' && (
-          <p className="end-result">{E.result(r.playerVotes, r.rivalVotes, r.otherVotes)}</p>
+          <p className="end-result">{`You ${r.playerVotes} · ${game.rival.name} ${r.rivalVotes} · Others ${r.otherVotes}`}</p>
         )}
         {r.deciders.length > 0 && (
           <section>
@@ -30,7 +30,7 @@ export function EndCard() {
             <ol>
               {r.deciders.map((d) => (
                 <li key={d.logId}>
-                  {deciderText(d)}{' '}
+                  {deciderText(d, game.rival.name)}{' '}
                   <span className={d.impact >= 0 ? 'helped' : 'hurt'}>
                     ({d.impact >= 0 ? E.helped : E.hurt}, {E.votes(Math.round(Math.abs(d.impact)))})
                   </span>

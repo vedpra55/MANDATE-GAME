@@ -19,6 +19,7 @@ import type { Rng } from './rng.ts';
 import { computeCells, margin, totals } from './vote.ts';
 import { allGroups, applyEffect } from './state.ts';
 import { openBigPromises } from './statements.ts';
+import { archetypeOf, sideWeight } from './world.ts';
 
 type Candidate = {
   move: RivalMove;
@@ -43,9 +44,9 @@ function topPlayerIssue(s: GameState): IssueId | null {
 function candidates(s: GameState): Candidate[] {
   const list: Candidate[] = [{ move: 'lieLow', effect: {} }];
   for (const t of TOLAS) {
-    list.push({ move: 'doorToDoor', tola: t, effect: { rivalMood: { [t]: 4 } } });
+    list.push({ move: 'doorToDoor', tola: t, effect: { rivalMood: { [t]: 5 } } });
     if (s.rival.cash >= 5000) {
-      list.push({ move: 'sweets', tola: t, effect: { rivalMood: { [t]: 6 }, rivalCash: -5000 } });
+      list.push({ move: 'sweets', tola: t, effect: { rivalMood: { [t]: 8 }, rivalCash: -5000 } });
     }
   }
   const issue = topPlayerIssue(s);
@@ -66,11 +67,30 @@ function candidates(s: GameState): Candidate[] {
     });
   }
   const big = openBigPromises(s);
-  if (big >= 6 && s.clock.day - s.rival.lastMockDay >= 3) {
+  if (big >= archetypeOf(s).mockThreshold && s.clock.day - s.rival.lastMockDay >= 4) {
     // "Itna paisa kahan se aayega?" The rival mocks a candidate who promises everything.
     list.push({
       move: 'mockPromises',
-      effect: { trust: allGroups(-Math.min(6, (big - 5) * 0.8)), reputation: -3 },
+      effect: {
+        trust: allGroups(-Math.min(2, 0.5 * (big - archetypeOf(s).mockThreshold + 1))),
+        reputation: -1,
+      },
+    });
+  }
+  // A win-win announced but not yet delivered: "Kab hoga? Sab hawa hai."
+  for (const p of s.promises) {
+    if (!p.faultLine || p.status !== 'open' || s.clock.day - p.day < 3) continue;
+    if (s.projects.some((pr) => pr.faultLine === p.faultLine)) continue;
+    if (s.rival.attackedPromiseIds.includes(p.id)) continue;
+    const trust: Partial<Record<GroupId, number>> = {};
+    for (const g of GROUPS)
+      trust[g] =
+        -2.5 * (sideWeight(p.faultLine, 'side_a', g) + sideWeight(p.faultLine, 'side_b', g));
+    list.push({
+      move: 'doubtSolution',
+      issue: p.issue,
+      promiseId: p.id,
+      effect: { trust, credibility: -0.03 },
     });
   }
   if (!s.rival.rallyDone && s.clock.day >= 10 && s.rival.cash >= 8000) {
@@ -108,6 +128,7 @@ const KIND = {
   attackPromise: 'rivalAttack',
   rally: 'rivalRally',
   mockPromises: 'rivalMock',
+  doubtSolution: 'rivalDoubt',
   lastNight: 'rivalLastNight',
 } as const;
 
@@ -127,16 +148,19 @@ export function rivalTurn(s: GameState, rng: Rng): PaNote[] {
     s.rival.heat += 5;
     return notes;
   }
-  const moves = day >= 12 ? 2 : 1;
+  const moves = day >= 10 ? 2 : 1;
   for (let i = 0; i < moves; i++) {
     const list = candidates(s);
-    const weights = list.map((c) => Math.exp(utility(s, c) / 0.5));
+    const bias = archetypeOf(s).moveBias;
+    const weights = list.map((c) => Math.exp(utility(s, c) / 0.5) * (bias[c.move] ?? 1));
     const pick = list[rng.weightedIndex(weights)]!;
     if (pick.move === 'lieLow') continue;
     if (pick.move === 'rally') s.rival.rallyDone = true;
     if (pick.move === 'attackPromise' && pick.promiseId !== undefined)
       s.rival.attackedPromiseIds.push(pick.promiseId);
     if (pick.move === 'sweets') s.rival.heat += 2;
+    if (pick.tola && (pick.move === 'doorToDoor' || pick.move === 'sweets'))
+      s.tolas[pick.tola].rivalLastVisit = day;
     if (pick.move === 'mockPromises') s.rival.lastMockDay = day;
     record(s, {
       actor: 'rival',

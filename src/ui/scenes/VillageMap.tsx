@@ -1,4 +1,4 @@
-import layout from '../../data/desk-layout.json';
+import layout from '../../data/desk-layout.json' with { type: 'json' };
 import { bandOfTola } from '../../engine/pa.ts';
 import type { TolaId } from '../../engine/types.ts';
 import { useGame } from '../../state/gameStore.ts';

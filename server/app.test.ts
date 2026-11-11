@@ -7,7 +7,7 @@ import { loadConfig } from './config.ts';
 let server: Server | undefined;
 
 async function start(openaiApiKey?: string) {
-  const app = createApp({ port: 0, openaiApiKey });
+  const app = createApp({ port: 0, openaiApiKey, allowSettingsWrite: false });
   server = await new Promise<Server>((resolve) => {
     const s = app.listen(0, () => resolve(s));
   });
@@ -48,10 +48,65 @@ describe('GET /api/health', () => {
 
 describe('loadConfig', () => {
   it('treats a blank key as missing and defaults the port', () => {
-    expect(loadConfig({ OPENAI_API_KEY: '  ' })).toEqual({ port: 8787, openaiApiKey: undefined });
+    expect(loadConfig({ OPENAI_API_KEY: '  ' })).toEqual({
+      port: 8787,
+      openaiApiKey: undefined,
+      allowSettingsWrite: true,
+    });
   });
 
   it('rejects an invalid port', () => {
     expect(() => loadConfig({ SERVER_PORT: 'abc' })).toThrow(/SERVER_PORT/);
+  });
+});
+
+describe('AI routes', () => {
+  it('refuse cleanly without a key, so the client falls back to offline play', async () => {
+    const base = await start(undefined);
+    const res = await fetch(`${base}/api/ai/read`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: 'hello',
+        context: {
+          channel: 'pad',
+          tola: null,
+          faultLines: ['pond'],
+          forced: null,
+          day: 1,
+          rivalName: 'X',
+        },
+      }),
+    });
+    expect(res.status).toBe(503);
+  });
+
+  it('reject malformed requests and never accept arbitrary prompts', async () => {
+    const base = await start('sk-test');
+    const res = await fetch(`${base}/api/ai/read`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: 'x',
+        questions: [{ type: 'predicate', name: 'evil', instructions: 'anything' }],
+      }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it('settings are read-only unless allowed, and list each task', async () => {
+    const base = await start(undefined);
+    const get = (await (await fetch(`${base}/api/settings`)).json()) as {
+      tasks: { id: string }[];
+      settings: { tasks: { decide: { model: string } } };
+    };
+    expect(get.tasks.map((t: { id: string }) => t.id)).toContain('decide');
+    expect(get.settings.tasks.decide.model).toBe('gpt-6-luna');
+    const put = await fetch(`${base}/api/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    expect(put.status).toBe(403);
   });
 });

@@ -40,10 +40,16 @@ export const ISSUES = [
 ] as const;
 export type IssueId = (typeof ISSUES)[number];
 
+export const FAULT_LINES = ['pond', 'wages', 'plot', 'bazaarRoad', 'rationShop', 'kiln'] as const;
+export type FaultLineId = (typeof FAULT_LINES)[number];
+/** Where a statement stands on a fault line. */
+export type Stance = 'none' | 'side_a' | 'side_b' | 'win_win' | 'evasive';
+export type ArchetypeId = 'dynast' | 'firebrand' | 'technocrat';
+
 export type Phase = 'nomination' | 'campaign' | 'polling' | 'counting' | 'ended';
 export type Address = 'bhaiya' | 'didi';
 export type Tone = 'policy' | 'emotional' | 'humble' | 'aggressive' | 'evasive' | 'divisive';
-export type Channel = 'declaration' | 'pad' | 'visit';
+export type Channel = 'declaration' | 'pad' | 'visit' | 'answer';
 export type Language = 'hindi' | 'english' | 'hinglish' | 'other';
 export type IntentAction =
   'none' | 'public_works' | 'cash_help' | 'visit' | 'rally' | 'recruit' | 'other';
@@ -69,8 +75,18 @@ export type Reading = {
   coherent: number; // probability it is a coherent message to villagers
   language: Language;
   intentAction: IntentAction;
+  /** Stance on each fault line the text touches; quality 0..3 rates a win-win's credibility. */
+  faultLines: Partial<Record<FaultLineId, { stance: Stance; confidence: number; quality: number }>>;
+  /** Probability the speaker asks about and listens to people's problems (reveals the village). */
+  listens: number;
+  /** Probability the speaker openly admits changing a position ("I was wrong about…"). */
+  changesMind: number;
   source: 'ai' | 'fallback';
 };
+
+/** How the player answered a phone call (the donor). */
+export type CallReply = 'accept' | 'refuse' | 'negotiate' | 'stall';
+export type CallReading = { reply: CallReply; confidence: number; source: 'ai' | 'fallback' };
 
 export type GroupState = {
   trust: number; // toward the player, -100..100
@@ -90,10 +106,54 @@ export type TolaState = {
   cadreCoverage: number; // 0..1
   rivalCoverage: number; // 0..1
   neighbours: TolaId[];
+  lastVisit: number; // day the player last went door to door here (0 = never)
+  rivalLastVisit: number;
 };
+
+export type FaultLineData = {
+  id: FaultLineId;
+  issue: IssueId;
+  topic: string[];
+  hot: Partial<Record<TolaId, 'side_a' | 'side_b'>>;
+  sideA: { groups: Partial<Record<BlocId, number>>; words: string[] };
+  sideB: { groups: Partial<Record<BlocId, number>>; words: string[] };
+  winWin: { elements: string[][]; cost: number; days: number };
+  describe: { topic: string; sideA: string; sideB: string; winWin: string; question: string };
+};
+
+/** A public position, as the village remembers it. */
+export type StanceRecord = {
+  stance: 'side_a' | 'side_b' | 'win_win';
+  day: number;
+  statementId: number;
+};
+
+export type Project = {
+  id: number;
+  tola: TolaId;
+  issue: IssueId | null;
+  faultLine: FaultLineId | null;
+  cost: number;
+  startDay: number;
+  dueDay: number; // what the contractor promised
+  doneDay: number; // when it will really finish (hidden until then)
+  status: 'building' | 'done';
+};
+
+/** A question the player must answer: the rival's wedge or the donor's demand. */
+export type PendingQuestion = {
+  faultLine: FaultLineId;
+  by: 'rival' | 'donor';
+  askedDay: number;
+  dueDay: number;
+};
+export type PendingCall = { kind: 'donorOffer'; day: number; dueDay: number };
+
+export type DonorState = 'none' | 'offered' | 'accepted' | 'negotiated' | 'refused' | 'angry';
 
 export type LedgerPromise = {
   id: number;
+  faultLine?: FaultLineId;
   day: number;
   text: string;
   issue: IssueId;
@@ -130,6 +190,10 @@ export type Statement = {
   tone: Tone;
   flags: RiskFlag[];
   source: 'ai' | 'fallback';
+  /** The reading the engine used (the AI tape: replaying it reproduces the game). */
+  reading?: Reading;
+  /** AI-written reactions, attached after the engine resolved the statement. Presentation only. */
+  voices?: { pa?: string; quotes?: { who: string; text: string }[] };
 };
 
 /** A change to the world. Every change is logged so the end card can say what decided the result. */
@@ -166,8 +230,22 @@ export type LogKind =
   | 'rivalCounterIssue'
   | 'rivalAttack'
   | 'rivalMock'
+  | 'rivalDoubt'
   | 'rivalRally'
-  | 'rivalLastNight';
+  | 'rivalLastNight'
+  | 'stance'
+  | 'evasion'
+  | 'contradiction'
+  | 'worksStarted'
+  | 'worksDone'
+  | 'solutionDelivered'
+  | 'rivalWedge'
+  | 'silence'
+  | 'neglect'
+  | 'donorAccepted'
+  | 'donorRefused'
+  | 'favourLeaked'
+  | 'donorAngry';
 
 export type LogEntry = {
   id: number;
@@ -180,6 +258,8 @@ export type LogEntry = {
   amount?: number;
   statementId?: number;
   promiseId?: number;
+  faultLine?: FaultLineId;
+  stance?: Stance;
   effect: Effect;
 };
 
@@ -205,7 +285,28 @@ export type PaNote =
   | { day: number; kind: 'rivalMove'; move: RivalMove; tola?: TolaId; issue?: IssueId }
   | { day: number; kind: 'silence' }
   | { day: number; kind: 'lastNight'; tola: TolaId }
-  | { day: number; kind: 'pollingDay' };
+  | { day: number; kind: 'pollingDay' }
+  | { day: number; kind: 'stanceTaken'; faultLine: FaultLineId; stance: Stance }
+  | { day: number; kind: 'notBelieved'; faultLine: FaultLineId }
+  | { day: number; kind: 'contradiction'; faultLine: FaultLineId }
+  | { day: number; kind: 'learned'; tola: TolaId; issues: IssueId[]; faultLines: FaultLineId[] }
+  | { day: number; kind: 'wedge'; faultLine: FaultLineId }
+  | { day: number; kind: 'silent'; faultLine: FaultLineId }
+  | { day: number; kind: 'neglect'; tola: TolaId }
+  | { day: number; kind: 'worksStarted'; tola: TolaId; dueDay: number }
+  | {
+      day: number;
+      kind: 'worksDone';
+      tola: TolaId;
+      issue: IssueId | null;
+      faultLine: FaultLineId | null;
+    }
+  | { day: number; kind: 'worksLate'; tola: TolaId }
+  | { day: number; kind: 'donorCall' }
+  | { day: number; kind: 'donorDemand'; faultLine: FaultLineId }
+  | { day: number; kind: 'donorResult'; result: DonorState }
+  | { day: number; kind: 'favourLeaked' }
+  | { day: number; kind: 'boothsUnmanned'; count: number };
 
 export type StoryKind =
   | 'quiet'
@@ -222,10 +323,25 @@ export type StoryKind =
   | 'rivalRally'
   | 'rivalAttack'
   | 'rivalLastNight'
-  | 'pollingDay';
+  | 'pollingDay'
+  | 'stance'
+  | 'dodge'
+  | 'contradiction'
+  | 'wedge'
+  | 'silent'
+  | 'worksDone'
+  | 'solution'
+  | 'favourLeaked';
 
 /** Tomorrow's newspaper. Structured; the UI writes the headline. */
-export type Story = { day: number; kind: StoryKind; tola?: TolaId; issue?: IssueId };
+export type Story = {
+  day: number;
+  kind: StoryKind;
+  tola?: TolaId;
+  issue?: IssueId;
+  faultLine?: FaultLineId;
+  stance?: Stance;
+};
 
 export type RivalMove =
   | 'doorToDoor'
@@ -235,9 +351,11 @@ export type RivalMove =
   | 'rally'
   | 'lieLow'
   | 'mockPromises'
+  | 'doubtSolution'
   | 'lastNight';
 
 export type RivalState = {
+  archetype: ArchetypeId;
   name: string;
   cash: number;
   heat: number;
@@ -245,6 +363,7 @@ export type RivalState = {
   rallyDone: boolean;
   attackedPromiseIds: number[];
   lastMockDay: number;
+  lastWedgeDay: number;
   /** What the rival has learned about the player: issue focus counts, aggression. */
   memory: { issueFocus: Partial<Record<IssueId, number>>; aggression: number };
 };
@@ -276,7 +395,13 @@ export type EndingTitle =
   | 'barred';
 
 export type EndingTag =
-  'favoursOwed' | 'fir' | 'notice' | 'brokenPromises' | 'openPromises' | 'giftsFilmed';
+  | 'favoursOwed'
+  | 'fir'
+  | 'notice'
+  | 'brokenPromises'
+  | 'openPromises'
+  | 'giftsFilmed'
+  | 'contradictions';
 
 export type Decider = {
   logId: number;
@@ -284,6 +409,8 @@ export type Decider = {
   actor: LogEntry['actor'];
   tola?: TolaId;
   issue?: IssueId;
+  faultLine?: FaultLineId;
+  stance?: Stance;
   day: number;
   impact: number;
 };
@@ -316,6 +443,18 @@ export type GameState = {
   groups: Record<GroupId, GroupState>;
   tolas: Record<TolaId, TolaState>;
   rival: RivalState;
+  faultLines: FaultLineId[]; // the conflicts that exist in this village
+  stances: Partial<Record<FaultLineId, StanceRecord>>; // the player's public positions
+  known: {
+    grievances: Record<TolaId, IssueId[]>;
+    faultLines: FaultLineId[];
+    level: Record<TolaId, number>; // 0..1, how well Pintu knows this tola
+  };
+  pollBias: Record<TolaId, number>; // Pintu's systematic error per tola, shrinks with knowledge
+  projects: Project[];
+  pending: { question: PendingQuestion | null; call: PendingCall | null };
+  donor: { state: DonorState; demandMade: boolean };
+  boothPlan: Record<TolaId, number> | null;
   promises: LedgerPromise[];
   favours: Favour[];
   statements: Statement[];
@@ -334,6 +473,7 @@ export type GameState = {
     pendingFilming: { tola: TolaId; chance: number }[];
     pendingTension: number | null; // day a communal tension event fires
     initialMargin: number; // expected vote share margin at the start (for "giant-killer")
+    contradictions: number;
   };
   counting: CountingState | null;
   result: GameResult | null;
@@ -347,6 +487,10 @@ export type Action =
   | { type: 'publicWorks'; tola: TolaId; issue: IssueId }
   | { type: 'gifts'; tola: TolaId; amount: number }
   | { type: 'recruit'; tola: TolaId; strongman: boolean }
+  | { type: 'answer'; text: string }
+  | { type: 'answerCall'; text: string }
+  | { type: 'deliver'; faultLine: FaultLineId }
+  | { type: 'assignBooths'; plan: Record<TolaId, number> }
   | { type: 'endDay' }
   | { type: 'beginCounting' }
   | { type: 'revealRound' };
@@ -359,4 +503,8 @@ export type ActionError =
   | 'emptyText'
   | 'textTooLong'
   | 'nothingToFix'
-  | 'invalidAmount';
+  | 'invalidAmount'
+  | 'nothingPending'
+  | 'unknownGrievance'
+  | 'alreadyBuilding'
+  | 'tooManyWorkers';

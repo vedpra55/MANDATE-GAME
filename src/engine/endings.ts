@@ -47,6 +47,8 @@ export function topDeciders(s: GameState, n = 3): Decider[] {
       actor: e.actor,
       tola: e.tola,
       issue: e.issue,
+      faultLine: e.faultLine,
+      stance: e.stance,
       day: e.day,
       impact: marginImpact(s, cells, i),
     }))
@@ -67,6 +69,7 @@ export function computeResult(s: GameState): GameResult {
   if (broken > 0) tags.push('brokenPromises');
   if (open > 0) tags.push('openPromises');
   if (s.flags.giftsFilmed > 0) tags.push('giftsFilmed');
+  if (s.flags.contradictions > 0) tags.push('contradictions');
 
   const base = {
     tags,

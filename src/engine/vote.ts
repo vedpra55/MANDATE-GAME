@@ -45,7 +45,15 @@ export function computeCells(s: GameState): Cell[] {
       const pRival = eR / sum;
       const pOther = eO / sum;
       // Workers bring their own supporters out; the old family's machine does the same.
-      const mobP = 0.1 * tola.cadreCoverage * (s.cadre.loyalty / 100);
+      // On polling day what counts is who you actually put at each booth.
+      const plan = s.boothPlan;
+      const tolaTotal = GROUPS.reduce((a, gg) => a + tola.voters[gg], 0);
+      const mobP = plan
+        ? 0.12 *
+          Math.min(1, (plan[t] ?? 0) / Math.max(1, tolaTotal / 120)) *
+          (s.cadre.loyalty / 100)
+        : 0.1 * tola.cadreCoverage * (s.cadre.loyalty / 100);
+      const unmanned = plan && (plan[t] ?? 0) === 0 ? 0.95 : 1;
       const mobR = 0.08 * tola.rivalCoverage;
       cells.push({
         tola: t,
@@ -55,7 +63,7 @@ export function computeCells(s: GameState): Cell[] {
         pPlayer,
         pRival,
         pOther,
-        votesPlayer: voters * Math.min(0.95, turnout + mobP) * pPlayer,
+        votesPlayer: voters * Math.min(0.95, turnout + mobP) * pPlayer * unmanned,
         votesRival: voters * Math.min(0.95, turnout + mobR) * pRival,
         votesOther: voters * turnout * pOther,
       });

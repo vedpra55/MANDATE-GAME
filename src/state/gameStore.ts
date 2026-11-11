@@ -1,9 +1,19 @@
 import { create } from 'zustand';
-import { applyAction, newGame } from '../engine/engine.ts';
-import type { Action, ActionError, Address, GameState, TolaId } from '../engine/types.ts';
+import { aiPromises, aiReadCall, aiReadStatement, aiVoices } from '../ai/client.ts';
+import { voiceFacts } from '../ai/facts.ts';
+import { applyAction, attachVoices, newGame } from '../engine/engine.ts';
+import type {
+  Action,
+  ActionError,
+  Address,
+  Channel,
+  FaultLineId,
+  GameState,
+  TolaId,
+} from '../engine/types.ts';
 
 export type OverlayId =
-  'phone' | 'ledger' | 'newspaper' | 'files' | 'writingPad' | 'diary' | 'cash';
+  'phone' | 'ledger' | 'newspaper' | 'files' | 'writingPad' | 'diary' | 'cash' | 'booths';
 export type SceneId = 'title' | 'desk' | 'map' | 'counting';
 
 const SAVE_KEY = 'mandate.save.v1';
@@ -36,11 +46,17 @@ type GameStore = {
   lastError: ActionError | null;
   phoneSeen: boolean;
   hasSave: boolean;
+  /** True while the AI is reading the player's words. */
+  thinking: boolean;
+  /** Whether the last AI call worked: shown in settings; the game plays either way. */
+  aiStatus: 'unknown' | 'on' | 'offline';
   startNewGame: (name: string, address: Address) => void;
   continueGame: () => void;
   quitToTitle: () => void;
   /** Apply an engine action. Returns true if it was accepted. */
   dispatch: (action: Action) => boolean;
+  /** Say something (statement, visit, answer, declaration): AI reading first, offline fallback. */
+  say: (action: Extract<Action, { text: string }>) => Promise<boolean>;
   open: (overlay: OverlayId) => void;
   close: () => void;
   goTo: (scene: SceneId) => void;
@@ -59,6 +75,8 @@ export const useGame = create<GameStore>((set, get) => ({
   lastError: null,
   phoneSeen: false,
   hasSave: loadSave() !== null,
+  thinking: false,
+  aiStatus: 'unknown',
 
   startNewGame: (name, address) => {
     const game = newGame({ seed: Math.floor(Math.random() * 2 ** 31), name, address });
@@ -97,6 +115,65 @@ export const useGame = create<GameStore>((set, get) => ({
     writeSave(state);
     set({ game: state, lastError: null });
     return true;
+  },
+
+  say: async (action) => {
+    const { game } = get();
+    if (!game || get().thinking) return false;
+    const { state: checked, error } = applyAction(game, action); // validate cheaply first
+    if (error) {
+      set({ lastError: error });
+      return false;
+    }
+    void checked;
+    set({ thinking: true, lastError: null });
+    try {
+      if (action.type === 'answerCall') {
+        const callReading = await aiReadCall(action.text);
+        const r = applyAction(get().game!, action, { callReading: callReading ?? undefined });
+        writeSave(r.state);
+        set({ game: r.state, aiStatus: callReading ? 'on' : 'offline' });
+        return true;
+      }
+      const channel: Channel =
+        action.type === 'declare'
+          ? 'declaration'
+          : action.type === 'visit'
+            ? 'visit'
+            : action.type === 'answer'
+              ? 'answer'
+              : 'pad';
+      const tola: TolaId | null = action.type === 'visit' ? action.tola : null;
+      const forced: FaultLineId | null =
+        action.type === 'answer' ? (game.pending.question?.faultLine ?? null) : null;
+      const ai = await aiReadStatement(game, action.text, channel, tola, forced);
+      const promises =
+        ai && channel !== 'declaration' && ai.reading.containsPromise >= 0.5 && !ai.flagged
+          ? await aiPromises(game, action.text, tola)
+          : undefined;
+      const notesBefore = get().game!.paNotes.length;
+      const r = applyAction(get().game!, action, { reading: ai?.reading, promises });
+      if (r.error) {
+        set({ lastError: r.error });
+        return false;
+      }
+      writeSave(r.state);
+      set({ game: r.state, aiStatus: ai ? 'on' : 'offline' });
+      // Voices arrive a moment later and never block play.
+      const st = r.state.statements.at(-1);
+      if (ai && st && st.text === action.text) {
+        void aiVoices(voiceFacts(r.state, st, ai.flagged, notesBefore)).then((voices) => {
+          const current = get().game;
+          if (!voices || !current) return;
+          const next = attachVoices(current, st.id, { pa: voices.pa, quotes: voices.quotes });
+          writeSave(next);
+          set({ game: next });
+        });
+      }
+      return true;
+    } finally {
+      set({ thinking: false });
+    }
   },
 
   open: (overlay) =>

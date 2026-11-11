@@ -1,26 +1,28 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { pollRanges } from '../../../engine/polls.ts';
 import { bandOfTola } from '../../../engine/pa.ts';
-import { TOLAS } from '../../../engine/types.ts';
+import { pollRanges } from '../../../engine/polls.ts';
+import { TOLAS, type GameState, type Statement } from '../../../engine/types.ts';
+import { FAULT_LINE_DATA } from '../../../engine/world.ts';
 import { useGame } from '../../../state/gameStore.ts';
 import { Stamp } from '../../components/Stamp.tsx';
 import { openingMessages } from '../../content.ts';
-import { noteText, storyHeadline } from '../../paText.ts';
+import { noteText, solutionLabel, stanceLabel, storyHeadline } from '../../paText.ts';
 import { strings as S } from '../../strings.ts';
 
 /** Whichever desk object is picked up, shown large over a dimmed desk. Esc or click outside closes. */
 export function Overlays() {
   const overlay = useGame((s) => s.overlay);
   const close = useGame((s) => s.close);
+  const thinking = useGame((s) => s.thinking);
 
   useEffect(() => {
     if (!overlay) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close();
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !thinking && close();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [overlay, close]);
+  }, [overlay, close, thinking]);
 
-  if (!overlay) return null;
+  if (!overlay || overlay === 'booths') return null;
   const body = {
     phone: <Phone />,
     ledger: <Ledger />,
@@ -32,10 +34,10 @@ export function Overlays() {
   }[overlay];
 
   return (
-    <div className="overlay" onClick={close}>
+    <div className="overlay" onClick={() => !thinking && close()}>
       <div className={`overlay-body overlay-${overlay}`} onClick={(e) => e.stopPropagation()}>
         {body}
-        <Stamp className="overlay-close" onClick={close} aria-label={S.close}>
+        <Stamp className="overlay-close" onClick={close} disabled={thinking} aria-label={S.close}>
           ✕
         </Stamp>
       </div>
@@ -43,10 +45,39 @@ export function Overlays() {
   );
 }
 
+/** Pintu's line and villagers' quotes for a statement: AI voices if they came, else the engine's note. */
+export function Reactions({
+  game,
+  statement,
+  fallbackNote,
+}: {
+  game: GameState;
+  statement: Statement | undefined;
+  fallbackNote: string | null;
+}) {
+  if (!statement) return null;
+  const v = statement.voices;
+  return (
+    <div className="reactions">
+      <p className="hand pintu-line">
+        {S.pa}: {v?.pa ?? fallbackNote}
+      </p>
+      {v?.quotes?.map((q, i) => (
+        <p key={i} className="quote-line">
+          <span className="hand">"{q.text}"</span> <span className="muted">— {q.who}</span>
+        </p>
+      ))}
+      {!v && statement.source === 'ai' && <p className="muted">…</p>}
+      {statement.source === 'fallback' && game.statements.length > 1 && null}
+    </div>
+  );
+}
+
 /** Day 0: Pintu's cold open and the first thing you ever write. Cannot be skipped. */
 export function Declaration() {
   const game = useGame((s) => s.game)!;
-  const dispatch = useGame((s) => s.dispatch);
+  const say = useGame((s) => s.say);
+  const thinking = useGame((s) => s.thinking);
   const error = useGame((s) => s.lastError);
   const [text, setText] = useState('');
   return (
@@ -54,7 +85,7 @@ export function Declaration() {
       <div className="overlay-body">
         <div className="paper writing">
           <p className="hand pintu-line">
-            {noteText({ day: 1, kind: 'welcome' }, game.player.address)}
+            {noteText({ day: 1, kind: 'welcome' }, game.player.address, game.rival.name)}
           </p>
           <p className="hand pintu-line">
             "Log poochhenge: aap kyun khade ho rahe ho? Ek-do line likh do."
@@ -67,10 +98,16 @@ export function Declaration() {
             placeholder={S.writing.placeholder}
             autoFocus
             rows={4}
+            disabled={thinking}
           />
           <div className="writing-foot">
-            <span className="muted">{error ? S.errors[error] : S.writing.declareCost}</span>
-            <Stamp onClick={() => dispatch({ type: 'declare', text })} disabled={!text.trim()}>
+            <span className="muted">
+              {thinking ? S.thinking : error ? S.errors[error] : S.writing.declareCost}
+            </span>
+            <Stamp
+              onClick={() => void say({ type: 'declare', text })}
+              disabled={!text.trim() || thinking}
+            >
               {S.writing.declareStamp}
             </Stamp>
           </div>
@@ -80,7 +117,34 @@ export function Declaration() {
   );
 }
 
+/** The phone: old messages, the donor's offer or demand, and the press asking the rival's question. */
 function Phone() {
+  const game = useGame((s) => s.game)!;
+  const say = useGame((s) => s.say);
+  const thinking = useGame((s) => s.thinking);
+  const error = useGame((s) => s.lastError);
+  const [text, setText] = useState('');
+  const call = game.pending.call;
+  const q = game.pending.question;
+  const answered = game.statements.filter((st) => st.channel === 'answer').at(-1);
+  const donorNote = [...game.paNotes]
+    .reverse()
+    .find((n) => n.kind === 'donorResult' || n.kind === 'favourLeaked');
+
+  let incoming: { from: string; text: string } | null = null;
+  if (call) incoming = { from: S.phone.donorFrom, text: S.phone.donorOffer };
+  else if (q?.by === 'donor') incoming = { from: S.phone.donorFrom, text: S.phone.donorDemand };
+  else if (q)
+    incoming = {
+      from: S.phone.priyaFrom,
+      text: S.phone.wedge(game.rival.name, FAULT_LINE_DATA[q.faultLine].describe.question),
+    };
+
+  const send = async () => {
+    const ok = call ? await say({ type: 'answerCall', text }) : await say({ type: 'answer', text });
+    if (ok) setText('');
+  };
+
   return (
     <div className="phone-device">
       <div className="phone-screen">
@@ -91,6 +155,49 @@ function Phone() {
             <div>{m.text}</div>
           </div>
         ))}
+        {donorNote && !incoming && (
+          <div className="phone-msg">
+            <div className="phone-from">{S.pa}</div>
+            <div>{noteText(donorNote, game.player.address, game.rival.name)}</div>
+          </div>
+        )}
+        {answered && !incoming && (
+          <div className="phone-msg mine">
+            <div>{answered.text}</div>
+            {answered.voices?.pa && (
+              <div className="phone-pa">
+                {S.pa}: {answered.voices.pa}
+              </div>
+            )}
+          </div>
+        )}
+        {incoming && (
+          <>
+            <div className="phone-msg urgent">
+              <div className="phone-from">{incoming.from}</div>
+              <div>{incoming.text}</div>
+              <div className="phone-due">{S.phone.dueToday}</div>
+            </div>
+            <textarea
+              className="phone-input"
+              rows={3}
+              value={text}
+              placeholder={S.phone.placeholder}
+              onChange={(e) => setText(e.target.value)}
+              disabled={thinking}
+            />
+            <div className="phone-actions">
+              <span className="muted">{thinking ? S.thinking : error ? S.errors[error] : ''}</span>
+              <Stamp
+                className="small"
+                onClick={() => void send()}
+                disabled={!text.trim() || thinking}
+              >
+                {S.phone.send}
+              </Stamp>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -111,7 +218,7 @@ function Ledger() {
         empty={L.noPromises}
         rows={game.promises.map((p) => [
           String(p.day),
-          `${p.text} (${p.deadlineDay ? L.due(p.deadlineDay) : L.ifElected})`,
+          `${p.faultLine ? solutionLabel(p.faultLine) : p.text} (${p.deadlineDay ? L.due(p.deadlineDay) : L.ifElected})`,
           L.status[p.status],
         ])}
         statusColumn
@@ -196,12 +303,17 @@ function Newspaper() {
         <div className="masthead">{S.newspaper.masthead}</div>
         <div className="edition">{S.newspaper.edition(day)}</div>
       </header>
-      <h1>{storyHeadline(story)}</h1>
+      <h1>{storyHeadline(story, game.rival.name)}</h1>
       <div className="columns">
         <p>{S.newspaper.countdown(daysToPoll)}</p>
         {last && (
           <p className="quote">
             {S.newspaper.quote} "{last.text.slice(0, 160)}"
+          </p>
+        )}
+        {last?.voices?.quotes?.[0] && (
+          <p>
+            "{last.voices.quotes[0].text}" — {last.voices.quotes[0].who}
           </p>
         )}
       </div>
@@ -211,16 +323,17 @@ function Newspaper() {
 
 function WritingPad() {
   const game = useGame((s) => s.game)!;
-  const dispatch = useGame((s) => s.dispatch);
+  const say = useGame((s) => s.say);
+  const thinking = useGame((s) => s.thinking);
   const error = useGame((s) => s.lastError);
   const [text, setText] = useState('');
   const silence = game.clock.daysToPoll === 1;
   const able = game.phase === 'campaign' && game.clock.slotsLeftToday > 0 && !silence;
-  const lastNote = game.paNotes.at(-1);
   const recent = game.statements
-    .filter((s) => s.channel !== 'declaration')
+    .filter((s) => s.channel === 'pad')
     .slice(-3)
     .reverse();
+  const lastNote = game.paNotes.at(-1);
   return (
     <div className="paper writing">
       <h2>{S.writing.title}</h2>
@@ -229,37 +342,39 @@ function WritingPad() {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={S.writing.placeholder}
-        disabled={!able}
+        disabled={!able || thinking}
         autoFocus
-        rows={6}
+        rows={5}
       />
       <div className="writing-foot">
         <span className="muted">
-          {error
-            ? S.errors[error]
-            : silence
-              ? S.errors.silencePeriod
-              : able
-                ? S.writing.slotCost
-                : S.errors.noSlots}
+          {thinking
+            ? S.thinking
+            : error
+              ? S.errors[error]
+              : silence
+                ? S.errors.silencePeriod
+                : able
+                  ? S.writing.slotCost
+                  : S.errors.noSlots}
         </span>
         <Stamp
-          onClick={() => {
-            if (dispatch({ type: 'statement', text })) setText('');
+          onClick={async () => {
+            if (await say({ type: 'statement', text })) setText('');
           }}
-          disabled={!able || !text.trim()}
+          disabled={!able || !text.trim() || thinking}
         >
           {S.writing.stamp}
         </Stamp>
       </div>
-      {recent.length > 0 && lastNote && (
-        <p className="hand pintu-line">
-          {S.pa}: {noteText(lastNote, game.player.address)}
-        </p>
-      )}
-      {recent.length > 0 && (
+      <Reactions
+        game={game}
+        statement={recent[0]}
+        fallbackNote={lastNote ? noteText(lastNote, game.player.address, game.rival.name) : null}
+      />
+      {recent.length > 1 && (
         <ol className="said hand">
-          {recent.map((s) => (
+          {recent.slice(1).map((s) => (
             <li key={s.id}>
               <span className="muted">
                 {S.calendar.day} {s.day}, {S.slots[s.slot]}:
@@ -276,7 +391,8 @@ function WritingPad() {
 function Diary() {
   const game = useGame((s) => s.game)!;
   const ranges = pollRanges(game);
-  const notes = game.paNotes.slice(-6).reverse();
+  const notes = game.paNotes.slice(-5).reverse();
+  const building = game.projects.filter((p) => p.status === 'building');
   return (
     <div className="diary">
       <h2>{S.diary.title}</h2>
@@ -287,33 +403,69 @@ function Diary() {
               <span className="muted">
                 {S.calendar.day} {n.day}:
               </span>{' '}
-              {noteText(n, game.player.address)}
+              {noteText(n, game.player.address, game.rival.name)}
             </p>
           ))}
         </div>
-        <table className="tally hand">
-          <caption>{S.diary.tally}</caption>
-          <tbody>
-            {TOLAS.map((t) => (
-              <tr key={t}>
-                <th>{S.tolas[t]}</th>
+        <div>
+          <table className="tally hand">
+            <caption>{S.diary.tally}</caption>
+            <tbody>
+              {TOLAS.map((t) => (
+                <tr key={t}>
+                  <th>{S.tolas[t]}</th>
+                  <td>
+                    {ranges[t].low}–{ranges[t].high}%
+                  </td>
+                  <td className={`band band-${bandOfTola(game, t)}`}>
+                    {S.bands[bandOfTola(game, t)].split(' (')[0]}
+                  </td>
+                </tr>
+              ))}
+              <tr className="tally-total">
+                <th>{S.diary.village}</th>
                 <td>
-                  {ranges[t].low}–{ranges[t].high}%
+                  {ranges.village.low}–{ranges.village.high}%
                 </td>
-                <td className={`band band-${bandOfTola(game, t)}`}>
-                  {S.bands[bandOfTola(game, t)].split(' (')[0]}
-                </td>
+                <td />
               </tr>
-            ))}
-            <tr className="tally-total">
-              <th>{S.diary.village}</th>
-              <td>
-                {ranges.village.low}–{ranges.village.high}%
-              </td>
-              <td />
-            </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+          <h3 className="diary-h3">{S.diary.divides}</h3>
+          <ul className="divides hand">
+            {game.known.faultLines.map((f) => {
+              const st = game.stances[f];
+              return (
+                <li key={f}>
+                  <strong>{S.faultLines[f].name}</strong>
+                  <span className="muted"> {S.diary.yourWord} </span>
+                  {st ? (
+                    stanceLabel(f, st.stance)
+                  ) : (
+                    <span className="muted">{S.diary.noPosition}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          {game.known.faultLines.length < game.faultLines.length && (
+            <p className="muted small-note">{S.diary.unknownDivides}</p>
+          )}
+          {building.length > 0 && (
+            <>
+              <h3 className="diary-h3">{S.diary.works}</h3>
+              <ul className="divides hand">
+                {building.map((p) => (
+                  <li key={p.id}>
+                    {S.tolas[p.tola]}:{' '}
+                    {p.faultLine ? S.faultLines[p.faultLine].name : S.issues[p.issue!]}{' '}
+                    <span className="muted">({S.diary.due(p.dueDay)})</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

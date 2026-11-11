@@ -9,7 +9,7 @@ const TEAR_MS = 650;
 export function Calendar({ x, y, width }: { x: number; y: number; width: number }) {
   const game = useGame((s) => s.game)!;
   const dispatch = useGame((s) => s.dispatch);
-  const goTo = useGame((s) => s.goTo);
+  const open = useGame((s) => s.open);
   const [tearing, setTearing] = useState(false);
   const { clock, phase } = game;
   const pollDay = phase === 'polling';
@@ -21,11 +21,8 @@ export function Calendar({ x, y, width }: { x: number; y: number; width: number 
     if (tearing || !canTear) return;
     setTearing(true);
     window.setTimeout(() => {
-      if (pollDay) {
-        if (dispatch({ type: 'beginCounting' })) goTo('counting');
-      } else {
-        dispatch({ type: 'endDay' });
-      }
+      if (pollDay) open('booths');
+      else dispatch({ type: 'endDay' });
       setTearing(false);
     }, TEAR_MS);
   };

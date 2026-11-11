@@ -1174,3 +1174,145 @@ button {
   font-size: 30px;
   background: rgba(232, 169, 91, 0.14);
 }
+
+/* ---------- challenge layer + AI ---------- */
+.reactions {
+  margin-top: 10px;
+}
+
+.quote-line {
+  margin: 4px 0;
+  font-size: 22px;
+}
+
+.quote-line .hand {
+  font-size: 24px;
+  color: var(--umber);
+}
+
+.phone-msg.urgent {
+  border-left: 6px solid var(--vermilion);
+}
+
+.phone-msg.mine {
+  margin-left: auto;
+  background: #dcf1c6;
+  border-radius: 16px 4px 16px 16px;
+}
+
+.phone-pa {
+  margin-top: 6px;
+  font-size: 17px;
+  color: var(--indigo);
+}
+
+.phone-due {
+  margin-top: 6px;
+  font-size: 16px;
+  color: var(--vermilion);
+  font-weight: 600;
+}
+
+.phone-input {
+  width: 100%;
+  font: 21px var(--font-body);
+  border: 2px solid var(--leaf);
+  border-radius: 12px;
+  padding: 8px 10px;
+  resize: none;
+  outline: none;
+}
+
+.phone-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.diary-h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 26px;
+  color: var(--umber);
+  margin: 18px 0 6px;
+}
+
+.divides {
+  margin: 0;
+  padding-left: 1.1em;
+  font-size: 22px;
+  color: var(--indigo);
+}
+
+.small-note {
+  font-size: 18px;
+}
+
+.booth-plan,
+.settings-panel {
+  width: 900px;
+}
+
+.settings-panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 960px;
+  overflow-y: auto;
+}
+
+.booth-table,
+.settings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 26px;
+}
+
+.booth-table th,
+.settings-table th {
+  text-align: left;
+  font-weight: 400;
+  padding: 6px 0;
+  color: var(--umber);
+}
+
+.settings-table th {
+  font: 20px var(--font-body);
+}
+
+.booth-table td,
+.settings-table td {
+  padding: 6px 10px;
+  border-bottom: 2px dashed rgba(86, 62, 47, 0.2);
+}
+
+.settings-table select {
+  font: 18px var(--font-body);
+  padding: 4px 8px;
+}
+
+.chip {
+  width: 44px;
+  height: 44px;
+  border: 3px solid var(--umber);
+  border-radius: 50%;
+  background: var(--paper-light);
+  font: 700 26px var(--font-body);
+  cursor: pointer;
+}
+
+.chip:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.booth-count {
+  display: inline-block;
+  width: 60px;
+  text-align: center;
+  font-size: 32px;
+  color: var(--indigo);
+}

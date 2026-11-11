@@ -14,6 +14,11 @@ cp .env.example .env   # then add your OPENAI_API_KEY
 npm run dev            # Vite on :5173 + AI proxy on :8787
 ```
 
+With `OPENAI_API_KEY` set, the AI reads every statement (Decisions API) and writes Pintu's line and
+villagers' quotes (Responses API). Without a key, or if a call fails, the game plays offline with
+its keyword reader. Choose the model for each AI task under **Settings** on the title screen
+(defaults: `gpt-6-luna`, `omni-moderation-latest`).
+
 ## Scripts
 
 | Script              | What it does                                                                                                                             |

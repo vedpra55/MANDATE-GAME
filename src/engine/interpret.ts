@@ -5,6 +5,7 @@
  * are "indifferent" and nothing is flagged.
  */
 import { hasAny, hasWord, ISSUE_WORDS, MARKERS, TOLA_WORDS } from './lexicon.ts';
+import { detectChangeOfMind, detectListening, detectStances } from './faultlines.ts';
 import {
   GROUPS,
   ISSUES,
@@ -116,7 +117,8 @@ export function interpretFallback(state: GameState, text: string): Reading {
   let tone: Tone;
   if (divisive || exclusion) tone = 'divisive';
   else if (hasAny(t, MARKERS.aggressive)) tone = 'aggressive';
-  else if (hasAny(t, MARKERS.humble)) tone = 'humble';
+  else if (hasAny(t, MARKERS.humble) || detectListening(t) >= 0.5)
+    tone = 'humble'; // asking people is humble, not evasive
   else if (hasAny(t, MARKERS.emotional) || (text.match(/!/g)?.length ?? 0) >= 2) tone = 'emotional';
   else if (anyIssue || specificity >= 2) tone = 'policy';
   else tone = 'evasive';
@@ -155,6 +157,9 @@ export function interpretFallback(state: GameState, text: string): Reading {
     coherent,
     language: detectLanguage(text),
     intentAction,
+    faultLines: detectStances(state, t, specificity),
+    listens: detectListening(t),
+    changesMind: detectChangeOfMind(t),
     source: 'fallback',
   };
 }

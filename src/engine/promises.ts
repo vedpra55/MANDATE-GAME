@@ -13,7 +13,7 @@ import {
   type Reading,
   type TolaId,
 } from './types.ts';
-import region from '../data/regions/bihar-village.json';
+import region from '../data/regions/bihar-village.json' with { type: 'json' };
 
 const WORKS = region.works as Partial<Record<IssueId, number>>;
 const UNDOABLE_COST = 20000;
@@ -109,4 +109,39 @@ export function promisesDue(state: GameState): LedgerPromise[] {
   return state.promises.filter(
     (p) => p.status === 'open' && p.deadlineDay !== null && p.deadlineDay <= state.clock.day,
   );
+}
+
+/**
+ * Turn promises extracted by the AI (structured output) into ledger drafts with the engine's own
+ * costs, deadlines and beneficiaries. The AI says what was promised; the engine decides the price.
+ */
+export function draftsFromExtraction(
+  state: GameState,
+  items: {
+    text: string;
+    issue: IssueId;
+    tola: TolaId | 'none';
+    when: 'during_campaign' | 'if_elected';
+    deadline_days: number;
+  }[],
+  contextTola: TolaId | null,
+): PromiseDraft[] {
+  return items.slice(0, 3).map((it) => {
+    const cost = worksCost(it.issue);
+    const left = state.clock.daysToPoll;
+    const duringCampaign =
+      it.when === 'during_campaign' && cost !== null && it.deadline_days < left;
+    const defaultDays = cost === null ? 14 : cost <= 3000 ? 3 : cost <= 8000 ? 7 : 14;
+    const days = it.deadline_days > 0 ? it.deadline_days : defaultDays;
+    return {
+      day: state.clock.day,
+      text: it.text.slice(0, 140),
+      issue: it.issue,
+      tola: it.tola === 'none' ? contextTola : it.tola,
+      when: duringCampaign ? 'during_campaign' : 'if_elected',
+      deadlineDay: duringCampaign ? state.clock.day + Math.min(days, left - 1) : null,
+      cost: cost ?? UNDOABLE_COST,
+      beneficiaries: beneficiariesOf(state, it.issue),
+    };
+  });
 }

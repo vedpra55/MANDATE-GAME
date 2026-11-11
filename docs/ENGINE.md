@@ -710,3 +710,26 @@ Result over 100 seeds per bot:
 The honest bot plays perfectly, so it sits a little above the 45–60% target; human players are less
 efficient. Recheck these numbers when the Decisions API replaces the fallback (E4), since AI readings
 will be sharper than keyword matching.
+
+---
+
+## 17. AI wiring as built (2026-11-11)
+
+- **Server routes:**
+  - `POST /api/ai/read`: Decide on statements, about 46 questions, with moderation in parallel.
+  - `POST /api/ai/read-call`: Decide on the donor reply.
+  - `POST /api/ai/promises`: Responses API with Structured Outputs.
+  - `POST /api/ai/voices`: Pintu's line and two villager quotes, Structured Outputs.
+  - `GET` / `PUT /api/settings`: model per task; write access only in development.
+- **Shared contract:** `src/ai/contract.ts` holds the question set, the answer-to-Reading mapping
+  (each missing or refused answer falls back to the keyword reading, field by field) and the JSON
+  schemas. The server builds every prompt; the client can only send the kind and the text.
+- **Client:** `src/ai/client.ts` returns null on any failure, and the store falls back to offline.
+  `say()` in the store reads the text → extracts promises (only when a promise is likely) →
+  applies the action in the engine → attaches voices asynchronously.
+- **Implemented tasks:** `decide`, `moderate`, `extract_promises`, `voice_reactions`. Defaults:
+  `gpt-6-luna` and `omni-moderation-latest`. The press, key-character, region-director and
+  end-card tasks arrive with E5.
+- **Language** is decided by script in code (Devanagari means Hindi); the AI only chooses
+  Hinglish or English for Latin text.
+- **The AI tape:** each statement stores the AI reading it was resolved with (`statement.reading`).
