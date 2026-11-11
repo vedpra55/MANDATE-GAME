@@ -35,6 +35,12 @@ export const en = {
     favours: 'Favours owed',
     noPromises: 'No promises yet. Every one you make will be written here.',
     noFavours: 'You owe nobody. Yet.',
+    colDay: 'Day',
+    colPromise: 'Promise',
+    colStatus: 'Status',
+    colOwedTo: 'Owed to',
+    colAsk: 'Their price',
+    status: { open: 'open', kept: 'kept', broken: 'broken' },
   },
   newspaper: {
     masthead: 'Gram Samachar',

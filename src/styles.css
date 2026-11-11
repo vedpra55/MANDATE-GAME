@@ -326,8 +326,7 @@ button {
 }
 
 .paper h2,
-.diary h2,
-.ledger-page h2 {
+.diary h2 {
   margin: 0 0 16px;
   font-family: var(--font-display);
   font-weight: 400;
@@ -381,37 +380,119 @@ button {
   color: var(--umber);
 }
 
-/* ledger */
-.ledger-open {
-  position: relative;
-  width: 1300px;
-}
-
-.ledger-open img {
-  display: block;
-  width: 100%;
-}
-
-.ledger-page .hand {
-  color: var(--umber);
-  font-weight: 700;
-  background: rgba(248, 232, 204, 0.75);
+/* ledger: a flat bahi-khata spread drawn in code so text and rules always align */
+.ledger-spread {
+  --line: 44px;
+  --rule: rgba(50, 69, 100, 0.28);
+  --red-rule: rgba(211, 45, 36, 0.7);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 1440px;
+  padding: 26px;
+  background: var(--vermilion) url('./assets/textures/texture-red-cloth.webp') center / 400px;
+  border: 4px solid var(--umber);
+  border-radius: 12px;
+  box-shadow: 16px 18px 0 rgba(50, 69, 100, 0.45);
+  transform: rotate(-0.4deg);
 }
 
 .ledger-page {
-  position: absolute;
-  top: 12%;
-  bottom: 14%;
-  width: 36%;
-  overflow: auto;
+  position: relative;
+  padding: 26px 34px 30px;
+  background: var(--paper-light) url('./assets/textures/texture-paper.webp') center / 512px;
+  border: 2px solid var(--umber);
 }
 
-.ledger-left {
-  left: 10%;
+.ledger-page:first-child {
+  border-right: 0;
+  box-shadow: inset -28px 0 24px -20px rgba(86, 62, 47, 0.45);
 }
 
-.ledger-right {
-  right: 9%;
+.ledger-page:last-child {
+  border-left: 0;
+  box-shadow: inset 28px 0 24px -20px rgba(86, 62, 47, 0.45);
+}
+
+.ledger-page h2 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1.1;
+  color: var(--umber);
+}
+
+.ledger-promises {
+  --col1: 64px;
+  --col3: 130px;
+}
+
+.ledger-favours {
+  --col1: 64px;
+  --col3: 220px;
+}
+
+.ledger-row {
+  display: grid;
+  grid-template-columns: var(--col1) 1fr var(--col3);
+}
+
+.ledger-row > span {
+  padding: 0 10px;
+  font-family: var(--font-hand);
+  font-size: 24px;
+  line-height: var(--line);
+  color: var(--indigo);
+  overflow-wrap: anywhere;
+}
+
+.ledger-head {
+  height: var(--line);
+  border-bottom: 5px double var(--red-rule);
+}
+
+.ledger-head > span {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--vermilion);
+}
+
+.ledger-head > span + span {
+  border-left: 2px solid var(--red-rule);
+}
+
+/* 13 ruled lines; the rules and the two column lines scroll with the writing */
+.ledger-body {
+  height: calc(var(--line) * 13);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  background:
+    linear-gradient(var(--red-rule), var(--red-rule)) var(--col1) 0 / 2px 100% no-repeat,
+    linear-gradient(var(--red-rule), var(--red-rule)) calc(100% - var(--col3)) 0 / 2px 100%
+      no-repeat,
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--line) - 2px),
+      var(--rule) calc(var(--line) - 2px) var(--line)
+    );
+  background-attachment: local;
+}
+
+.ledger-empty {
+  color: var(--earth) !important;
+}
+
+.status-kept {
+  color: var(--leaf) !important;
+}
+
+.status-broken {
+  color: var(--vermilion) !important;
+  text-decoration: line-through;
 }
 
 /* newspaper */

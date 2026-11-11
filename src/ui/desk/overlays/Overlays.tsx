@@ -1,6 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { headlineFor, useGame } from '../../../state/gameStore.ts';
-import { art } from '../../assets.ts';
 import { canAct } from '../../../engine/clock.ts';
 import { Stamp } from '../../components/Stamp.tsx';
 import { grievanceFiles } from '../../content.ts';
@@ -59,23 +58,85 @@ function Phone() {
   );
 }
 
+/**
+ * The open bahi-khata, built in code (not an image) so every line of handwriting sits exactly
+ * on a ruled line and inside its column. Cover and paper use the generated textures.
+ */
 function Ledger() {
-  const img = art('prop-ledger-open');
+  const promises = useGame((s) => s.promises);
+  const favours = useGame((s) => s.favours);
+  const L = strings.ledger;
   return (
-    <div className="ledger-open">
-      <img src={img.src} srcSet={img.srcSet} alt="" draggable={false} />
-      <Page side="left" title={strings.ledger.promises} empty={strings.ledger.noPromises} />
-      <Page side="right" title={strings.ledger.favours} empty={strings.ledger.noFavours} />
+    <div className="ledger-spread">
+      <LedgerPage
+        title={L.promises}
+        columns={[L.colDay, L.colPromise, L.colStatus]}
+        empty={L.noPromises}
+        rows={promises.map((p) => [String(p.day), p.text, L.status[p.status]])}
+        statusColumn
+        kind="promises"
+      />
+      <LedgerPage
+        title={L.favours}
+        columns={[L.colDay, L.colOwedTo, L.colAsk]}
+        empty={L.noFavours}
+        rows={favours.map((f) => [String(f.day), f.owedTo, f.ask])}
+        kind="favours"
+      />
     </div>
   );
 }
 
-function Page({ side, title, empty }: { side: 'left' | 'right'; title: string; empty: string }) {
+function LedgerPage({
+  title,
+  columns,
+  rows,
+  empty,
+  kind,
+  statusColumn = false,
+}: {
+  title: string;
+  columns: [string, string, string];
+  rows: string[][];
+  empty: string;
+  kind: 'promises' | 'favours';
+  statusColumn?: boolean;
+}) {
   return (
-    <div className={`ledger-page ledger-${side}`}>
+    <section className={`ledger-page ledger-${kind}`}>
       <h2>{title}</h2>
-      <p className="hand muted">{empty}</p>
-    </div>
+      <div role="table" aria-label={title}>
+        <div className="ledger-row ledger-head" role="row">
+          {columns.map((c) => (
+            <span key={c} role="columnheader">
+              {c}
+            </span>
+          ))}
+        </div>
+        {/* Fixed-height body: rules and column lines are drawn on it, so empty lines look ruled too. */}
+        <div className="ledger-body">
+          {rows.length === 0 && (
+            <div className="ledger-row" role="row">
+              <span />
+              <span className="ledger-empty">{empty}</span>
+              <span />
+            </div>
+          )}
+          {rows.map((r, i) => (
+            <div className="ledger-row" role="row" key={i}>
+              {r.map((cell, j) => (
+                <span
+                  key={j}
+                  className={statusColumn && j === 2 ? `status status-${cell}` : undefined}
+                >
+                  {cell}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 

@@ -8,6 +8,13 @@ export type SceneId = 'desk' | 'map';
 
 export type PhoneMessage = { id: number; from: string; text: string; day: number };
 export type Statement = { id: number; day: number; slot: number; text: string };
+export type LedgerPromise = {
+  id: number;
+  day: number;
+  text: string;
+  status: 'open' | 'kept' | 'broken';
+};
+export type LedgerFavour = { id: number; day: number; owedTo: string; ask: string };
 
 type GameStore = {
   clock: Clock;
@@ -17,6 +24,8 @@ type GameStore = {
   messages: PhoneMessage[];
   unread: number;
   statements: Statement[];
+  promises: LedgerPromise[];
+  favours: LedgerFavour[];
   paNotes: string[];
   open: (overlay: OverlayId) => void;
   close: () => void;
@@ -39,6 +48,8 @@ export const useGame = create<GameStore>((set, get) => ({
   messages: openingMessages.map((m) => ({ ...m, id: nextId++, day: 1 })),
   unread: openingMessages.length,
   statements: [],
+  promises: [],
+  favours: [],
   paNotes: [paNotesByDay[0]!],
 
   open: (overlay) => set(overlay === 'phone' ? { overlay, unread: 0 } : { overlay }),
@@ -68,4 +79,9 @@ export const useGame = create<GameStore>((set, get) => ({
 
 export function headlineFor(day: number): string {
   return headlines[(day - 1) % headlines.length]!;
+}
+
+// Dev-only handle for inspecting and seeding state from the browser console or test scripts.
+if (import.meta.env.DEV) {
+  (window as unknown as { __game: typeof useGame }).__game = useGame;
 }
