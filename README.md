@@ -16,14 +16,15 @@ npm run dev            # Vite on :5173 + AI proxy on :8787
 
 ## Scripts
 
-| Script              | What it does                                  |
-| ------------------- | --------------------------------------------- |
-| `npm run dev`       | Frontend (Vite) and AI proxy server together  |
-| `npm test`          | Vitest: engine and server tests               |
-| `npm run lint`      | ESLint (also enforces the engine purity rule) |
-| `npm run typecheck` | TypeScript project build check                |
-| `npm run build`     | Typecheck and production build to `dist/`     |
-| `npm run format`    | Prettier                                      |
+| Script              | What it does                                                                                                                             |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`       | Frontend (Vite) and AI proxy server together                                                                                             |
+| `npm test`          | Vitest: engine and server tests                                                                                                          |
+| `npm run lint`      | ESLint (also enforces the engine purity rule)                                                                                            |
+| `npm run typecheck` | TypeScript project build check                                                                                                           |
+| `npm run build`     | Typecheck and production build to `dist/`                                                                                                |
+| `npm run format`    | Prettier                                                                                                                                 |
+| `npm run assets:*`  | Image pipeline: `generate` (dry run by default), `review`, `slice`, `optimize`. See [`tools/assets/README.md`](./tools/assets/README.md) |
 
 ## Layout
 

@@ -1,0 +1,5 @@
+# PLACEHOLDER: the real style block is written in Phase 0 (step 3), after the owner picks
+# style direction A, B or C. Every asset will then share exactly this wording.
+#
+# Lines starting with "#" are comments and are never sent to the model.
+# generate.mjs refuses to spend credits while this file contains the word PLACEHOLDER.

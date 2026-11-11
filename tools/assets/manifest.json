@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "defaults": {
+    "model": "gpt-image-2.6-flare",
+    "quality": "medium",
+    "variants": 4,
+    "styleBlockFile": "style-block.txt",
+    "references": ["references"]
+  },
+  "assets": [
+    {
+      "id": "scene.village-desk",
+      "category": "scenes",
+      "kind": "image",
+      "description": "Top-down view of a village sarpanch candidate's workspace in a fictional north Indian village: a woven charpai under the shade of a neem tree, used as a desk. On it: a red cloth bahi-khata ledger, a folded newspaper (blank, no readable text), a small stack of tied paper files, a glass of chai, an old landline phone, a dented tin cash box and a small spiral notebook. A tear-off wall calendar hangs on a nail in the neem trunk at the top of the frame. A bicycle leans at the edge. Dappled leaf shadows. Leave clear open space in the centre of the charpai for a sheet of paper.",
+      "size": "2048x1152",
+      "background": "opaque",
+      "displayWidth": 1920,
+      "status": "todo"
+    },
+    {
+      "id": "prop.phone",
+      "category": "props",
+      "kind": "image",
+      "description": "An old cream-coloured rotary landline telephone with a coiled cord, slightly worn and scuffed, seen from directly above to match the desk scene.",
+      "size": "1024x1024",
+      "background": "transparent",
+      "displayWidth": 220,
+      "model": "gpt-image-2.6-sunburst",
+      "references": ["references", "@picked:scene.village-desk"],
+      "status": "todo"
+    },
+    {
+      "id": "character.pa",
+      "category": "characters",
+      "kind": "character-sheet",
+      "description": "The player's personal assistant: a fictional young man in his mid-twenties from a small north Indian village. Sharp, loyal and a little anxious. Neatly combed hair, thin moustache, simple checked half-sleeve shirt with a pen clipped in the pocket.",
+      "size": "2048x2048",
+      "background": "opaque",
+      "displayWidth": 360,
+      "status": "todo"
+    },
+    {
+      "id": "crowd.villager-back-01",
+      "category": "crowd",
+      "kind": "image",
+      "description": "One villager standing in a rally crowd, seen from behind and slightly above, head and shoulders and upper body. Simple flat shapes suitable for a crowd silhouette; ordinary everyday clothes.",
+      "size": "1024x1536",
+      "background": "transparent",
+      "displayWidth": 160,
+      "sprite": "crowd",
+      "status": "todo"
+    }
+  ]
+}

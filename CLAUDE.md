@@ -397,3 +397,5 @@ Work in small, reviewable steps. After each step, summarise what changed and wha
 | 2026-11-11 | AI proxy starts as a small Node + Express server (`/server`, run with `tsx`); Vite proxies `/api` to it in dev. Kept portable to serverless later. |
 | 2026-11-11 | Scaffold: React 19 + Vite 8 + TypeScript (strict, `noUncheckedIndexedAccess`), ESLint flat config with an engine-purity rule, Prettier, Vitest. |
 | 2026-11-11 | Player-facing strings live in `src/ui/strings.ts` (i18n-ready from day one). |
+| 2026-11-11 | Image model IDs verified against the API: `gpt-image-2.6-flare` (exploration, default) and `gpt-image-2.6-sunburst` (prop matching). |
+| 2026-11-11 | Asset pipeline in `tools/assets/` (see its README). `generate.mjs` is dry-run by default; spending needs `--yes`, a non-placeholder style block, and stays under `--max-images`. Review is a small local server (`review.mjs`) serving `review.html`. |
