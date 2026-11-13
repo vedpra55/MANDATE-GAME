@@ -255,6 +255,10 @@ export const en = {
   dusk: {
     text: 'Shaam ho gayi. The day is done…',
     wait: 'Wait',
+    endNow: 'End the day',
+    done: 'Shaam ho gayi. Nothing left to do today.',
+    waiting: 'Shaam ho gayi, but someone is waiting for your answer on the phone.',
+    answer: 'Open the phone',
     auto: 'End the day by itself when I have nothing left to do',
   },
   files: { title: 'Janta darbar', hint: 'Hearings at the chaupal arrive in a later build.' },

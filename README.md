@@ -13,8 +13,15 @@ Requires Node 22+.
 ```bash
 npm install
 cp .env.example .env   # then add your OPENAI_API_KEY
-npm run dev            # Vite on :5173 + AI proxy on :8787
+npm run play           # to PLAY: built game on :4173 + AI proxy on :8787
+npm run dev            # to DEVELOP: Vite on :5173 (hot reload) + AI proxy on :8787
 ```
+
+**Play with `npm run play`, not `npm run dev`.** The dev server reloads the page and restarts the AI
+proxy whenever a source file changes (an editor save, a `git pull`), which drops what you were
+doing. `play` builds once and serves the finished game: no watching, no reloads, faster loading.
+Your game is autosaved in the browser, so _Continue_ on the title screen picks it up again; the
+saves of `play` (:4173) and `dev` (:5173) are separate because they are different addresses.
 
 With `OPENAI_API_KEY` set, the AI reads every statement (Decisions API) and writes Pintu's line and
 villagers' quotes (Responses API). Without a key, or if a call fails, the game plays offline with
@@ -25,7 +32,8 @@ its keyword reader. Choose the model for each AI task under **Settings** on the 
 
 | Script              | What it does                                                                                                                             |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`       | Frontend (Vite) and AI proxy server together                                                                                             |
+| `npm run play`      | Build, then serve the finished game (:4173) and the AI proxy, with no file watching: use this to play                                    |
+| `npm run dev`       | Frontend (Vite, hot reload) and AI proxy server (restarts on change) together: use this to develop                                       |
 | `npm test`          | Vitest: engine and server tests                                                                                                          |
 | `npm run lint`      | ESLint (also enforces the engine purity rule)                                                                                            |
 | `npm run typecheck` | TypeScript project build check                                                                                                           |

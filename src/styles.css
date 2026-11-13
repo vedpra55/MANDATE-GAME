@@ -1597,3 +1597,8 @@ button {
   justify-content: center;
   margin-top: 14px;
 }
+
+/* On the map the tola card fills the right side: dusk sits over the village instead. */
+.dusk.dusk-map {
+  left: 36%;
+}

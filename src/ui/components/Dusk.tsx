@@ -4,6 +4,8 @@ import { strings as S } from '../strings.ts';
 import { Stamp } from './Stamp.tsx';
 
 const DELAY_MS = 3000;
+/** With a tola card open, people's reactions are still on screen: leave time to read them. */
+const READING_DELAY_MS = 7000;
 
 /**
  * When the day's slots are used and nothing is waiting, dusk falls and the day ends by itself
@@ -18,37 +20,66 @@ export function Dusk() {
   const auto = useGame((s) => s.autoEndDay);
   const dispatch = useGame((s) => s.dispatch);
   const goTo = useGame((s) => s.goTo);
+  const open = useGame((s) => s.open);
   const [waitedOn, setWaitedOn] = useState<number | null>(null);
 
-  const ready =
-    auto &&
+  // Shown whenever the day's slots are used up, so the game never just goes quiet.
+  const evening =
     !!game &&
     game.phase === 'campaign' &&
     game.clock.slotsLeftToday === 0 &&
-    !game.pending.question &&
-    !game.pending.call &&
     !thinking &&
     overlay === null &&
-    (scene === 'desk' || (scene === 'map' && selectedTola === null)) &&
-    waitedOn !== game.clock.day;
+    (scene === 'desk' || scene === 'map');
+  const waiting = !!game && (!!game.pending.question || !!game.pending.call);
+  const ready = evening && auto && !waiting && waitedOn !== game!.clock.day;
+
+  const delay = scene === 'map' && selectedTola !== null ? READING_DELAY_MS : DELAY_MS;
 
   useEffect(() => {
     if (!ready) return;
     const t = window.setTimeout(() => {
-      if (dispatch({ type: 'endDay' })) {
-        const g = useGame.getState();
-        if (g.overlay !== 'phone') goTo('desk');
-      }
-    }, DELAY_MS);
+      if (dispatch({ type: 'endDay' }) && useGame.getState().overlay !== 'phone') goTo('desk');
+    }, delay);
     return () => window.clearTimeout(t);
-  }, [ready, dispatch, goTo]);
+  }, [ready, delay, dispatch, goTo]);
 
-  if (!ready) return null;
+  const endNow = () => {
+    if (dispatch({ type: 'endDay' }) && useGame.getState().overlay !== 'phone') goTo('desk');
+  };
+  if (!evening) return null;
+  if (waiting)
+    return (
+      <div className={`dusk${scene === 'map' ? ' dusk-map' : ''}`}>
+        <span className="hand">{S.dusk.waiting}</span>
+        <Stamp
+          className="small"
+          onClick={() => {
+            goTo('desk');
+            open('phone');
+          }}
+        >
+          {S.dusk.answer}
+        </Stamp>
+      </div>
+    );
+  if (!ready)
+    return (
+      <div className={`dusk${scene === 'map' ? ' dusk-map' : ''}`}>
+        <span className="hand">{S.dusk.done}</span>
+        <Stamp className="small" onClick={endNow}>
+          {S.dusk.endNow}
+        </Stamp>
+      </div>
+    );
   return (
-    <div className="dusk">
+    <div className={`dusk${scene === 'map' ? ' dusk-map' : ''}`}>
       <span className="hand">{S.dusk.text}</span>
       <Stamp className="small" onClick={() => setWaitedOn(game!.clock.day)}>
         {S.dusk.wait}
+      </Stamp>
+      <Stamp className="small" onClick={endNow}>
+        {S.dusk.endNow}
       </Stamp>
     </div>
   );

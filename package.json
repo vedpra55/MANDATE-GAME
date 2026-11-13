@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "concurrently -n web,server -c blue,magenta \"npm:dev:web\" \"npm:dev:server\"",
+    "play": "npm run build && concurrently -k -n web,server -c blue,magenta \"vite preview --port 4173 --strictPort\" \"npm:start:server\"",
     "dev:web": "vite",
     "dev:server": "tsx watch server/index.ts",
     "build": "tsc -b && vite build",
